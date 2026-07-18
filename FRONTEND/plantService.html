@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plant Services</title>
+    <link rel="stylesheet" href="plantService.css">
+    <link rel="stylesheet" href="toast.css">
+    <link rel="stylesheet" href="confirm.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="icon" type="image/x-icon" href="favicon.jpg">
+</head>
+<body>
+
+    <!-- =========================
+        NAVBAR
+    ========================= -->
+    <div class="navbar">
+        <div class="logo">
+            <img src="JSL Logo.jpg" height="35" alt="JSL Logo">
+        </div>
+        <div class="user-info">
+            Welcome, User
+            <a href="#" class="logout-btn" onclick="logout(event)">Logout</a>
+        </div>
+    </div>
+
+    <!-- =========================
+        MAIN LAYOUT
+    ========================= -->
+    <div class="dashboard-layout">
+
+        <!-- =========================
+            SIDEBAR
+        ========================= -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <button id="toggleSidebarBtn" class="toggle-sidebar">☰</button>
+            </div>
+
+            <button id="dashboardBtn" class="sidebar-btn" onclick="window.location.href='dashboard.html'">📦 Dashboard</button>
+            <button id="networkBtn" class="sidebar-btn" onclick="window.location.href='network.html'">🌐 Network and Bandwidth Management</button>
+            <button id="amcBtn" class="sidebar-btn" onclick="window.location.href='amc.html'">🛠 Annual Maintenance Contract</button>
+            <button id="contractBtn" class="sidebar-btn" onclick="window.location.href='contract.html'">📋 Contract Resource and Support PRs</button>
+
+            <button id="inventoryToggleBtn" class="sidebar-btn">📦 IT Inventory ▼</button>
+            <div id="inventorySubMenu" class="inventory-submenu">
+                <button id="inventoryNetworkBtn" class="sidebar-btn inventory-sub-btn" onclick="window.location.href='inventoryNetwork.html'">Network Accel IT</button>
+                <button id="inventoryHardwareBtn" class="sidebar-btn inventory-sub-btn" onclick="window.location.href='inventoryHardware.html'">Hardware CMS</button>
+                <button id="inventoryDepartmentBtn" class="sidebar-btn inventory-sub-btn" onclick="window.location.href='inventoryDepartment.html'">IT Department Indent</button>
+            </div>
+
+            <button id="plantToggleBtn" class="sidebar-btn active">📦 Plants ▲</button>
+            <div id="plantSubMenu" class="plant-submenu show">
+                <button id="plantMaterialBtn" class="sidebar-btn plant-sub-btn" onclick="window.location.href='plantMaterial.html'">Plant Material</button>
+                <button id="plantServiceBtn" class="sidebar-btn plant-sub-btn active">Plant Service</button>
+            </div>
+
+            <button id="wbsProjectBtn" class="sidebar-btn" onclick="window.location.href='wbsProject.html'">📦 WBS (Project)</button>
+
+            <button class="sidebar-btn" onclick="window.location.href='profile.html'">👤 View Profile</button>
+        </div>
+
+        <!-- =========================
+            CONTENT AREA
+        ========================= -->
+        <div class="content-area">
+
+            <!-- =========================
+                MODULE SECTION
+            ========================= -->
+                <div class="dashboard-heading">
+                    <h1>PLANT (SERVICES)</h1>
+                </div>
+
+                <div class="stats-container">
+                    <div class="stat-card">
+                        <h3>Total Records</h3>
+                        <p id="totalRecords">0</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Total PR Amount</h3>
+                        <p id="totalPrAmount">₹0</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Total PO Amount</h3>
+                        <p id="totalPoAmount">₹0</p>
+                    </div>
+                </div>
+                
+                <div class="top-actions">
+                    <button class="add-btn" onclick="openAddModal()">+ Add Record</button>
+                    <button class="export-btn" onclick="exportExcel()">Export Excel</button>
+                    
+                    <button class="import-btn" onclick="document.getElementById('importExcelFile').click()">Import Excel</button>
+                    <input type="file" id="importExcelFile" accept=".xlsx,.xls" style="display:none" onchange="importExcel(this)">
+
+                    <input type="text" id="searchBox" class="search-box" placeholder="Search by PR Number or PO Number..." oninput="renderTable()">
+                </div>
+
+                <div id="tableContainer" class="table-container">
+                    <p class="no-data">No Records Found</p>
+                </div>
+        </div>
+    </div>
+
+    <!-- =========================
+        RECORD MODAL
+    ========================= -->
+    <div id="recordModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <h2>Add New Record</h2>
+            <form id="recordForm" onsubmit="addRecord(event)">
+                <div class="po-box">
+                    <label>PR Requirement Date</label>
+                    <input type="date" id="prReqDate" required>
+                </div>
+            
+                <div class="po-box">
+                    <label>PR Creation Date</label>
+                    <input type="date" id="prCreationDate" required>
+                </div>
+            
+                <input type="text" id="prNum" placeholder="PR Number" required>
+            
+                <div id="serviceSection">
+                    <div class="service-header">
+                        <h3>Plant Service Details</h3>
+                        <button type="button" class="add-service-btn" onclick="addMaterialRow()">
+                            + Add More Plant Service Items
+                        </button>
+                        <p id="serviceCountText">
+                            Total Plant Service Items Added: 0
+                        </p>
+                    </div>
+                    <div id="serviceContainer"></div>
+                </div>
+
+                <input type="text" id="poNum" placeholder="PO Number">
+                <input type="text" id="poAmount" placeholder="PO Amount" oninput="formatAmountInput(this)">
+                <button type="submit">Save Record</button>
+            </form>
+        </div>
+    </div>
+
+
+    <script src="config.js"></script>
+    <script src="toast.js"></script>
+    <script src="confirm.js"></script>
+    <script src="plantService.js"></script>
+</body>
+</html>

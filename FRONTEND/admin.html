@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel</title>
+    <link rel="stylesheet" href="admin.css">
+    <link rel="stylesheet" href="toast.css">
+    <link rel="stylesheet" href="confirm.css">
+    <link rel="icon" type="image/x-icon" href="favicon.jpg">
+</head>
+<body>
+    <!-- =========================
+        TOP NAVBAR
+    ========================= -->
+    <div class="navbar">
+        <div class="logo">
+            <img src="JSL Logo.jpg" alt="JSL Logo">
+        </div>
+        <div class="nav-right">
+            <span id="adminName">Welcome, Admin</span>
+            <button class="logout-btn" onclick="logout()">Logout</button>
+        </div>
+    </div>
+
+    <!-- =========================
+        MAIN LAYOUT
+    ========================= -->
+    <div class="admin-layout">
+        
+        <!-- =========================
+            SIDEBAR
+        ========================= -->
+        <div class="sidebar">
+            <button class="sidebar-btn active" id="profileBtn" onclick="showSection('profileSection', this)">&#128100; View Profile</button>
+            <button class="sidebar-btn" onclick="showSection('addEmployeeSection', this)">&#10133; Add Employee</button>
+            <button class="sidebar-btn" onclick="showSection('employeeListSection', this)">&#128203; Employee List</button>
+        </div>
+
+        <!-- =========================
+            CONTENT AREA
+        ========================= -->
+        <div class="content-area">
+
+            <!-- =========================
+                PROFILE SECTION
+            ========================= -->
+            <div id="profileSection" class="content-section">
+                <div class="profile-card">
+                    <div class="profile-header">
+                
+                        <h2>Admin Profile</h2>
+                
+                        <div class="profile-actions">
+                            <button class="edit-profile-btn" onclick="openEditProfileModal()">
+                                ✏️ Edit Profile
+                            </button>
+                            <button class="change-password-btn" onclick="openPasswordModal()">
+                                🔒 Change Password
+                            </button>
+                        </div>
+                    </div>
+                
+                    <div class="profile-row">
+                        <span>Name</span>
+                        <strong id="profileName"></strong>
+                    </div>
+                
+                    <div class="profile-row">
+                        <span>Email</span>
+                        <strong id="profileEmail"></strong>
+                    </div>
+                
+                    <div class="profile-row">
+                        <span>Role</span>
+                        <strong id="profileRole"></strong>
+                    </div>
+                
+                </div>
+            </div>
+
+            <!-- =========================
+                ADD EMPLOYEE SECTION
+            ========================= -->
+            <div id="addEmployeeSection" class="content-section" style="display:none;">
+                <div class="add-user-card">
+                    <h2>Add Employee</h2>
+                    <input type="text" id="name" placeholder="Employee Name">
+                    <input type="email" id="email" placeholder="Employee Email">
+                    <input type="password" id="password" placeholder="Password">
+                    <div class="access-row">
+                        <div class="access-group">
+                            <label>Network Access</label>
+                            <select id="networkPermission">
+                                <option value="none">None</option>
+                                <option value="view">View</option>
+                                <option value="edit">Edit</option>
+                            </select>
+                        </div>
+                        <div class="access-group">
+                            <label>AMC Access</label>
+                            <select id="amcPermission">
+                                <option value="none">None</option>
+                                <option value="view">View</option>
+                                <option value="edit">Edit</option>
+                            </select>
+                        </div>
+                        <div class="access-group">
+                            <label>Contract Access</label>
+                            <select id="contractPermission">
+                                <option value="none">None</option>
+                                <option value="view">View</option>
+                                <option value="edit">Edit</option>
+                            </select>
+                        </div>
+                        <div class="access-group">
+                            <label>Inventory Network Access</label>
+                                <select id="inventoryNetworkPermission">
+                                    <option value="none">None</option>
+                                    <option value="view">View</option>
+                                    <option value="edit">Edit</option>
+                                </select>
+                        </div>
+                        <div class="access-group">
+                            <label>Inventory Hardware Access</label>
+                                <select id="inventoryHardwarePermission">
+                                    <option value="none">None</option>
+                                    <option value="view">View</option>
+                                    <option value="edit">Edit</option>
+                                </select>
+                        </div>
+                        <div class="access-group">
+                            <label>Inventory Department Access</label>
+                                <select id="inventoryDepartmentPermission">
+                                    <option value="none">None</option>
+                                    <option value="view">View</option>
+                                    <option value="edit">Edit</option>
+                                </select>
+                        </div>
+                        <div class="access-group">
+                            <label>Plant Material Access</label>
+                                <select id="plantMaterialPermission">
+                                    <option value="none">None</option>
+                                    <option value="view">View</option>
+                                    <option value="edit">Edit</option>
+                                </select>
+                        </div>
+                        <div class="access-group">
+                            <label>Plant Service Access</label>
+                                <select id="plantServicePermission">
+                                    <option value="none">None</option>
+                                    <option value="view">View</option>
+                                    <option value="edit">Edit</option>
+                                </select>
+                        </div>
+                        <div class="access-group">
+                            <label>WBS Project Access</label>
+                                <select id="wbsProjectPermission">
+                                    <option value="none">None</option>
+                                    <option value="view">View</option>
+                                    <option value="edit">Edit</option>
+                                </select>
+                        </div>
+                    </div>
+                    <button onclick="addUser()">Add Employee</button>
+                </div>
+            </div>
+
+            <!-- =========================
+                EMPLOYEE LIST SECTION
+            ========================= -->
+            <div id="employeeListSection" class="content-section" style="display:none;">
+                <div class="table-container employee-list-section">
+                    <h2>Employee List</h2>
+                    <div class="table-scroll">
+                        <table id="employeeTable">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>Role</th>
+                                    <th>Network</th>
+                                    <th>AMC</th>
+                                    <th>Contract</th>
+                                    <th>Inventory Network</th>
+                                    <th>Inventory Hardware</th>
+                                    <th>Inventory Department</th>
+                                    <th>Plant Material</th>
+                                    <th>Plant Service</th>
+                                    <th>WBS Project</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="userTableBody"></tbody>
+                        </table>
+                    </div>
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- =========================
+        EDIT PERMISSIONS MODAL
+    ========================= -->
+    <div id="permissionModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closePermissionModal()">
+                &times;
+            </span>
+            <h2>Edit Permissions</h2>
+            <div class="access-group">
+                <label>Network Access</label>
+                <select id="editNetworkPermission">
+                    <option value="none">None</option>
+                    <option value="view">View</option>
+                    <option value="edit">Edit</option>
+                </select>
+            </div>
+            <div class="access-group">
+                <label>AMC Access</label>
+                <select id="editAmcPermission">
+                    <option value="none">None</option>
+                    <option value="view">View</option>
+                    <option value="edit">Edit</option>
+                </select>
+            </div>
+            <div class="access-group">
+                <label>Contract Access</label>
+                <select id="editContractPermission">
+                    <option value="none">None</option>
+                    <option value="view">View</option>
+                    <option value="edit">Edit</option>
+                </select>
+            </div>
+            <div class="access-group">
+                <label>Inventory Network Access</label>
+                <select id="editInventoryNetworkPermission">
+                    <option value="none">None</option>
+                    <option value="view">View</option>
+                    <option value="edit">Edit</option>
+                </select>
+            </div>
+            <div class="access-group">
+                <label>Inventory Hardware Access</label>
+                <select id="editInventoryHardwarePermission">
+                    <option value="none">None</option>
+                    <option value="view">View</option>
+                    <option value="edit">Edit</option>
+                </select>
+            </div>
+            <div class="access-group">
+                <label>Inventory Department Access</label>
+                <select id="editInventoryDepartmentPermission">
+                    <option value="none">None</option>
+                    <option value="view">View</option>
+                    <option value="edit">Edit</option>
+                </select>
+            </div>
+            <div class="access-group">
+                <label>Plant Material Access</label>
+                <select id="editPlantMaterialPermission">
+                    <option value="none">None</option>
+                    <option value="view">View</option>
+                    <option value="edit">Edit</option>
+                </select>
+            </div>    
+            <div class="access-group">
+                <label>Plant Service Access</label>
+                <select id="editPlantServicePermission">
+                    <option value="none">None</option>
+                    <option value="view">View</option>
+                    <option value="edit">Edit</option>
+                </select>
+            </div>
+            <div class="access-group">
+                <label>WBS Project Access</label>
+                <select id="editWbsProjectPermission">
+                    <option value="none">None</option>
+                    <option value="view">View</option>
+                    <option value="edit">Edit</option>
+                </select>
+            </div>
+            <button onclick="savePermissions()">Save Permissions</button>
+        </div>
+    </div>
+
+
+    <!-- =========================
+     DELETE USER MODAL
+    ========================= -->
+    <div id="deleteUserModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeDeleteModal()">
+                &times;
+            </span>
+
+            <h2>Delete Employee</h2>
+
+            <div class="profile-row">
+                <span>Name</span>
+                <strong id="deleteUserName"></strong>
+            </div>
+
+            <div class="profile-row">
+                <span>Email</span>
+                <strong id="deleteUserEmail"></strong>
+            </div>
+
+            <div class="profile-row">
+                <span>Role</span>
+                <strong id="deleteUserRole"></strong>
+            </div>
+
+            <div id="deletePermissionsContainer"></div>
+
+            <div style="margin-top:20px; display:flex; gap:10px;">
+                <button id="confirmDeleteBtn" class="delete-btn" style="flex:1;">
+                    Delete
+                </button>
+
+                <button onclick="closeDeleteModal()" class="edit-btn" style="flex:1;">
+                    Cancel
+                </button>
+            </div>
+
+        </div>
+    </div>
+
+
+
+
+    <!-- =========================
+        EDIT PROFILE MODAL
+    ========================= -->
+
+    <div id="editProfileModal" class="modal">
+        <div class="modal-content">
+
+            <span class="close" onclick="closeEditProfileModal()">
+                &times;
+            </span>
+
+            <h2>Edit Profile</h2>
+
+            <form id="editProfileForm" onsubmit="updateProfile(event)">
+                <label>Name</label>
+
+                <input type="text" id="editName" required>
+
+                <label>Email</label>
+
+                <input type="email" id="editEmail" required>
+
+                <div class="modal-buttons">
+
+                    <button type="button" class="cancel-btn" onclick="closeEditProfileModal()">
+                        Cancel
+                    </button>
+
+                    <button type="submit" class="save-btn">
+                        Save Changes
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+
+    <!-- =========================
+        CHANGE PASSWORD
+    ========================= -->
+
+    <div id="passwordModal" class="modal">
+        <div class="modal-content">
+        
+            <span class="close" onclick="closePasswordModal()">
+                &times;
+            </span>
+        
+            <h2>Change Password</h2>
+        
+            <form id="passwordForm" onsubmit="changePassword(event)">
+
+                <label>Current Password</label>
+                <input
+                type="password"
+                id="currentPassword"
+                required>
+                
+                <label>New Password</label>
+                <input
+                type="password"
+                id="newPassword"
+                minlength="6"
+                required>
+                
+                <label>Confirm Password</label>
+                <input
+                type="password"
+                id="confirmPassword"
+                minlength="6"
+                required>
+                
+                <div class="modal-buttons">
+                
+                <button
+                type="button"
+                class="cancel-btn"
+                onclick="closePasswordModal()">
+                
+                Cancel
+                
+                </button>
+                
+                <button
+                type="submit"
+                class="save-btn">
+                
+                Update Password
+                
+                </button>
+                
+                </div>
+                
+                </form>
+        
+        </div>
+    </div>
+
+    <script src="config.js"></script>
+    <script src="toast.js"></script>
+    <script src="confirm.js"></script>
+    <script src="admin.js"></script>
+</body>
+</html>

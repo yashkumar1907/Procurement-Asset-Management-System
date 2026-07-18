@@ -1,0 +1,589 @@
+/* =========================
+   GLOBAL RESET
+========================= */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+body {
+    min-height: 100vh;
+    background: #f7f8fa;
+    color: #1e293b;
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+}
+
+
+/* =========================
+   NAVBAR
+========================= */
+.navbar {
+    height: 80px;
+    background: #ffffff;
+    border-bottom: 1px solid #e5e7eb;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 35px;
+    box-shadow: none;
+}
+
+.logo img {
+    height: 42px;
+}
+
+.nav-right {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    color: #1e293b;
+    font-weight: 500;
+}
+
+.logout-btn {
+    background: linear-gradient(
+        135deg,
+        #ff6b00,
+        #ff7f11
+    );
+
+    color: white;
+    border: none;
+    padding: 12px 22px;
+    border-radius: 12px;
+    cursor: pointer;
+}
+.logout-btn:hover {
+    background: #e65c00;
+}
+
+
+/* =========================
+   MAIN LAYOUT
+========================= */
+.admin-layout {
+    display: flex;
+    min-height: calc(100vh - 80px);
+    overflow-x: hidden;
+}
+
+.content-area {
+    flex: 1;
+    padding: 40px;
+    overflow-x: hidden;
+}
+.content-section {
+    width: 100%;
+}
+
+
+/* =========================
+   SIDEBAR
+========================= */
+.sidebar {
+    width: 280px;
+    background: #ffffff;
+    border-right: 1px solid #e5e7eb;
+    padding: 25px 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.sidebar-btn {
+    width: 100%;
+    border: none;
+    background: transparent;
+    text-align: left;
+    padding: 15px 18px;
+    border-radius: 14px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 600;
+    color: #1f2937;
+    transition: 0.3s;
+}
+
+.sidebar-btn:hover {
+    background: #fff4ea;
+}
+
+.sidebar-btn.active {
+    background: linear-gradient(
+        135deg,
+        #ff6b00,
+        #ff7f11
+    );
+    color: white;
+    box-shadow: none;
+}
+
+
+/* =========================
+   PROFILE SECTION
+========================= */
+.profile-card {
+    max-width: 700px;
+    border-radius: 20px;
+    padding: 30px;
+    background: white;
+    border: 1px solid #e5e7eb;
+    color: #1e293b;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+}
+
+.profile-card h2 {
+    color: #1e293b;
+    margin-bottom: 30px;
+}
+
+.profile-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 0;
+    border-bottom: 1px solid #ececec;
+}
+
+.profile-row:last-child {
+    border-bottom: none;
+}
+
+.profile-row span {
+    color: #64748b;
+    font-weight: 500;
+}
+
+.profile-row strong {
+    color: #1e293b;
+}
+
+
+/* =========================
+   ADD EMPLOYEE CARD
+========================= */
+.add-user-card {
+    background: white;
+    border: 1px solid #e5e7eb;
+    color: #1e293b;
+    padding: 30px;
+    border-radius: 20px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+}
+
+.add-user-card h2 {
+    margin-bottom: 25px;
+    color: #1e293b;
+}
+
+.add-user-card input {
+    width: 100%;
+    padding: 14px;
+    margin-bottom: 18px;
+    border-radius: 10px;
+    font-size: 15px;
+    backdrop-filter: blur(25px);
+    background: white;
+    border: 1px solid #d1d5db;
+    color: #1e293b;
+}
+
+.add-user-card input::placeholder {
+    color: #94a3b8;
+}
+
+.add-user-card input:focus {
+    outline: none;
+    border-color: #ff6b00;
+    box-shadow: 0 0 0 4px rgba(255,107,0,0.15);
+}
+
+.access-row {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+}
+
+.access-group {
+    display: flex;
+    flex-direction: column;
+    min-width: 180px;
+}
+
+.access-group label {
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: #1e293b;
+}
+
+.access-group select {
+    padding: 12px;
+    background: white;
+    color: #1e293b;
+    border: 1px solid #d1d5db;
+    border-radius: 12px;
+    transition: all 0.3s ease;
+}
+
+.access-group select:focus {
+    outline: none;
+    border-color: #ff6b00;
+    box-shadow: 0 0 0 4px rgba(255, 107, 0, 0.15);
+}
+
+.add-user-card button {
+    width: 100%;
+    padding: 14px;
+    border: none;
+    background: linear-gradient(
+        135deg,
+        #ff6b00,
+        #ff7f11
+    );
+    color: white;
+    border-radius: 12px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.add-user-card button:hover {
+    filter: brightness(1.05);
+    box-shadow: 0 8px 20px rgba(255, 107, 0, 0.25);
+}
+
+
+/* =========================
+   EMPLOYEE TABLE SECTION
+========================= */
+.table-container {
+    background: white;
+    border: 1px solid #e5e7eb;
+    color: #1e293b;
+    padding: 25px;
+    border-radius: 20px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+    overflow: hidden;
+}
+
+.table-container h2 {
+    margin-bottom: 20px;
+    color: #1e293b;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+thead {
+    background: linear-gradient(
+        135deg,
+        #ff6b00,
+        #ff7f11
+    );
+    color: white;
+    font-weight: 600;
+}
+
+th {
+    padding: 15px;
+    text-align: left;
+}
+
+td {
+    padding: 15px;
+    color: #1e293b;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+tbody tr {
+    transition: 0.3s;
+}
+
+tbody tr:hover {
+    background: #fff4ea;
+}
+
+.employee-list-section {
+    max-width: 100%;
+}
+
+
+/* =========================
+   ACTION BUTTONS (EDIT/DELETE)
+========================= */
+.edit-btn {
+    background: #ff6b00;
+    border-radius: 10px;
+    color: white;
+    border: none;
+    padding: 8px 14px;
+    cursor: pointer;
+    margin-right: 8px;
+}
+
+.edit-btn:hover{
+    background: #e65c00;
+}
+
+.delete-btn {
+    background: #dc3545;
+    border-radius: 10px;
+    color: white;
+    border: none;
+    padding: 8px 14px;
+    cursor: pointer;
+}
+
+.delete-btn:hover {
+    background: #c82333;
+}
+
+
+/* =========================
+   PERMISSION MODAL
+========================= */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 9999;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.45);
+}
+
+.modal-content {
+    background: white;
+    border: 1px solid #e5e7eb;
+    color: #1e293b;
+    width: 450px;
+    max-width: 90%;
+    margin: 30px auto;
+    padding: 30px;
+    border-radius: 20px;
+    position: relative;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+.modal-content h2 {
+    color: #ff6b00;
+    margin-bottom: 25px;
+}
+
+.modal-content select {
+    width: 100%;
+    padding: 12px;
+    background: white;
+    color: #1e293b;
+    border: 1px solid #d1d5db;
+    border-radius: 12px;
+}
+
+.modal-content .access-group {
+    margin-bottom: 18px;
+}
+
+.modal-content button {
+    width: 100%;
+    padding: 14px;
+    background: linear-gradient(
+        135deg,
+        #ff6b00,
+        #ff7f11
+    );
+    color: white;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+}
+
+.close {
+    position: absolute;
+    top: 12px;
+    right: 18px;
+    font-size: 28px;
+    cursor: pointer;
+}
+
+
+/* =========================
+   RESPONSIVE DESIGN
+========================= */
+@media (max-width: 900px) {
+    .admin-layout {
+        flex-direction: column;
+    }
+    .sidebar {
+        width: 100%;
+        border-right: none;
+        border-bottom: 1px solid #e5e7eb;
+    }
+    .content-area {
+        padding: 20px;
+    }
+    .access-row {
+        flex-direction: column;
+    }
+    .profile-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+}
+
+
+/* =========================
+   EMPLOYEE TABLE SCROLL
+========================= */
+.table-scroll {
+    width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+    display: block;
+}
+
+#employeeTable {
+    min-width: 1800px;
+    width: max-content;
+}
+
+
+
+/* =====================================================
+   PROFILE HEADER
+===================================================== */
+
+.profile-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:30px;
+}
+
+.profile-actions{
+    display:flex;
+    gap:14px;
+}
+
+.edit-profile-btn,
+.change-password-btn{
+    border:none;
+    border-radius:12px;
+    padding:14px 22px;
+    cursor:pointer;
+    color:#fff;
+    font-size:15px;
+    font-weight:600;
+    transition:.25s;
+}
+
+.edit-profile-btn{
+    background:#ff6b00;
+}
+
+.edit-profile-btn:hover{
+    background:#e65c00;
+}
+
+.change-password-btn{
+    background:#16a34a;
+}
+
+.change-password-btn:hover{
+    background:#15803d;
+}
+
+
+/* =====================================================
+   EDIT PROFILE / CHANGE PASSWORD MODALS
+===================================================== */
+
+.modal-content h2{
+    color:#1f2937;
+    margin-bottom:28px;
+    font-size:22px;
+}
+
+.modal-content label{
+    display:block;
+    margin-bottom:8px;
+    margin-top:18px;
+    font-size:15px;
+    font-weight:600;
+    color:#1f2937;
+}
+
+.modal-content input{
+    width:100%;
+    height:46px;
+    border:1px solid #d1d5db;
+    border-radius:12px;
+    padding:0 14px;
+    font-size:15px;
+    background:#fff;
+    transition:.25s;
+}
+
+.modal-content input:focus{
+    outline:none;
+    border-color:#ff6b00;
+    box-shadow:0 0 0 4px rgba(255,107,0,.15);
+}
+
+.modal-buttons{
+    display:flex;
+    justify-content:flex-end;
+    gap:14px;
+    margin-top:34px;
+}
+
+.cancel-btn{
+    width:110px !important;
+    background:#e5e7eb !important;
+    color:#1f2937 !important;
+    border:none;
+    border-radius:12px;
+    font-weight:600;
+    padding:12px 20px;
+    cursor:pointer;
+}
+
+.cancel-btn:hover{
+    background:#d1d5db !important;
+}
+
+.save-btn{
+    width:170px !important;
+    background:#ff6b00 !important;
+    color:white !important;
+    border:none;
+    border-radius:12px;
+    font-weight:600;
+    padding:12px 20px;
+    cursor:pointer;
+}
+
+.save-btn:hover{
+    background:#e65c00 !important;
+}
+
+.close{
+    position:absolute;
+    right:24px;
+    top:18px;
+    font-size:22px;
+    font-weight:700;
+    color:#1f2937;
+    cursor:pointer;
+}
+
+.close:hover{
+    color:#ff6b00;
+}

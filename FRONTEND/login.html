@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PO Tracking System</title>
+    <link rel="icon" type="image/x-icon" href="favicon.jpg">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="login.css">
+</head>
+<body>
+    <div class="split-container">
+        <div class="visual-panel">
+            <div class="visual-content">
+                <div class="logo-left">
+                    <img src="JSL Logo.jpg" alt="JSL Logo">
+                </div>
+                <h1>SHAPING A<br><span>STAINLESS</span><br>FUTURE</h1>
+                <p class="tagline">INNOVATION • STRENGTH • SUSTAINABILITY</p>
+            </div>
+            <div class="glow-sphere"></div>
+        </div>
+        <div class="form-panel">
+            <div class="login-box">
+                <div class="logo">
+                    <img src="JSL Logo.jpg" alt="Jindal Stainless Logo">
+                </div>
+                <div class="form-header">
+                    <h2>Welcome</h2>
+                    <p>Please enter your credentials to access your dashboard</p>
+                </div>
+                <form id="loginForm">
+                    <div class="input-group">
+                        <input type="text" id="email" placeholder="Login ID / Email" required>
+                    </div>
+                    <div class="input-group password-group">
+                        <input type="password" id="password" placeholder="Password" required>
+                        <span class="show-password" onclick="togglePassword()">Show</span>
+                    </div>
+                    
+                    <div id="error-message" class="error-message">
+                        <i>⚠️</i> Invalid Login ID or Password!
+                    </div>
+                    <button type="submit" class="login-btn">
+                        <span>Sign In</span>
+                        <svg class="arrow-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"> <path d="M5 12H19M19 12L13 6M19 12L13 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/> </svg>
+                    </button>
+                </form>
+            </div>
+            <div class="form-footer">
+                &copy; <span id="currentYear"></span> Jindal Stainless Ltd. All rights reserved.
+            </div>
+        </div>
+    </div>
+
+    <script src="config.js"></script>
+    <script src="login.js"></script>
+</body>
+</html>

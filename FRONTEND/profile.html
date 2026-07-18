@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile</title>
+
+    <link rel="stylesheet" href="profile.css">
+    <link rel="stylesheet" href="toast.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="icon" type="image/x-icon" href="favicon.jpg">
+</head>
+<body>
+
+    <!-- =========================
+        NAVBAR
+    ========================= -->
+    <div class="navbar">
+        <div class="logo">
+            <img src="JSL Logo.jpg" height="35" alt="JSL Logo">
+        </div>
+
+        <div class="user-info">
+            Welcome, User
+            <a href="#" class="logout-btn" onclick="logout(event)">
+                Logout
+            </a>
+        </div>
+    </div>
+
+    <!-- =========================
+        MAIN LAYOUT
+    ========================= -->
+    <div class="dashboard-layout">
+
+        <!-- =========================
+            SIDEBAR
+        ========================= -->
+        <div class="sidebar">
+
+            <div class="sidebar-header">
+                <button id="toggleSidebarBtn" class="toggle-sidebar">
+                    ☰
+                </button>
+            </div>
+
+            <button id="dashboardBtn" class="sidebar-btn" onclick="window.location.href='dashboard.html'">📦 Dashboard</button>
+            <button id="networkBtn" class="sidebar-btn" onclick="window.location.href='network.html'">🌐 Network and Bandwidth Management</button>
+            <button id="amcBtn" class="sidebar-btn" onclick="window.location.href='amc.html'">🛠 Annual Maintenance Contract</button>
+            <button id="contractBtn" class="sidebar-btn" onclick="window.location.href='contract.html'">📋 Contract Resource and Support PRs</button>
+
+            <button id="inventoryToggleBtn" class="sidebar-btn">📦 IT Inventory ▼</button>
+            <div id="inventorySubMenu" class="inventory-submenu">
+                <button id="inventoryNetworkBtn" class="sidebar-btn inventory-sub-btn" onclick="window.location.href='inventoryNetwork.html'">Network Accel IT</button>
+                <button id="inventoryHardwareBtn" class="sidebar-btn inventory-sub-btn" onclick="window.location.href='inventoryHardware.html'">Hardware CMS</button>
+                <button id="inventoryDepartmentBtn" class="sidebar-btn inventory-sub-btn" onclick="window.location.href='inventoryDepartment.html'">IT Department Indent</button>
+            </div>
+
+
+            <button id="plantToggleBtn" class="sidebar-btn">📦 Plants ▼</button>
+            <div id="plantSubMenu" class="plant-submenu">
+                <button id="plantMaterialBtn" class="sidebar-btn plant-sub-btn" onclick="window.location.href='plantMaterial.html'">Plant Material</button>
+                <button id="plantServiceBtn" class="sidebar-btn plant-sub-btn" onclick="window.location.href='plantService.html'">Plant Service</button>
+            </div>
+
+            <button id="wbsProjectBtn" class="sidebar-btn" onclick="window.location.href='wbsProject.html'">📦 WBS (Project)</button>
+
+            <button class="sidebar-btn active">👤 View Profile</button>
+
+            
+        </div>
+
+        <!-- =========================
+            CONTENT AREA
+        ========================= -->
+        <div class="content-area">
+
+            <div class="dashboard-heading">
+                <h1>IT INFRA, HISAR</h1>
+            </div>
+
+            <div class="profile-card">
+
+                <div class="profile-header">
+
+                    <h2>Employee Profile</h2>
+                
+                    <div class="profile-actions">
+                        <button class="edit-profile-btn" onclick="openEditProfileModal()">
+                            ✏️ Edit Profile
+                        </button>
+                
+                        <button class="change-password-btn" onclick="openPasswordModal()">
+                            🔒 Change Password
+                        </button>
+                    </div>
+                </div>
+
+                <div class="profile-row">
+                    <span>Name</span>
+                    <strong id="profileName"></strong>
+                </div>
+
+                <div class="profile-row">
+                    <span>Email</span>
+                    <strong id="profileEmail"></strong>
+                </div>
+
+                <div class="profile-row">
+                    <span>Role</span>
+                    <strong id="profileRole"></strong>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- =========================
+     EDIT PROFILE MODAL
+========================= -->
+    <div id="editProfileModal" class="modal">
+
+        <div class="modal-content">
+            <span class="close" onclick="closeEditProfileModal()">
+                &times;
+            </span>
+
+            <h2>Edit Profile</h2>
+
+            <form id="editProfileForm" onsubmit="updateProfile(event)">
+
+                <label>Name</label>
+                <input type="text" id="editName" required>
+
+                <label>Email</label>
+                <input type="email" id="editEmail" required>
+
+                <div class="modal-buttons">
+
+                    <button type="button" class="cancel-btn" onclick="closeEditProfileModal()">
+                        Cancel
+                    </button>
+
+                    <button type="submit" class="save-btn">
+                        Save Changes
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- =========================
+     CHANGE PASSWORD MODAL
+    ========================= -->
+    <div id="passwordModal" class="modal">
+        <div class="modal-content">
+
+            <span class="close" onclick="closePasswordModal()">
+                &times;
+            </span>
+
+            <h2>Change Password</h2>
+
+            <form id="passwordForm" onsubmit="changePassword(event)">
+
+                <label>Current Password</label>
+                <input type="password" id="currentPassword" required>
+
+                <label>New Password</label>
+                <input type="password" id="newPassword" minlength="6" required>
+
+                <label>Confirm Password</label>
+                <input type="password" id="confirmPassword" minlength="6" required>
+
+                <div class="modal-buttons">
+
+                    <button type="button" class="cancel-btn" onclick="closePasswordModal()">
+                        Cancel
+                    </button>
+
+                    <button type="submit" class="save-btn">
+                        Update Password
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="config.js"></script>
+    <script src="toast.js"></script>
+    <script src="profile.js"></script>
+</body>
+</html>

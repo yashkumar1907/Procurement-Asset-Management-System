@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contract Resource and Support PRs</title>
+    <link rel="stylesheet" href="contract.css">
+    <link rel="stylesheet" href="toast.css">
+    <link rel="stylesheet" href="confirm.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="icon" type="image/x-icon" href="favicon.jpg">
+</head>
+<body>
+
+    <!-- =========================
+        NAVBAR
+    ========================= -->
+    <div class="navbar">
+        <div class="logo">
+            <img src="JSL Logo.jpg" height="35" alt="JSL Logo">
+        </div>
+        <div class="user-info">
+            Welcome, User
+            <a href="#" class="logout-btn" onclick="logout(event)">Logout</a>
+        </div>
+    </div>
+
+    <!-- =========================
+        MAIN LAYOUT
+    ========================= -->
+    <div class="dashboard-layout">
+
+        <!-- =========================
+            SIDEBAR
+        ========================= -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <button id="toggleSidebarBtn" class="toggle-sidebar">☰</button>
+            </div>
+
+            <button id="dashboardBtn" class="sidebar-btn" onclick="window.location.href='dashboard.html'">📦 Dashboard</button>
+            <button id="networkBtn" class="sidebar-btn" onclick="window.location.href='network.html'">🌐 Network and Bandwidth Management</button>
+            <button id="amcBtn" class="sidebar-btn" onclick="window.location.href='amc.html'">🛠 Annual Maintenance Contract</button>
+            <button class="sidebar-btn active">📋 Contract Resource and Support PRs</button>
+
+            <button id="inventoryToggleBtn" class="sidebar-btn">📦 IT Inventory ▼</button>
+            <div id="inventorySubMenu" class="inventory-submenu">
+                <button id="inventoryNetworkBtn" class="sidebar-btn inventory-sub-btn" onclick="window.location.href='inventoryNetwork.html'">Network Accel IT</button>
+                <button id="inventoryHardwareBtn" class="sidebar-btn inventory-sub-btn" onclick="window.location.href='inventoryHardware.html'">Hardware CMS</button>
+                <button id="inventoryDepartmentBtn" class="sidebar-btn inventory-sub-btn" onclick="window.location.href='inventoryDepartment.html'">IT Department Indent</button>
+            </div>
+
+            <button id="plantToggleBtn" class="sidebar-btn">📦 Plants ▼</button>
+            <div id="plantSubMenu" class="plant-submenu">
+                <button id="plantMaterialBtn" class="sidebar-btn plant-sub-btn" onclick="window.location.href='plantMaterial.html'">Plant Material</button>
+                <button id="plantServiceBtn" class="sidebar-btn plant-sub-btn" onclick="window.location.href='plantService.html'">Plant Service</button>
+            </div>
+
+            <button id="wbsProjectBtn" class="sidebar-btn" onclick="window.location.href='wbsProject.html'">📦 WBS (Project)</button>
+
+            <button class="sidebar-btn" onclick="window.location.href='profile.html'">👤 View Profile</button>
+        </div>
+
+        <!-- =========================
+            CONTENT AREA
+        ========================= -->
+        <div class="content-area">
+
+            <!-- =========================
+                MODULE SECTION
+            ========================= -->
+                <div class="dashboard-heading">
+                    <h1>CONTRACT RESOURCE AND SUPPORT PRs</h1>
+                </div>
+
+                <div class="stats-container">
+                    <div class="stat-card">
+                        <h3>Total Records</h3>
+                        <p id="totalRecords">0</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Total PO Amount</h3>
+                        <p id="totalPoAmount">₹0</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Balance Amount</h3>
+                        <p id="totalBalanceAmount">₹0</p>
+                    </div>
+                </div>
+                
+                <div class="top-actions">
+                    <button class="add-btn" onclick="openAddModal()">+ Add Record</button>
+                    <button class="export-btn" onclick="exportExcel()">Export Excel</button>
+                    
+                    <button class="import-btn" onclick="document.getElementById('importExcelFile').click()">Import Excel</button>
+                    <input type="file" id="importExcelFile" accept=".xlsx,.xls" style="display:none" onchange="importExcel(this)">
+
+                    <input type="text" id="searchBox" class="search-box" placeholder="Search by Vendor Name or PO..." oninput="renderTable()">
+                </div>
+
+                <div id="tableContainer" class="table-container">
+                    <p class="no-data">No Records Found</p>
+                </div>
+        </div>
+    </div>
+
+    <!-- =========================
+        RECORD MODAL
+    ========================= -->
+    <div id="recordModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <h2>Add New Record</h2>
+            <form id="recordForm" onsubmit="addRecord(event)">
+                <input type="text" id="vendorName" placeholder="Vendor Name" required>
+                <input type="text" id="vendorCode" placeholder="Vendor Code" required>
+                <input type="text" id="pr" placeholder="PR" required>
+                <input type="text" id="po" placeholder="PO" required>
+
+                <select id="referencePO">
+                    <option value="">No Reference PO</option>
+                </select>
+
+                
+                <div class="po-box">
+                    <label>PO Date</label>
+                    <input type="date" id="poDate" required>
+                </div>
+                <textarea id="poDescription" placeholder="PO Description" class="description-box" required></textarea>
+
+                <div id="serviceSection">
+                    <div class="service-header">
+                            <h3>Service Details</h3>
+                        <button type="button" class="add-service-btn" onclick="addServiceRow()">
+                            + Add More Services
+                        </button>
+
+                        <p id="serviceCountText" style="margin-top:5px;font-weight:600;">
+                            Total Services Added: 0
+                        </p>
+                    </div>
+                    <div id="serviceContainer"></div>
+                </div>
+
+                <div class="period-container">
+
+                    <div class="period-box">
+                        <label>PO Start Date</label>
+                        <input type="date" id="poStartDate" required>
+                    </div>
+                
+                    <div class="period-box">
+                        <label>Period</label>
+                        <select id="poPeriod" required>
+                            <option value="">Select Period</option>
+                            <option value="Monthly">Monthly</option>
+                            <option value="Quarterly">Quarterly</option>
+                            <option value="Half-Yearly">Half Yearly</option>
+                            <option value="Yearly">Yearly</option>
+                        </select>
+                    </div>
+                
+                    <div class="period-box">
+                        <label>PO End Date</label>
+                        <input type="date" id="poEndDate" required>
+                    </div>
+                
+                </div>
+
+                <div id="documentSection">
+                    <h3>Documents Attached</h3>
+                    <div class="document-fixed-section">
+
+                        <label>Document Type</label>
+                    
+                        <select id="documentTypeSelector" onchange="switchDocumentType()">
+                            <option value="JUSTIFICATION">JUSTIFICATION</option>
+                            <option value="NFA">NFA</option>
+                            <option value="AGREEMENT">AGREEMENT</option>
+                        </select>
+                    
+                        <div id="documentUploadArea">
+                    
+                            <input type="file" id="fixedDocumentFile" accept="application/pdf">
+                    
+                            <div id="fixedDocumentPreview"></div>
+                    
+                        </div>
+                    
+                    </div>
+                    
+                    <div class="service-header">
+                        <h4>OTHERS</h4>
+                        <button type="button" class="add-service-btn" onclick="addDocumentRow()">
+                            + Add More Files
+                        </button>
+                    </div>
+                
+                    <div id="documentContainer"></div>
+                </div>
+
+                <button type="submit">Save Record</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- =========================
+        DETAIL MODAL
+    ========================= -->
+    <div id="detailModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeDetailModal()">
+                &times;
+            </span>
+            <h2>Add Detail</h2>
+            <form id="detailForm" onsubmit="saveDetail(event)">
+                <input type="hidden" id="detailId">
+                <input type="hidden" id="detailRecordId">
+                <div id="serviceCodeGroup">
+                    <select id="serviceCode">
+                        <option value="">Select Service / Material Code</option>
+                    </select>
+                </div>
+                <input type="text" id="invoiceNumber" placeholder="Invoice / External Number" required>
+                <div class="invoice-box">
+                    <label>Invoice Date</label>
+                    <input type="date" id="invoiceDate" required>
+                </div>
+                
+                <input type="text" id="trackingNumber" placeholder="Tracking Number">
+                
+                <div class="period-container">
+
+                    <div class="period-box">
+                        <label>Invoice Period Start</label>
+                        <input type="date" id="invoicePeriodStartDate" required>
+                    </div>
+                
+                    <div class="period-box">
+                        <label>Period</label>
+                        <select id="invoicePeriod" required>
+                            <option value="">Select Period</option>
+                            <option value="Monthly">Monthly</option>
+                            <option value="Quarterly">Quarterly</option>
+                            <option value="Half-Yearly">Half Yearly</option>
+                            <option value="Yearly">Yearly</option>
+                        </select>
+                    </div>
+                
+                    <div class="period-box">
+                        <label>Invoice Period End</label>
+                        <input type="date" id="invoicePeriodEndDate" required>
+                    </div>
+
+                </div>
+
+                <input type="text" id="invoiceAmount" placeholder="Invoice Amount" required>
+                <input type="text" id="serviceEntryNumber" placeholder="Service Entry Number" required>
+                <input type="text" id="documentNumber" placeholder="Document Number">
+                <div class="invoicepdf-box">
+                    <label>Invoice PDF</label>
+                
+                    <div class="invoice-pdf-upload">
+                        <input type="file" id="invoicePdf" accept="application/pdf">
+                    </div>
+                
+                    <div id="invoicePdfPreview"></div>
+                </div>
+
+                <button type="submit">Save Detail</button>
+            </form>
+        </div>
+    </div>
+    
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="config.js"></script>
+    <script src="toast.js"></script>
+    <script src="confirm.js"></script>
+    <script src="contract.js"></script>
+</body>
+</html>

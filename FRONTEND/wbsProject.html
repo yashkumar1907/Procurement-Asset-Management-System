@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WBS (Project)</title>
+    <link rel="stylesheet" href="wbsProject.css">
+    <link rel="stylesheet" href="toast.css">
+    <link rel="stylesheet" href="confirm.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="icon" type="image/x-icon" href="favicon.jpg">
+</head>
+<body>
+
+    <!-- =========================
+        NAVBAR
+    ========================= -->
+    <div class="navbar">
+        <div class="logo">
+            <img src="JSL Logo.jpg" height="35" alt="JSL Logo">
+        </div>
+        <div class="user-info">
+            Welcome, User
+            <a href="#" class="logout-btn" onclick="logout(event)">Logout</a>
+        </div>
+    </div>
+
+    <!-- =========================
+        MAIN LAYOUT
+    ========================= -->
+    <div class="dashboard-layout">
+
+        <!-- =========================
+            SIDEBAR
+        ========================= -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <button id="toggleSidebarBtn" class="toggle-sidebar">☰</button>
+            </div>
+
+            <button id="dashboardBtn" class="sidebar-btn" onclick="window.location.href='dashboard.html'">📦 Dashboard</button>
+            <button id="networkBtn" class="sidebar-btn" onclick="window.location.href='network.html'">🌐 Network and Bandwidth Management</button>
+            <button id="amcBtn" class="sidebar-btn" onclick="window.location.href='amc.html'">🛠 Annual Maintenance Contract</button>
+            <button id="contractBtn" class="sidebar-btn" onclick="window.location.href='contract.html'">📋 Contract Resource and Support PRs</button>
+
+            <button id="inventoryToggleBtn" class="sidebar-btn">📦 IT Inventory ▼</button>
+            <div id="inventorySubMenu" class="inventory-submenu">
+                <button id="inventoryNetworkBtn" class="sidebar-btn inventory-sub-btn" onclick="window.location.href='inventoryNetwork.html'">Network Accel IT</button>
+                <button id="inventoryHardwareBtn" class="sidebar-btn inventory-sub-btn" onclick="window.location.href='inventoryHardware.html'">Hardware CMS</button>
+                <button id="inventoryDepartmentBtn" class="sidebar-btn inventory-sub-btn" onclick="window.location.href='inventoryDepartment.html'">IT Department Indent</button>
+            </div>
+
+
+            <button id="plantToggleBtn" class="sidebar-btn">📦 Plants ▼</button>
+            <div id="plantSubMenu" class="plant-submenu">
+                <button id="plantMaterialBtn" class="sidebar-btn plant-sub-btn" onclick="window.location.href='plantMaterial.html'">Plant Material</button>
+                <button id="plantServiceBtn" class="sidebar-btn plant-sub-btn" onclick="window.location.href='plantService.html'">Plant Service</button>
+            </div>
+
+            <button id="wbsProjectBtn" class="sidebar-btn active">📦 WBS (Project)</button>
+
+            <button class="sidebar-btn" onclick="window.location.href='profile.html'">👤 View Profile</button>
+
+        </div>
+
+        <!-- =========================
+            CONTENT AREA
+        ========================= -->
+        <div class="content-area">
+
+            <!-- =========================
+                MODULE SECTION
+            ========================= -->
+                <div class="dashboard-heading">
+                    <h1>WBS (Project)</h1>
+                </div>
+
+                <div class="stats-container">
+                    <div class="stat-card">
+                        <h3>Total Records</h3>
+                        <p id="totalRecords">0</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Total Budget</h3>
+                        <p id="totalBudget">₹0</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Total Actual</h3>
+                        <p id="totalActual">₹0</p>
+                    </div>
+                </div>
+                
+                <div class="top-actions">
+                    <button class="add-btn" onclick="openAddModal()">+ Add Record</button>
+                    <button class="export-btn" onclick="exportExcel()">Export Excel</button>
+                    
+                    <button class="import-btn" onclick="document.getElementById('importExcelFile').click()">Import Excel</button>
+                    <input type="file" id="importExcelFile" accept=".xlsx,.xls" style="display:none" onchange="importExcel(this)">
+
+                    <input type="text" id="searchBox" class="search-box" placeholder="Search by WBS Number or Description..." oninput="renderTable()">
+                </div>
+
+                <div id="tableContainer" class="table-container">
+                    <p class="no-data">No Records Found</p>
+                </div>
+        </div>
+    </div>
+
+    <!-- =========================
+        RECORD MODAL
+    ========================= -->
+    <div id="recordModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <h2>Add New Record</h2>
+            <form id="recordForm" onsubmit="addRecord(event)">
+                <div class="linked-record-section">
+                    <h3>Related Record</h3>
+                
+                    <div class="linked-record-row">
+                
+                        <div class="selector-box">
+                            <label>Select Module</label>
+                
+                            <select id="linkedModule" required>
+                                <option value="">Select Module</option>
+                                <option value="inventory-network">Inventory Network</option>
+                                <option value="inventory-hardware">Inventory Hardware</option>
+                                <option value="inventory-department">Inventory Department</option>
+                                <option value="plant-material">Plant Material</option>
+                                <option value="plant-service">Plant Service</option>
+                            </select>
+                        </div>
+                
+                        <div class="selector-box">
+                            <label>Select Record</label>
+                
+                            <select id="linkedRecord" required>
+                                <option value="">Select Record</option>
+                            </select>
+                        </div>
+                
+                    </div>
+                </div>
+                                
+                <input type="number" id="SrNum" placeholder="Serial Number" required>
+                <input type="number" id="WbsNum" placeholder="WBS Number" required>
+                <textarea id="Description" class="description-box" placeholder="Description"></textarea>
+                <input type="number" id="Budget" placeholder="Budget" required>
+                <input type="text" id="Transfer" placeholder="Transfer">
+                <input type="text" id="Released" placeholder="Released">
+                <input type="text" id="PreqComm" placeholder="Preq Comm">
+                <input type="text" id="POCommt" placeholder="PO Commt">
+                <input type="text" id="Commitment" placeholder="Commitment">
+                <input type="number" id="Actual" placeholder="Actual" required>
+                <input type="text" id="Assigned" placeholder="Assigned">
+                <input type="text" id="TotalAvailable" placeholder="Total Available">
+                
+                <button type="submit">Save Record</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="config.js"></script>
+    <script src="toast.js"></script>
+    <script src="confirm.js"></script>
+    <script src="wbsProject.js"></script>
+</body>
+</html>
