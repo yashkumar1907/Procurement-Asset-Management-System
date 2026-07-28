@@ -220,6 +220,11 @@ router.put("/:id", upload.array("documents", 10), async (req, res) => {
             lastEditedBy: req.body.lastEditedBy
         };
 
+        if (req.body.poEndDate && new Date(req.body.poEndDate).getTime() !== new Date(existingRecord.poEndDate).getTime()) {
+            updateData.twoMonthReminderSentAt = null;
+            updateData.oneMonthReminderSentAt = null;
+        }
+
         
         const updatedServices = req.body.serviceDetails ? JSON.parse(req.body.serviceDetails) : existingRecord.serviceDetails;
         

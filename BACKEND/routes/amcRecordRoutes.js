@@ -202,6 +202,11 @@ router.put("/:id", upload.array("documents", 10), async (req, res) => {
             lastEditedBy: req.body.lastEditedBy
         };
 
+        if (req.body.poEndDate && new Date(req.body.poEndDate).getTime() !== new Date(existingRecord.poEndDate).getTime()) {
+            updateData.twoMonthReminderSentAt = null;
+            updateData.oneMonthReminderSentAt = null;
+        }
+
 
         // If PO amount is updated than update the balance amount
         if (req.body.poAmount) {

@@ -62,7 +62,15 @@
         <div class="content-area">
 
             <div class="dashboard-heading">
+
                 <h1>DASHBOARD</h1>
+            
+                <button
+                    id="paymentReportBtn"
+                    class="export-payment-btn">
+                    📄 Export Payment Report
+                </button>
+            
             </div>
         
             <div class="dashboard-grid">
@@ -222,6 +230,39 @@
         </div>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+
+    <!-- ===============================
+     PAYMENT REPORT MODAL
+    ================================ -->
+    <div id="paymentReportModal" class="payment-modal">
+        <div class="payment-modal-content">
+
+            <h2>Export Payment Report</h2>
+            <div class="payment-field">
+                <label>From Date</label>
+                <input type="date" id="paymentFromDate">
+            </div>
+
+            <div class="payment-field">
+                <label>To Date</label>
+                <input type="date" id="paymentToDate">
+            </div>
+
+            <div class="payment-modal-buttons">
+
+                <button id="cancelPaymentReportBtn" class="cancel-payment-btn">
+                    Cancel
+                </button>
+
+                <button id="downloadPaymentReportBtn" class="download-payment-btn">
+                    Export Excel
+                </button>
+            </div>
+        </div>
+    </div>
+
+
     <script src="config.js"></script>
     <script src="dashboard.js"></script>
 </body>

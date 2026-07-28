@@ -48,6 +48,9 @@ const wbsProjectRecordRoutes = require("./routes/wbsProjectRecordRoutes");
 
 const dashboardRoutes = require("./routes/dashboardRoutes");
 
+const cron = require("node-cron");
+const {checkNetworkPOReminders, checkAmcPOReminders, checkContractPOReminders} = require("./services/poReminderService");
+
 /* =========================
    Creates backend application
 ========================= */
@@ -103,6 +106,14 @@ app.use("/api/dashboard", dashboardRoutes);
    CONNECT DATABASE
 ========================= */
 connectDB();
+
+
+cron.schedule("0 9 * * *", async () => {
+   console.log("Running PO Reminder Job...");
+   await checkNetworkPOReminders();
+   await checkAmcPOReminders();
+   await checkContractPOReminders();
+});
 
 
 /* =========================

@@ -179,28 +179,27 @@ function getPOStatus(record) {
 
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-
+    
     const endDate = new Date(poEndDate);
     endDate.setHours(0, 0, 0, 0);
-
-    const diffDays = Math.ceil(
-        (endDate - today) / (1000 * 60 * 60 * 24)
-    );
-
-    if (diffDays < 0) {
+    
+    const twoMonthsLater = new Date(today);
+    twoMonthsLater.setMonth(twoMonthsLater.getMonth() + 2);
+    
+    if (endDate < today) {
         return {
             text: "Expired",
             className: "status-expired"
         };
     }
-
-    if (diffDays <= 30) {
+    
+    if (endDate <= twoMonthsLater) {
         return {
             text: "Expiring Soon",
             className: "status-expiring"
         };
     }
-
+    
     return {
         text: "Active",
         className: "status-active"

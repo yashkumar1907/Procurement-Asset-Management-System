@@ -1,5 +1,7 @@
 const express = require("express");
 
+const XLSX = require("xlsx");
+
 const router = express.Router();
 
 const NetworkRecord = require("../models/NetworkRecord");
@@ -469,6 +471,159 @@ router.get("/monthly-po", async (req, res) => {
             labels,
             data: monthlyAmount
         });
+    }
+    catch (error) {
+        console.log(error);
+        res.status(500).json({
+            message: "Server Error"
+        });
+    }
+});
+
+
+router.get("/payment-report", async (req, res) => {
+    try {
+        const { from, to } = req.query;
+
+        if (!from || !to) {
+            return res.status(400).json({
+                message: "From Date and To Date are required."
+            });
+        }
+
+        const fromDate = new Date(from);
+        fromDate.setHours(0, 0, 0, 0);
+
+        const toDate = new Date(to);
+        toDate.setHours(23, 59, 59, 999);
+
+
+        const networkDetails = await NetworkDetail.find({
+            invoiceDate: {
+                $gte: fromDate,
+                $lte: toDate
+            }
+        }).populate("recordId");
+        
+        const amcDetails = await AmcDetail.find({
+            invoiceDate: {
+                $gte: fromDate,
+                $lte: toDate
+            }
+        }).populate("recordId");
+        
+        const contractDetails = await ContractDetail.find({
+            invoiceDate: {
+                $gte: fromDate,
+                $lte: toDate
+            }
+        }).populate("recordId");
+
+        const paymentData = [];
+
+
+        networkDetails.forEach(detail => {
+
+            paymentData.push({
+                "Module": "Network",
+                "Vendor Name": detail.recordId?.vendorName || "",
+                "Vendor Code": detail.recordId?.vendorCode || "",
+                "PO Number": detail.recordId?.po || "",
+                "Description": detail.recordId?.poDescription || "",
+                "Invoice Number": detail.invoiceNumber,
+                "Invoice Date": new Date(detail.invoiceDate).toLocaleDateString("en-GB").replace(/\//g, "."),
+                "Invoice Period": detail.invoicePeriod,
+                "Invoice Amount": detail.invoiceAmount,
+                "Tracking Number": detail.trackingNumber,
+                "Service Entry Number": detail.serviceEntryNumber,
+                "Document Number": detail.documentNumber
+            });
+        
+        });
+
+        amcDetails.forEach(detail => {
+
+            paymentData.push({
+                "Module": "AMC",
+                "Vendor Name": detail.recordId?.vendorName || "",
+                "Vendor Code": detail.recordId?.vendorCode || "",
+                "PO Number": detail.recordId?.po || "",
+                "Description": detail.recordId?.poDescription || "",
+                "Invoice Number": detail.invoiceNumber,
+                "Invoice Date": new Date(detail.invoiceDate).toLocaleDateString("en-GB").replace(/\//g, "."),
+                "Invoice Period": detail.invoicePeriod,
+                "Invoice Amount": detail.invoiceAmount,
+                "Tracking Number": detail.trackingNumber,
+                "Service Entry Number": detail.serviceEntryNumber,
+                "Document Number": detail.documentNumber
+            });
+        
+        });
+
+        contractDetails.forEach(detail => {
+
+            paymentData.push({
+                "Module": "Contract",
+                "Vendor Name": detail.recordId?.vendorName || "",
+                "Vendor Code": detail.recordId?.vendorCode || "",
+                "PO Number": detail.recordId?.po || "",
+                "Description": detail.recordId?.poDescription || "",
+                "Invoice Number": detail.invoiceNumber,
+                "Invoice Date": new Date(detail.invoiceDate).toLocaleDateString("en-GB").replace(/\//g, "."),
+                "Invoice Period": detail.invoicePeriod,
+                "Invoice Amount": detail.invoiceAmount,
+                "Tracking Number": detail.trackingNumber,
+                "Service Entry Number": detail.serviceEntryNumber,
+                "Document Number": detail.documentNumber
+            });
+        
+        });
+
+        const worksheet = XLSX.utils.json_to_sheet(paymentData);
+
+        worksheet["!cols"] = [
+            { wch: 12 }, // Module
+            { wch: 30 }, // Vendor Name
+            { wch: 18 }, // Vendor Code
+            { wch: 20 }, // PO Number
+            { wch: 35 }, // Description
+            { wch: 20 }, // Invoice Number
+            { wch: 15 }, // Invoice Date
+            { wch: 18 }, // Invoice Period
+            { wch: 18 }, // Invoice Amount
+            { wch: 18 }, // Tracking Number
+            { wch: 22 }, // Service Entry Number
+            { wch: 22 }  // Document Number
+        ];
+
+
+        const workbook = XLSX.utils.book_new();
+
+        XLSX.utils.book_append_sheet(
+            workbook,
+            worksheet,
+            "Payment Report"
+        );
+
+
+        const excelBuffer = XLSX.write(workbook, {
+            bookType: "xlsx",
+            type: "buffer"
+        });
+        
+        res.setHeader(
+            "Content-Disposition",
+            `attachment; filename=Payment_Report_${from}_to_${to}.xlsx`
+        );
+        
+        res.setHeader(
+            "Content-Type",
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        );
+        
+        res.send(excelBuffer);
+
+
     }
     catch (error) {
         console.log(error);

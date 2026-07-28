@@ -659,6 +659,51 @@ function renderMonthlyPoChart(chartData) {
 }
 
 
+// ===============================
+// PAYMENT REPORT MODAL
+// ===============================
+const paymentReportBtn = document.getElementById("paymentReportBtn");
+const paymentReportModal = document.getElementById("paymentReportModal");
+const cancelPaymentReportBtn = document.getElementById("cancelPaymentReportBtn");
+
+paymentReportBtn.addEventListener("click", () => {
+    paymentReportModal.style.display = "flex";
+});
+
+cancelPaymentReportBtn.addEventListener("click", () => {
+    paymentReportModal.style.display = "none";
+});
+
+window.addEventListener("click", (event) => {
+    if (event.target === paymentReportModal) {
+        paymentReportModal.style.display = "none";
+    }
+});
+
+
+const downloadPaymentReportBtn = document.getElementById("downloadPaymentReportBtn");
+
+downloadPaymentReportBtn.addEventListener("click", () => {
+    const from = document.getElementById("paymentFromDate").value;
+    const to = document.getElementById("paymentToDate").value;
+
+    if (!from || !to) {
+        alert("Please select both dates.");
+        return;
+    }
+
+    if (from > to) {
+        alert("From Date cannot be greater than To Date.");
+        return;
+    }
+
+    const url = `${API_BASE_URL}/api/dashboard/payment-report?from=${from}&to=${to}`;
+
+    window.open(url, "_blank");
+    paymentReportModal.style.display = "none";
+});
+
+
 loadNetworkDashboard();
 loadInventoryDashboard();
 loadPlantDashboard();

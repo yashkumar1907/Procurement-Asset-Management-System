@@ -63,6 +63,14 @@ const amcRecordSchema = new mongoose.Schema({
         ref: "AmcRecord",
         default: null
     },
+    twoMonthReminderSentAt: {
+        type: Date,
+        default: null
+    },
+    oneMonthReminderSentAt: {
+        type: Date,
+        default: null
+    },
     referencePO: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "AmcRecord",

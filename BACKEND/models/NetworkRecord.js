@@ -63,6 +63,14 @@ const networkRecordSchema = new mongoose.Schema({
         ref: "NetworkRecord",
         default: null
     },
+    twoMonthReminderSentAt: {
+        type: Date,
+        default: null
+    },
+    oneMonthReminderSentAt: {
+        type: Date,
+        default: null
+    },
     referencePO: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "NetworkRecord",

@@ -88,6 +88,14 @@ const contractRecordSchema = new mongoose.Schema({
         ref: "ContractRecord",
         default: null
     },
+    twoMonthReminderSentAt: {
+        type: Date,
+        default: null
+    },
+    oneMonthReminderSentAt: {
+        type: Date,
+        default: null
+    },
     
     referencePO: {
         type: mongoose.Schema.Types.ObjectId,
