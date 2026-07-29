@@ -1,13 +1,16 @@
 const emailLayout = require("./emailLayout");
 
 function poExpiryReminderEmail(record, reminderType) {
-    const title = reminderType === "2_MONTH" ? "PO Expiry Reminder - 2 Months Remaining" : "Urgent: PO Expiry Reminder - 1 Month Remaining";
+    const title =
+    reminderType === "2_MONTH"
+        ? `PO Expiry Reminder (2 Months) - ${record.po}`
+        : `Urgent: PO Expiry Reminder (1 Month) - ${record.po}`;
 
     const message =
         reminderType === "2_MONTH"
-            ? `This is to inform you that the following Purchase Order (PO) will expire within the next <strong>2 months</strong>. Kindly initiate the renewal process if required.`
+            ? `This is a reminder that the following Purchase Order (PO) is due to expire within the next <strong>2 months</strong>. Kindly initiate the creation of a new PR/PO, if not already initiated, to ensure uninterrupted services.`
             : 
-            `This is to inform you that the following Purchase Order (PO) will expire within the next <strong>1 month</strong>. Kindly take the necessary action immediately.`;
+            `This is a reminder that the following Purchase Order (PO) is due to expire within the next <strong>1 month</strong>. If a new PR/PO has not yet been initiated, kindly take the necessary action immediately to avoid service disruption.`;
 
     const content = `
         <p>Hello,</p>

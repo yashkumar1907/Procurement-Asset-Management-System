@@ -108,7 +108,7 @@ app.use("/api/dashboard", dashboardRoutes);
 connectDB();
 
 
-cron.schedule("0 9 * * *", async () => {
+cron.schedule("0 10,16 * * *", async () => {
    console.log("Running PO Reminder Job...");
    await checkNetworkPOReminders();
    await checkAmcPOReminders();
