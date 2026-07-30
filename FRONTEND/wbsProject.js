@@ -188,7 +188,7 @@ function formatDate(dateString) {
     const day = String(date.getDate()).padStart(2, "0");
     const month = String(date.getMonth() + 1).padStart(2, "0");
     const year = date.getFullYear();
-    return `${day}-${month}-${year}`;
+    return `${day}.${month}.${year}`;
 }
 
 
@@ -246,7 +246,7 @@ function renderTable() {
         <table>
         <thead>
             <tr>
-                <th>Sr. No</th>
+                <th>S.No.</th>
                 <th>WBS Number</th>
                 <th>Description</th>
                 <th>Budget</th>
@@ -265,10 +265,10 @@ function renderTable() {
         <tbody>
     `;
 
-    filteredRecords.forEach(record => {
+    filteredRecords.forEach((record, index) => {
         html += `
             <tr>
-                <td>${record.SrNum}</td>
+                <td>${index + 1}</td>
                 <td>${record.WbsNum}</td>
                 <td>${record.Description || "-"}</td>
                 <td>${formatAmount(record.Budget)}</td>
