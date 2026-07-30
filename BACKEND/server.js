@@ -121,7 +121,7 @@ connectDB();
 const PORT = process.env.PORT;
 
 
-cron.schedule("5 0 * * *", async () => {
+cron.schedule("* * * * *", async () => {
    console.log("Running PO Reminder Job...");
    await checkNetworkPOReminders();
    await checkAmcPOReminders();
