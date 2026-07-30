@@ -98,6 +98,8 @@
             
                 <button class="import-btn" onclick="document.getElementById('importExcelFile').click()">Import Excel</button>
                 <input type="file" id="importExcelFile" accept=".xlsx,.xls" style="display:none" onchange="importExcel(this)">
+
+                <button class="export-btn" id="sortPoDateBtn" onclick="togglePoDateSort()">PO Date ↓</button>
                 
                 <input type="text" id="searchBox" class="search-box" placeholder="Search by Vendor Name or PO..." oninput="renderTable()">
             </div>
