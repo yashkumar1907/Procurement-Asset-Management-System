@@ -278,7 +278,7 @@ router.post("/import", excelUpload.single("excelFile"), async (req, res) => {
 
             // CHECK DUPLICATE WBS NUMBER
             const existingRecord = await WbsProjectRecord.findOne({
-                WbsNum: Number(row["WBS Number"])
+                WbsNum: String(row["WBS Number"] || "").trim()
             });
 
             if (existingRecord) {
@@ -287,7 +287,7 @@ router.post("/import", excelUpload.single("excelFile"), async (req, res) => {
             }
 
             const record = new WbsProjectRecord({
-                WbsNum: Number(row["WBS Number"]) || 0,
+                WbsNum: String(row["WBS Number"] || "").trim(),
                 Description: row["Description"] || "",
                 Budget: Number(row["Budget"]) || 0,
                 Transfer: row["Transfer"] || "",

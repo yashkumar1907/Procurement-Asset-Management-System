@@ -489,7 +489,7 @@ async function addRecord(event) {
     event.preventDefault();
 
     const recordData = {
-        WbsNum: Number(document.getElementById("WbsNum").value),
+        WbsNum: document.getElementById("WbsNum").value.trim(),
         Description: document.getElementById("Description").value.trim(),
         Budget: Number(document.getElementById("Budget").value),
         Transfer: document.getElementById("Transfer").value.trim(),

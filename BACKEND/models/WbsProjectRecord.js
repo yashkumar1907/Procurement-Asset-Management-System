@@ -2,9 +2,9 @@ const mongoose = require("mongoose");
 
 const wbsProjectRecordSchema = new mongoose.Schema({
     WbsNum: {
-        type: Number,
+        type: String,
         required: true,
-        default: 0
+        default: ""
     },
     Description: {
         type: String,
