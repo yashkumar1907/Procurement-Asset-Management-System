@@ -15,22 +15,23 @@ router.post("/run-po-reminders", async (req, res) => {
     }
 
     try {
-        await runPOReminderJob();
-
         res.status(200).json({
             success: true,
-            message: "PO Reminder Job Executed Successfully"
+            message: "PO Reminder Job Started"
         });
-
-    } catch (error) {
-
+    
+        runPOReminderJob()
+            .catch(err => console.error(err));
+    
+    }
+    catch (error) {
+    
         console.error(error);
-
+    
         res.status(500).json({
-            success: false,
-            message: "Internal Server Error"
+            success: false
         });
-
+    
     }
 
 });
