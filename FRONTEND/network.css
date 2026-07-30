@@ -929,8 +929,7 @@ table td a:hover {
     margin-top: 10px;
     margin-bottom: 8px;
 
-    background: #ffffff;
-    border:1px solid #e3e8ef;
+    background: #f8fafc;
     border: 1px solid #dbe3ec;
     border-radius: 10px;
 }
@@ -946,12 +945,6 @@ table td a:hover {
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
-}
-
-.document-entry:hover,
-.invoice-pdf-entry:hover{
-    border-color:#ff6b00;
-    box-shadow:0 3px 10px rgba(255,107,0,.12);
 }
 
 .remove-document-btn {
