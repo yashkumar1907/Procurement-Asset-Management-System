@@ -283,15 +283,14 @@ body {
    STATISTICS CARDS
 ========================= */
 .stats-container {
-    display: flex;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
     gap: 20px;
     margin-bottom: 25px;
-    flex-wrap: wrap;
 }
 
 .stat-card {
-    flex: 1;
-    min-width: 220px;
+    min-width: 0;
     padding: 20px;
     background: white;
     border: 1px solid #e5e7eb;

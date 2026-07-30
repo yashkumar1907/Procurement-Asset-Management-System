@@ -27,6 +27,8 @@ Used when building upload file paths
 ========================= */
 const path = require("path");
 
+const os = require("os");
+
 
 /* =========================
    Import Record Model
@@ -40,17 +42,31 @@ const ContractRecord = require("../models/ContractRecord");
 const ContractDetail = require("../models/ContractDetail");
 
 
+const uploadsDir = path.join(__dirname, "../uploads");
+
+if (!fs.existsSync(uploadsDir)) {
+    fs.mkdirSync(uploadsDir, { recursive: true });
+}
+
+
+const tempDir = path.join(os.tmpdir(), "jsl-uploads");
+
+if (!fs.existsSync(tempDir)) {
+    fs.mkdirSync(tempDir, { recursive: true });
+}
+
+
 /* =========================
    MULTER CONFIGURATION
 ========================= */
 const storage = multer.diskStorage({
     // Where to store files
     destination: function(req, file, cb) {
-        cb(null, "uploads/");
+        cb(null, tempDir);
     },
     // File Name
     filename: function(req, file, cb) {
-        cb(null, Date.now() + "-" + file.originalname);
+        cb(null, `${Date.now()}-${Math.round(Math.random() * 1e9)}${path.extname(file.originalname)}`);
     }
 });
 

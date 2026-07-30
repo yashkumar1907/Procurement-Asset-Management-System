@@ -21,6 +21,8 @@ Used when building upload file paths
 ========================= */
 const path = require("path");
 
+const os = require("os");
+
 
 /* =========================
    Creates a route container (Instead of app)
@@ -46,17 +48,31 @@ const ContractDetail = require("../models/ContractDetail");
 const XLSX = require("xlsx");
 
 
+
+const uploadsDir = path.join(__dirname, "../uploads");
+
+if (!fs.existsSync(uploadsDir)) {
+    fs.mkdirSync(uploadsDir, { recursive: true });
+}
+
+const tempDir = path.join(os.tmpdir(), "jsl-uploads");
+
+if (!fs.existsSync(tempDir)) {
+    fs.mkdirSync(tempDir, { recursive: true });
+}
+
+
 /* =========================
    MULTER CONFIGURATION
 ========================= */
 const storage = multer.diskStorage({
     // Where to store files
-    destination: function (req, file, cb) {
-        cb(null, 'uploads/');
+    destination: function(req, file, cb) {
+        cb(null, tempDir);
     },
     // File Name
     filename: function (req, file, cb) {
-        cb(null, Date.now() + "-" + file.originalname);
+        cb(null, `${Date.now()}-${Math.round(Math.random() * 1e9)}${path.extname(file.originalname)}`);
     }
 });
 
@@ -136,6 +152,22 @@ router.post("/",upload.array("documents", 10), async (req, res) => {
                 (sum, service) =>
                     sum + (Number(service.quantity || 0) * Number(service.pricePerQuantity || 0)), 0 );
 
+            if (req.body.referencePO) {
+                const referenceRecord = await ContractRecord.findById(req.body.referencePO);
+                
+                if (!referenceRecord) {
+                    return res.status(404).json({
+                        message: "Reference PO not found"
+                    });
+                }
+
+                if (referenceRecord.renewed) {
+                    return res.status(400).json({
+                        message: "Selected Reference PO has already been renewed."
+                    });
+                }
+            }
+
         // Create new record
         const record = new ContractRecord({
             ...req.body,
@@ -176,7 +208,14 @@ router.post("/",upload.array("documents", 10), async (req, res) => {
 // ===============================
 router.get("/", async (req, res) => {
     try {
-        const records = await ContractRecord.find();
+        const records = await ContractRecord.find().lean();
+
+        for (const record of records) {
+            record.invoiceCount =
+                await ContractDetail.countDocuments({
+                    recordId: record._id
+                });
+        }
         res.status(200).json(records);
     }
     catch (error) {
@@ -208,6 +247,28 @@ router.put("/:id", upload.array("documents", 10), async (req, res) => {
         const totalPaidAmount = details.reduce((sum, detail) => sum + (detail.invoiceAmount || 0), 0);
 
         const newReferencePO = req.body.referencePO || null;
+
+        if (newReferencePO && newReferencePO === req.params.id) {
+            return res.status(400).json({
+                message: "A PO cannot reference itself."
+            });
+        }
+
+        if (newReferencePO) {
+            const referenceRecord = await ContractRecord.findById(newReferencePO);
+        
+            if (!referenceRecord) {
+                return res.status(404).json({
+                    message: "Reference PO not found"
+                });
+            }
+
+            if (referenceRecord.renewed && oldReferencePO !== newReferencePO) {
+                return res.status(400).json({
+                    message: "Selected Reference PO has already been renewed."
+                });
+            }
+        }
 
         const oldReferencePO = existingRecord.referencePO
             ? existingRecord.referencePO.toString()
@@ -373,6 +434,19 @@ router.delete("/:id/document/:filename", async (req, res) => {
 router.delete("/:id", async (req, res) => {
     try {
         const record = await ContractRecord.findById(req.params.id);
+
+        // Restore previous Reference PO
+        if (record.referencePO) {
+            await ContractRecord.findByIdAndUpdate(
+                record.referencePO,
+                {
+                    renewed: false,
+                    renewedWith: null
+                }
+            );
+        }
+
+
         if (!record) {
             return res.status(404).json({
                 message: "Record not found"
@@ -403,6 +477,19 @@ router.delete("/:id", async (req, res) => {
                 }
             }
         });
+
+        // Remove renewal link from any record that points to this record
+        await ContractRecord.updateMany(
+            {
+                renewedWith: record._id
+            },
+            {
+                $set: {
+                    renewed: false,
+                    renewedWith: null
+                }
+            }
+        );
 
         // Delete all invoices of that PO
         await ContractDetail.deleteMany({recordId: req.params.id});
@@ -671,9 +758,31 @@ router.post("/import", excelUpload.single("excelFile"), async (req, res) => {
                 importedRecords++;
             }
             for(const row of detailSheet) {
+                const existingInvoice = await ContractDetail.findOne({
+                    invoiceNumber: row["Invoice / External Number"]
+                });
+            
+                if (existingInvoice) {
+                    continue;
+                }
+
                 const po = String(row["Purchase Order (PO)"]).trim();
                 const recordId = poMap[po];
                 if (!recordId) {
+                    continue;
+                }
+
+                const invoiceAmount = Number(row["Invoice Amount"]);
+                if (isNaN(invoiceAmount)) {
+                    continue;
+                }
+
+                const record = await ContractRecord.findById(recordId);
+                if (!record) {
+                    continue;
+                }
+
+                if (invoiceAmount > Number(record.balanceAmount)) {
                     continue;
                 }
 
@@ -687,18 +796,15 @@ router.post("/import", excelUpload.single("excelFile"), async (req, res) => {
                         invoicePeriodStartDate: parseExcelDate(row["Invoice Period Start"]),
                         invoicePeriod: row["Invoice Period"],
                         invoicePeriodEndDate: parseExcelDate(row["Invoice Period End"]),
-                        invoiceAmount: Number(row["Invoice Amount"]),
+                        invoiceAmount,
                         serviceEntryNumber: row["Service Entry Number"],
                         documentNumber: row["Document Number"]
                     });
 
                 await detail.save();
 
-                const record = await ContractRecord.findById(recordId);
-                if (record) {
-                    record.balanceAmount = Number(record.balanceAmount) - Number(row["Invoice Amount"]);
-                    await record.save();
-                }
+                record.balanceAmount -= invoiceAmount;
+                await record.save();
                 importedInvoices++;
             }
             fs.unlinkSync(req.file.path);

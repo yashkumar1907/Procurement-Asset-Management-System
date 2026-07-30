@@ -281,9 +281,17 @@ function updateStatistics() {
             0
         );
 
+    const totalInvoices =
+        records.reduce(
+            (sum, record) =>
+                sum + Number(record.invoiceCount || 0),
+            0
+        );
+
     document.getElementById("totalRecords").innerText = totalRecords;
     document.getElementById("totalPoAmount").innerText = formatAmount(totalPoAmount);
     document.getElementById("totalBalanceAmount").innerText = formatAmount(totalBalanceAmount);
+    document.getElementById("totalInvoices").innerText = totalInvoices;
 }
 
 
@@ -308,6 +316,7 @@ function renderTable() {
             <table id="data-table">
                 <thead>
                     <tr>
+                        <th>S.No.</th>
                         <th>Vendor Name</th>
                         <th>Vendor Code</th>
                         <th>Purchase Requestor (PR)</th>
@@ -330,10 +339,11 @@ function renderTable() {
             <tbody>                    
     `;
 
-    filteredRecords.forEach(item => {
+    filteredRecords.forEach((item, index) => {
         const status = getPOStatus(item);
         html += `
             <tr id="row-${item._id}" class="${status.className}-row">
+                <td>${index + 1}</td>
                 <td>${item.vendorName}</td>
                 <td>${item.vendorCode}</td>
                 <td>${item.pr}</td>
@@ -393,6 +403,7 @@ function renderTable() {
                 <table class="details-table">
                     <thead>
                         <tr>
+                            <th>S.No.</th>
                             <th>Service Code</th>
                             <th>Invoice / External Number</th>
                             <th>Invoice Date</th>
@@ -408,7 +419,7 @@ function renderTable() {
 
                     <tbody id="details-body-${item._id}">
                         <tr>
-                            <td colspan="10">
+                            <td colspan="11">
                                 Loading...
                             </td>
                         </tr>
@@ -431,7 +442,7 @@ function renderTable() {
             "</tbody>",
             `
                 <tr>
-                    <td colspan="17" class="no-data">
+                    <td colspan="18" class="no-data">
                         No Records Found
                     </td>
                 </tr>
@@ -1400,7 +1411,7 @@ async function loadDetails(recordId) {
         if (!details.length) {
             tbody.innerHTML = `
                 <tr>
-                    <td colspan="10" style="text-align:center;">
+                    <td colspan="11" style="text-align:center;">
                         No Details Added Yet
                     </td>
                 </tr>
@@ -1409,8 +1420,9 @@ async function loadDetails(recordId) {
         }
 
         tbody.innerHTML =
-            details.map(detail => `
+            details.map((detail, index) => `
                 <tr>
+                    <td>${index + 1}</td>
                     <td>${detail.serviceCode || "-"}</td>
                     <td>${detail.invoiceNumber}</td>
                     <td>${formatDate(detail.invoiceDate)}</td>
@@ -1552,6 +1564,7 @@ function renderInvoicePdfPreview() {
 document.getElementById("invoicePdf").addEventListener("change",
     function () {
         currentInvoicePdf = this.files[0];
+        removeInvoicePdfFlag = false;
         renderInvoicePdfPreview();
     }
 );
