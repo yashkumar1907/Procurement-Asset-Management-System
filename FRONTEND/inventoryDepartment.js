@@ -255,6 +255,7 @@ function renderTable() {
             <table id="data-table">
                 <thead>
                     <tr>
+                        <th>S.No.</th>
                         <th>PR Requirement Date</th>
                         <th>PR Number</th>
                         <th>PO Number</th>
@@ -276,13 +277,14 @@ function renderTable() {
                 <tbody>
     `;
 
-    filteredRecords.forEach(item => {
+    filteredRecords.forEach((item, index) => {
         html += `
             <tr>
+                <td>${index + 1}</td>
                 <td>${formatDate(item.prReqDate)}</td>
                 <td>${item.prNum || "-"}</td>
                 <td>${item.poNum || "-"}</td>
-                <td>${(item.departmentDetails || []).map(x => x.code).join("<br><br>")}</td>
+                <td>${(item.departmentDetails || []).map((x, i) => `${i + 1}. ${x.code}`).join("<br><br>")}</td>
                 <td>${(item.departmentDetails || []).map(x => x.desc).join("<br><br>")}</td>
                 <td>${(item.departmentDetails || []).map(x => x.quantity).join("<br><br>")}</td>
                 <td>${item.trackingId || "-"}</td>
@@ -323,7 +325,7 @@ function renderTable() {
             "</tbody>",
             `
                 <tr>
-                    <td colspan="16" class="no-data">
+                    <td colspan="17" class="no-data">
                         No Records Found
                     </td>
                 </tr>
@@ -505,7 +507,7 @@ async function addRecord(event) {
     const prReqDate = document.getElementById("prReqDate").value;
     const prNum = document.getElementById("prNum").value.trim();
     const poNum = document.getElementById("poNum").value.trim();
-    const trackingId = document.getElementById("trackingId").value.trim();
+    const trackingId = document.getElementById("trackingId").value;
     const costCenter = document.getElementById("costCenter").value;
     const projectName = document.getElementById("projectName").value;
     let currentProgress = document.getElementById("currentProgress").value;
@@ -531,8 +533,8 @@ async function addRecord(event) {
         const quantity = Number(row.querySelector(".quantityField").value);
 
         departmentDetails.push({
-            code: row.querySelector(".codeField").value.trim(),
-            desc: row.querySelector(".descField").value.trim(),
+            code: row.querySelector(".codeField").value,
+            desc: row.querySelector(".descField").value,
             quantity,
         });
     });
@@ -625,9 +627,6 @@ function editRecord(id) {
         record.departmentDetails.forEach(department => {
             addMaterialRow(department);
         });
-    }
-    if (!record.departmentDetails || record.departmentDetails.length === 0) {
-        addMaterialRow();
     }
 }
 

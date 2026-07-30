@@ -531,26 +531,6 @@ table td a:hover {
     background-color: #b02a37;
 }
 
-.details-btn {
-    background: linear-gradient(
-        135deg,
-        #ff6b00,
-        #ff7f11
-    );
-    color: white;
-    border: none;
-    border-radius: 6px;
-    padding: 8px 14px;
-    font-size: 14px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: 0.2s;
-}
-.details-btn:hover {
-    filter: brightness(1.05);
-}
-
-
 /* =========================
    MODAL BASE
 ========================= */
@@ -1099,51 +1079,6 @@ input[type="file"]:disabled::file-selector-button {
     /* cursor: not-allowed; */
     filter: grayscale(100%);
 }
-
-/* =========================
-   DETAIL MODAL
-========================= */
-#detailModal select {
-    width: 100%;
-    padding: 16px;
-    margin-bottom: 18px;
-    border-radius: 10px;
-    background: white;
-    color: #1e293b;
-    border: 1px solid #d1d5db;
-    font-size: 16px;
-    box-sizing: border-box;
-}
-
-#detailModal select:focus {
-    outline: none;
-    border-color: #ff6b00;
-    box-shadow: 0 0 0 3px rgba(255,107,0,0.15);
-}
-
-
-/* =========================
-   DETAIL TABLE SECTION
-========================= */
-.details-row td {
-    padding: 20px !important;
-}
-
-.details-row .add-btn {
-    position: sticky;
-    left: 20px;
-    z-index: 50;
-    
-    display: inline-block;
-    margin-bottom: 15px;
-}
-
-.details-table {
-    width: 100%;
-    margin-top: 10px;
-    border-collapse: collapse;
-}
-
 
 /* =========================
    RESPONSIVE
