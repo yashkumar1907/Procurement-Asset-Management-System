@@ -592,7 +592,9 @@ async function deleteRecord(id) {
             return;
         }
         showToast("success", data.message);
+        
         await loadRecords();
+        await loadReferencePOs();
     }
     catch (error) {
         console.error("Delete Record Error:", error);
@@ -814,6 +816,10 @@ async function editRecord(id) {
     document.getElementById("poPeriod").value = record.poPeriod || "";
     document.getElementById("poEndDate").value = formatDateForInput(record.poEndDate);
 
+    if (record.referencePO) {
+        document.getElementById("referencePO").value = record.referencePO;
+    }
+
     if (record.documents) {    
         fixedDocuments = {
             JUSTIFICATION: {
@@ -994,9 +1000,26 @@ async function saveDetail(event) {
 
     const record = records.find(record => record._id === recordId);
 
-    if (!detailId && record && Number(invoiceAmount) > Number(record.balanceAmount)) {
-        showToast("warning", "Invoice Amount should be less than or equal to Balance Amount");
-        return;
+    if (record) {
+        let allowedAmount = Number(record.balanceAmount);
+
+        if (detailId) {
+            const response = await fetch(
+                `${API_BASE_URL}/api/network-details/single/${detailId}`
+            );
+    
+            const existingDetail = await response.json();
+    
+            allowedAmount += Number(existingDetail.invoiceAmount || 0);
+        }
+    
+        if (Number(invoiceAmount) > allowedAmount) {
+            showToast(
+                "warning",
+                "Invoice Amount should be less than or equal to Balance Amount"
+            );
+            return;
+        }
     }
 
     const formData = new FormData();

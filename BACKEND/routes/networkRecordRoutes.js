@@ -126,13 +126,23 @@ router.post("/",upload.array("documents", 10), async (req, res) => {
         await record.save();
 
         if (req.body.referencePO) {
-            await NetworkRecord.findByIdAndUpdate(
-                req.body.referencePO,
-                {
-                    renewed: true,
-                    renewedWith: record._id
-                }
-            );
+            const referenceRecord = await NetworkRecord.findById(req.body.referencePO);
+        
+            if (!referenceRecord) {
+                return res.status(404).json({
+                    message: "Reference PO not found."
+                });
+            }
+        
+            if (referenceRecord.renewed) {
+                return res.status(400).json({
+                    message: "Selected Reference PO has already been renewed."
+                });
+            }
+        
+            referenceRecord.renewed = true;
+            referenceRecord.renewedWith = record._id;
+            await referenceRecord.save();
         }
 
         res.status(201).json({
@@ -192,6 +202,28 @@ router.put("/:id", upload.array("documents", 10), async (req, res) => {
         }
 
         const newReferencePO = req.body.referencePO || null;
+
+        if (newReferencePO && newReferencePO === req.params.id) {
+            return res.status(400).json({
+                message: "A PO cannot reference itself."
+            });
+        }
+
+        if (newReferencePO) {
+            const referenceRecord = await NetworkRecord.findById(newReferencePO);
+        
+            if (!referenceRecord) {
+                return res.status(404).json({
+                    message: "Reference PO not found."
+                });
+            }
+        
+            if (referenceRecord.renewed && referenceRecord.renewedWith && referenceRecord.renewedWith.toString() !== req.params.id) {
+                return res.status(400).json({
+                    message: "Selected Reference PO has already been renewed."
+                });
+            }
+        }
 
         const oldReferencePO = existingRecord.referencePO
             ? existingRecord.referencePO.toString()
@@ -351,6 +383,28 @@ router.delete("/:id", async (req, res) => {
                 }
             }
         });
+
+
+        // Remove renewal relationship if this PO is the renewed PO
+        if (record.referencePO) {
+            await NetworkRecord.findByIdAndUpdate(
+                record.referencePO,
+                {
+                    renewed: false,
+                    renewedWith: null
+                }
+            );
+        }
+
+        // If this PO is referenced by another PO, remove that reference
+        await NetworkRecord.updateMany(
+            { referencePO: req.params.id },
+            {
+                $set: {
+                    referencePO: null
+                }
+            }
+        );
 
         // Delete all invoices of that PO
         await NetworkDetail.deleteMany({recordId: req.params.id});
@@ -573,6 +627,21 @@ router.post("/import", excelUpload.single("excelFile"), async (req, res) => {
                 continue;
             }
 
+            const existingInvoice = await NetworkDetail.findOne({
+                recordId,
+                invoiceNumber: row["Invoice / External Number"]
+            });
+            
+            if (existingInvoice) {
+                continue;
+            }
+
+            const invoiceAmount = Number(row["Invoice Amount"]);
+
+            if (isNaN(invoiceAmount)) {
+                continue;
+            }
+
             const detail =
                 new NetworkDetail({
                     recordId,
@@ -582,7 +651,7 @@ router.post("/import", excelUpload.single("excelFile"), async (req, res) => {
                     invoicePeriodStartDate: parseExcelDate(row["Invoice Period Start"]),
                     invoicePeriod: row["Invoice Period"],
                     invoicePeriodEndDate: parseExcelDate(row["Invoice Period End"]),
-                    invoiceAmount: Number(row["Invoice Amount"]),
+                    invoiceAmount: invoiceAmount,
                     serviceEntryNumber: row["Service Entry Number"],
                     documentNumber: row["Document Number"]
                 });
@@ -591,7 +660,7 @@ router.post("/import", excelUpload.single("excelFile"), async (req, res) => {
 
                 const record = await NetworkRecord.findById(recordId);
                 if (record) {
-                    record.balanceAmount = Number(record.balanceAmount) - Number(row["Invoice Amount"]);
+                    record.balanceAmount = Number(record.balanceAmount) - invoiceAmount;
                     await record.save();
                 }
                 importedInvoices++;
