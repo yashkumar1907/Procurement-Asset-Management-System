@@ -244,7 +244,6 @@ router.get("/export", async (req, res) => {
 
         // CREATE EXCEL DATA
         const excelData = records.map(record => ({
-            "Sr. No": record.SrNum,
             "WBS Number": record.WbsNum,
             "Description": record.Description,
             "Budget": record.Budget,
@@ -264,7 +263,6 @@ router.get("/export", async (req, res) => {
         // CREATE WORKSHEET
         const worksheet = XLSX.utils.json_to_sheet(excelData, {
             header: [
-                "Sr. No",
                 "WBS Number",
                 "Description",
                 "Budget",
@@ -360,7 +358,6 @@ router.post("/import", excelUpload.single("excelFile"), async (req, res) => {
             }
 
             const record = new WbsProjectRecord({
-                SrNum: Number(row["Sr. No"]) || 0,
                 WbsNum: Number(row["WBS Number"]) || 0,
                 Description: row["Description"] || "",
                 Budget: Number(row["Budget"]) || 0,

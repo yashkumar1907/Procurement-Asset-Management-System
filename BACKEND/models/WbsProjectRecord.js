@@ -1,11 +1,6 @@
 const mongoose = require("mongoose");
 
 const wbsProjectRecordSchema = new mongoose.Schema({
-    SrNum: {
-        type: Number,
-        required: true,
-        default: 0
-    },
     WbsNum: {
         type: Number,
         required: true,

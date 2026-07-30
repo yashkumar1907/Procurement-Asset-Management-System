@@ -536,7 +536,6 @@ async function addRecord(event) {
     const recordData = {
         linkedModule: document.getElementById("linkedModule").value,
         linkedRecordId: document.getElementById("linkedRecord").value,
-        SrNum: Number(document.getElementById("SrNum").value),
         WbsNum: Number(document.getElementById("WbsNum").value),
         Description: document.getElementById("Description").value.trim(),
         Budget: Number(document.getElementById("Budget").value),
@@ -587,7 +586,6 @@ function editRecord(id) {
         document.getElementById("linkedRecord").value = record.linkedRecordId || "";
     });
 
-    document.getElementById("SrNum").value = record.SrNum || "";
     document.getElementById("WbsNum").value = record.WbsNum || "";
     document.getElementById("Description").value = record.Description || "";
     document.getElementById("Budget").value = record.Budget || "";
