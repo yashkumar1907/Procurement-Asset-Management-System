@@ -1379,6 +1379,10 @@ if (invoicePdfInput) {
     invoicePdfInput.addEventListener("change",
         function () {
             currentInvoicePdf = this.files[0];
+    
+            // A new PDF has been selected, so don't remove it.
+            removeInvoicePdfFlag = false;
+    
             renderInvoicePdfPreview();
         }
     );
