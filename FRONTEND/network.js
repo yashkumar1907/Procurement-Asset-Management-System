@@ -404,10 +404,17 @@ function renderTable() {
         <tr id="details-${item._id}" class="details-row" style="display:none;">
             <td colspan="100%">
             <div class="detail-section">
-                ${getCurrentPermission() === "edit" ? `
-                    <button class="add-btn" onclick="addDetailRow('${item._id}')">+ Add Detail</button>
-                    ` : ""
-                }
+                <div class="detail-toolbar">
+                    ${getCurrentPermission() === "edit" ? `
+                        <button class="add-btn" onclick="addDetailRow('${item._id}')">
+                            + Add Detail
+                        </button>
+                    ` : ""}
+
+                    <span class="invoice-count">
+                        Total Invoices: ${item.invoiceCount || 0}
+                    </span>
+                </div>
                 <div id="detail-form-${item._id}"></div>
                 <table class="details-table">
                     <thead>

@@ -1101,13 +1101,25 @@ input[type="file"]:disabled::file-selector-button {
     padding: 20px !important;
 }
 
-.details-row .add-btn {
+.detail-toolbar {
     position: sticky;
     left: 20px;
     z-index: 50;
-    
-    display: inline-block;
+
+    display: flex;
+    align-items: center;
+    gap: 18px;
     margin-bottom: 15px;
+}
+
+.detail-toolbar .add-btn {
+    margin-bottom: 0;
+}
+
+.invoice-count {
+    font-size: 17px;
+    font-weight: 600;
+    color: #374151;
 }
 
 .details-table {
