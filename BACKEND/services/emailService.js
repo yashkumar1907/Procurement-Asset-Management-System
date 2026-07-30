@@ -6,12 +6,23 @@ console.log(process.env.EMAIL_PASS ? "PASS FOUND" : "PASS NOT FOUND");
 const transporter = nodemailer.createTransport({
     host: "smtp.gmail.com",
     port: 587,
-    secure: false, // STARTTLS
+    secure: false,
     requireTLS: true,
+    connectionTimeout: 10000,
+    greetingTimeout: 10000,
+    socketTimeout: 10000,
 
     auth: {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASS
+    }
+});
+
+transporter.verify((error, success) => {
+    if (error) {
+        console.error("SMTP Verify Error:", error);
+    } else {
+        console.log("SMTP Server Ready");
     }
 });
 
