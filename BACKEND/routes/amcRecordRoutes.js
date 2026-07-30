@@ -106,7 +106,7 @@ router.get("/reference-pos", async (req, res) => {
         res.json(records);
     }
     catch (error) {
-        console.log(error);
+        console.error(error);
         res.status(500).json({
             message: "Server Error"
         });
@@ -117,7 +117,7 @@ router.get("/reference-pos", async (req, res) => {
 // ===============================
 // CREATE RECORD (Post /api/records)
 // ===============================
-router.post("/",upload.array("documents", 10), async (req, res) => {
+router.post("/", upload.array("documents", 10), async (req, res) => {
     try {
         const referencePO = req.body.referencePO || null;
 
@@ -140,7 +140,7 @@ router.post("/",upload.array("documents", 10), async (req, res) => {
         // JSON.parse converts string into array
         const documentTypes = req.body.documentTypes ? JSON.parse(req.body.documentTypes): [];
 
-        // Used to map files to thier types (means justification.pdf maps to Justification type))
+        // Used to map files to their types (means justification.pdf maps to Justification type))
         const documents = req.files ? req.files.map((file, index) => ({type: documentTypes[index], fileName: file.filename})): [];
 
         // Create new record
@@ -168,7 +168,7 @@ router.post("/",upload.array("documents", 10), async (req, res) => {
         });
     }
     catch (error) {
-        console.log(error);
+        console.error(error);
         res.status(500).json({
             message: "Server Error"
         });
@@ -192,7 +192,7 @@ router.get("/", async (req, res) => {
         res.status(200).json(records);
     }
     catch (error) {
-        console.log(error);
+        console.error(error);
         res.status(500).json({
             message: "Server Error"
         });
@@ -335,7 +335,7 @@ router.put("/:id", upload.array("documents", 10), async (req, res) => {
         });
     }
     catch (error) {
-        console.log(error);
+        console.error(error);
         res.status(500).json({
             message: "Server Error"
         });
@@ -371,7 +371,7 @@ router.delete("/:id/document/:filename", async (req, res) => {
         });
     }
     catch (error) {
-        console.log(error);
+        console.error(error);
         res.status(500).json({
             message: "Server Error"
         });
@@ -435,7 +435,7 @@ router.delete("/:id", async (req, res) => {
         });
     }
     catch (error) {
-        console.log(error);
+        console.error(error);
         res.status(500).json({
             message: "Server Error"
         });
@@ -580,7 +580,7 @@ router.get("/export", async (req, res) => {
         res.send(buffer);
     }
     catch (error) {
-        console.log(error);
+        console.error(error);
         res.status(500).json({
             message: "Export Failed"
         });
@@ -679,7 +679,7 @@ router.post("/import", excelUpload.single("excelFile"), async (req, res) => {
             });
         }
         catch (error) {
-            console.log(error);
+            console.error(error);
             res.status(500).json({
                 message: "Import Failed"
             });

@@ -125,7 +125,7 @@ router.get("/reference-pos", async (req, res) => {
         res.json(records);
     }
     catch (error) {
-        console.log(error);
+        console.error(error);
 
         res.status(500).json({
             message: "Server Error"
@@ -136,12 +136,12 @@ router.get("/reference-pos", async (req, res) => {
 // ===============================
 // CREATE RECORD (Post /api/records)
 // ===============================
-router.post("/",upload.array("documents", 10), async (req, res) => {
+router.post("/", upload.array("documents", 10), async (req, res) => {
     try {
         // JSON.parse converts string into array
         const documentTypes = req.body.documentTypes ? JSON.parse(req.body.documentTypes): [];
 
-        // Used to map files to thier types (means justification.pdf maps to Justification type))
+        // Used to map files to their types (means justification.pdf maps to Justification type))
         const documents = req.files ? req.files.map((file, index) => ({type: documentTypes[index], fileName: file.filename})): [];
 
         // JSON.parse converts string into array
@@ -195,7 +195,7 @@ router.post("/",upload.array("documents", 10), async (req, res) => {
         });
     }
     catch (error) {
-        console.log(error);
+        console.error(error);
         res.status(500).json({
             message: "Server Error"
         });
@@ -219,7 +219,7 @@ router.get("/", async (req, res) => {
         res.status(200).json(records);
     }
     catch (error) {
-        console.log(error);
+        console.error(error);
         res.status(500).json({
             message: "Server Error"
         });
@@ -254,6 +254,11 @@ router.put("/:id", upload.array("documents", 10), async (req, res) => {
             });
         }
 
+        const oldReferencePO = existingRecord.referencePO
+            ? existingRecord.referencePO.toString()
+            : null;
+
+        
         if (newReferencePO) {
             const referenceRecord = await ContractRecord.findById(newReferencePO);
         
@@ -269,11 +274,6 @@ router.put("/:id", upload.array("documents", 10), async (req, res) => {
                 });
             }
         }
-
-        const oldReferencePO = existingRecord.referencePO
-            ? existingRecord.referencePO.toString()
-            : null;
-        
 
         const updateData = {
             ...req.body,
@@ -312,7 +312,7 @@ router.put("/:id", upload.array("documents", 10), async (req, res) => {
             const existingDetails = await ContractDetail.find({recordId: req.params.id});
 
             // Old service code
-            const serviceCodesInUse = existingDetails.map(detail => detail.serviceCode);
+            const serviceCodesInUse = existingDetails.flatMap(detail => detail.serviceCodes || []);
 
             // New service code
             const updatedServiceCodes = newServices.map(service => service.code);
@@ -384,7 +384,7 @@ router.put("/:id", upload.array("documents", 10), async (req, res) => {
         });
     }
     catch (error) {
-        console.log(error);
+        console.error(error);
         res.status(500).json({
             message: "Server Error"
         });
@@ -420,7 +420,7 @@ router.delete("/:id/document/:filename", async (req, res) => {
         });
     }
     catch (error) {
-        console.log(error);
+        console.error(error);
         res.status(500).json({
             message: "Server Error"
         });
@@ -499,7 +499,7 @@ router.delete("/:id", async (req, res) => {
         });
     }
     catch (error) {
-        console.log(error);
+        console.error(error);
         res.status(500).json({
             message: "Server Error"
         });
@@ -584,7 +584,7 @@ router.get("/export", async (req, res) => {
 
             detailSheet.push({
                 "Purchase Order (PO)": record?.po || "",
-                "Service Code": detail.serviceCode,
+                "Service Code": (detail.serviceCodes || []).join(", "),
                 "Invoice / External Number": detail.invoiceNumber,
                 "Invoice Date": detail.invoiceDate,
                 "Tracking Number": detail.trackingNumber,
@@ -660,7 +660,7 @@ router.get("/export", async (req, res) => {
         res.send(buffer);
     }
     catch (error) {
-        console.log(error);
+        console.error(error);
         res.status(500).json({
             message: "Export Failed"
         });
@@ -789,7 +789,12 @@ router.post("/import", excelUpload.single("excelFile"), async (req, res) => {
                 const detail =
                     new ContractDetail({
                         recordId,
-                        serviceCode: row["Service Code"],
+                        serviceCodes: row["Service Code"]
+                            ? String(row["Service Code"])
+                                .split(",")
+                                .map(code => code.trim())
+                                .filter(Boolean)
+                            : [],
                         invoiceNumber: row["Invoice / External Number"],
                         invoiceDate: parseExcelDate(row["Invoice Date"]),
                         trackingNumber: row["Tracking Number"],
@@ -813,7 +818,7 @@ router.post("/import", excelUpload.single("excelFile"), async (req, res) => {
             });
         }
         catch (error) {
-            console.log(error);
+            console.error(error);
             res.status(500).json({
                 message: "Import Failed"
             });

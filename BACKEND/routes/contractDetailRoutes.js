@@ -143,7 +143,17 @@ router.post("/", upload.single("invoicePdf"), async (req, res) => {
         });
     }
     catch(error) {
-        console.log(error);
+
+        // Delete uploaded invoice PDF if database operation failed
+        if (req.file) {
+            const filePath = path.join(uploadDir, req.file.filename);
+
+            if (fs.existsSync(filePath)) {
+                fs.unlinkSync(filePath);
+            }
+        }
+
+        console.error(error);
         res.status(500).json({
             message: "Server Error"
         });
@@ -165,7 +175,7 @@ router.get("/single/:id", async (req, res) => {
         res.status(200).json(detail);
     }
     catch(error) {
-        console.log(error);
+        console.error(error);
         res.status(500).json({
             message: "Server Error"
         });
@@ -184,7 +194,7 @@ router.get("/", async (req, res) => {
         res.status(200).json(details);
     }
     catch (error) {
-        console.log(error);
+        console.error(error);
         res.status(500).json({
             message: "Server Error"
         });
@@ -201,7 +211,7 @@ router.get("/:recordId", async (req, res) => {
         res.status(200).json(details);
     }
     catch(error) {
-        console.log(error);
+        console.error(error);
         res.status(500).json({
             message: "Server Error"
         });
@@ -290,7 +300,7 @@ router.put("/:id", upload.single("invoicePdf"), async (req, res) => {
         });
     }
     catch(error) {
-        console.log(error);
+        console.error(error);
         res.status(500).json({
             message: "Server Error"
         });
@@ -337,7 +347,7 @@ router.delete("/:id", async (req, res) => {
         });
     }
     catch(error) {
-        console.log(error);
+        console.error(error);
         res.status(500).json({
             message: "Server Error"
         });

@@ -1,50 +1,50 @@
 const mongoose = require("mongoose");
 
 const wbsProjectRecordSchema = new mongoose.Schema({
-    WbsNum: {
+    wbsNum: {
         type: String,
         required: true,
         default: ""
     },
-    Description: {
+    description: {
         type: String,
         default: ""
     },
-    Budget: {
+    budget: {
         type: Number,
         required: true,
         default: 0
     },
-    Transfer: {
+    transfer: {
         type: String,
         default: ""
     },
-    Released: {
+    released: {
         type: String,
         default: ""
     },
-    PreqComm: {
+    preqComm: {
         type: String,
         default: ""
     },
-    POCommt: {
+    poCommt: {
         type: String,
         default: ""
     },
-    Commitment: {
+    commitment: {
         type: String,
         default: ""
     },
-    Actual: {
+    actual: {
         type: Number,
         required: true,
         default: 0
     },
-    Assigned: {
+    assigned: {
         type: String,
         default: ""
     },
-    TotalAvailable: {
+    totalAvailable: {
         type: String,
         default: ""
     },
