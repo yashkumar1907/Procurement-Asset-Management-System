@@ -83,8 +83,14 @@ const upload = multer({
     }
 });
 
+const tempDir = path.join(__dirname, "..", "temp");
+
+if (!fs.existsSync(tempDir)) {
+    fs.mkdirSync(tempDir, { recursive: true });
+}
+
 const excelUpload = multer({
-    dest: "temp/"
+    dest: tempDir
 });
 
 
