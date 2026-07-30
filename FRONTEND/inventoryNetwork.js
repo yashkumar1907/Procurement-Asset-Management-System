@@ -276,63 +276,60 @@ function renderTable() {
                 <tbody>
     `;
 
+
     filteredRecords.forEach((item, index) => {
-        const materials = item.networkDetails || [];
-
-        materials.forEach((material, i) => {
-            html += `
-                <tr>
-                    ${i === 0 ? `
-                            <td rowspan="${materials.length}">${index + 1}</td>
-                            <td rowspan="${materials.length}">${formatDate(item.prReqDate)}</td>
-                            <td rowspan="${materials.length}">${item.prNum || "-"}</td>
-                            <td rowspan="${materials.length}">${item.poNum || "-"}</td>
-                        `
-                        : ""
-                    }
-
-                    <td>${material.code || "-"}</td>
-                    <td>${material.desc || "-"}</td>
-                    <td>${material.quantity || "-"}</td>
-
-                    ${i === 0 ? `
-                            <td rowspan="${materials.length}">${item.trackingId || "-"}</td>
-                            <td rowspan="${materials.length}">${item.costCenter || "-"}</td>
-                            <td rowspan="${materials.length}">${item.projectName || "-"}</td>
-                            <td rowspan="${materials.length}">${item.currentProgress || "-"}</td>
-                            <td rowspan="${materials.length}">${item.purchaserName || "-"}</td>
-                            <td rowspan="${materials.length}">${item.srrNumber || "-"}</td>
-                            <td rowspan="${materials.length}">${item.grnNumber || "-"}</td>
-                            <td rowspan="${materials.length}">${item.remark || "-"}</td>
-                            <td rowspan="${materials.length}">
-                                <div class="last-edited">
-                                    <i class="fa-solid fa-user"></i>
-                                    <span>${item.lastEditedBy || "-"}</span>
-                                </div>
-                            </td>
-
-                            <td rowspan="${materials.length}">
-                                ${
-                                    getCurrentPermission() === "edit"
-                                    ? `
-                                        <button class="edit-btn" onclick="editRecord('${item._id}')">Edit</button>
-                                        <button class="delete-btn" onclick="deleteRecord('${item._id}')">Delete</button>
-                                    `
-                                    : ""
-                                }
-                            </td>
-                        `
-                        : ""
-                    }
-
-                </tr>
-            `;
-        });
-
         html += `
-                    </tbody>
-                </table>
-            </div>
+            <tr>
+                <td>${index + 1}</td>
+                <td>${formatDate(item.prReqDate)}</td>
+                <td>${item.prNum || "-"}</td>
+                <td>${item.poNum || "-"}</td>
+    
+                <td>
+                    ${(item.networkDetails || [])
+                        .map((x, i) => `${i + 1}. ${x.code}`)
+                        .join("<br><br>")}
+                </td>
+    
+                <td>
+                    ${(item.networkDetails || [])
+                        .map((x, i) => `${i + 1}. ${x.desc}`)
+                        .join("<br><br>")}
+                </td>
+    
+                <td>
+                    ${(item.networkDetails || [])
+                        .map((x, i) => `${i + 1}. ${x.quantity}`)
+                        .join("<br><br>")}
+                </td>
+    
+                <td>${item.trackingId || "-"}</td>
+                <td>${item.costCenter || "-"}</td>
+                <td>${item.projectName || "-"}</td>
+                <td>${item.currentProgress || "-"}</td>
+                <td>${item.purchaserName || "-"}</td>
+                <td>${item.srrNumber || "-"}</td>
+                <td>${item.grnNumber || "-"}</td>
+                <td>${item.remark || "-"}</td>
+    
+                <td>
+                    <div class="last-edited">
+                        <i class="fa-solid fa-user"></i>
+                        <span>${item.lastEditedBy || "-"}</span>
+                    </div>
+                </td>
+    
+                <td>
+                    ${
+                        getCurrentPermission() === "edit"
+                            ? `
+                                <button class="edit-btn" onclick="editRecord('${item._id}')">Edit</button>
+                                <button class="delete-btn" onclick="deleteRecord('${item._id}')">Delete</button>
+                            `
+                            : ""
+                    }
+                </td>
+            </tr>
         `;
     });
 
