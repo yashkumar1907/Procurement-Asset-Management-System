@@ -4,6 +4,7 @@
 let records = [];    // Stores all PO records
 let editingRecordId = null;  // record being edited
 let deletedDocuments = [];  // stores deleted documents
+let poDateSortOrder = "desc";
 let currentInvoicePdf = null;
 let removeInvoicePdfFlag = false;
 let fixedDocuments = {  // Justification / NFA / Agreement files
@@ -242,6 +243,15 @@ function renderTable() {
         const po = (record.po || "").toLowerCase();
 
         return (vendorName.includes(searchText) || po.includes(searchText));
+    });
+
+    filteredRecords.sort((a, b) => {
+        const dateA = new Date(a.poDate);
+        const dateB = new Date(b.poDate);
+    
+        return poDateSortOrder === "desc"
+            ? dateB - dateA
+            : dateA - dateB;
     });
 
     let html = `
@@ -1415,3 +1425,14 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 });
+
+
+// ===============================
+// TOGGLE PO DATE SORT
+// ===============================
+function togglePoDateSort() {
+    poDateSortOrder = poDateSortOrder === "desc" ? "asc" : "desc";
+
+    document.getElementById("sortPoDateBtn").innerText = poDateSortOrder === "desc" ? "Sort by PO Date ↓" : "Sort by PO Date ↑";
+    renderTable();
+}
