@@ -34,7 +34,6 @@ window.onload = function () {
 
     applyPermissions();
     loadRecords();
-    document.getElementById("linkedModule").addEventListener("change", loadLinkedRecords);
 };
 
 // ===============================
@@ -330,50 +329,6 @@ function renderTable() {
 }
 
 
-function getSelectorApi(module) {
-    switch (module) {
-        case "inventory-network": return `${API_BASE_URL}/api/inventory-network-records/wbs-selector`;
-        case "inventory-hardware": return `${API_BASE_URL}/api/inventory-hardware-records/wbs-selector`;
-        case "inventory-department": return `${API_BASE_URL}/api/inventory-department-records/wbs-selector`;
-        case "plant-material": return `${API_BASE_URL}/api/plant-material-records/wbs-selector`;
-        case "plant-service": return `${API_BASE_URL}/api/plant-service-records/wbs-selector`;
-        default: return null;
-    }
-}
-
-async function loadLinkedRecords() {
-    const module = document.getElementById("linkedModule").value;
-    const recordDropdown = document.getElementById("linkedRecord");
-
-    recordDropdown.innerHTML = `<option value="">Select Record</option>`;
-
-    linkedRecords = [];
-
-    const api = getSelectorApi(module);
-
-    if (!api) {
-        return;
-    }
-
-    try {
-        const response = await fetch(api);
-        linkedRecords = await response.json();
-
-        linkedRecords.forEach(record => {
-            const option = document.createElement("option");
-            option.value = record._id;
-            option.textContent = `${record.prNum || "-"} | ${record.projectName || record.poNum || "Record"}`;
-
-            recordDropdown.appendChild(option);
-        });
-    }
-    catch (error) {
-        console.log(error);
-        showToast("error", "Unable to load linked records.");
-    }
-}
-
-
 
 // ============================================================================================================================
 // RECORD DATA APIs
@@ -534,8 +489,6 @@ async function addRecord(event) {
     event.preventDefault();
 
     const recordData = {
-        linkedModule: document.getElementById("linkedModule").value,
-        linkedRecordId: document.getElementById("linkedRecord").value,
         WbsNum: Number(document.getElementById("WbsNum").value),
         Description: document.getElementById("Description").value.trim(),
         Budget: Number(document.getElementById("Budget").value),
@@ -579,12 +532,6 @@ function editRecord(id) {
     editingRecordId = id;
 
     openModal();
-
-    document.getElementById("linkedModule").value = record.linkedModule || "";
-    
-    loadLinkedRecords().then(() => {
-        document.getElementById("linkedRecord").value = record.linkedRecordId || "";
-    });
 
     document.getElementById("WbsNum").value = record.WbsNum || "";
     document.getElementById("Description").value = record.Description || "";

@@ -51,14 +51,6 @@ const wbsProjectRecordSchema = new mongoose.Schema({
     lastEditedBy: {
         type: String,
         default: ""
-    },
-    linkedModule: {
-        type: String,
-        default: ""
-    },
-    linkedRecordId: {
-        type: mongoose.Schema.Types.ObjectId,
-        default: null
     }
 },
     {

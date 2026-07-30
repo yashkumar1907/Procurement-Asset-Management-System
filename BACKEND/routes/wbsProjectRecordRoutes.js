@@ -15,12 +15,6 @@ const router = express.Router();
 ========================= */
 const WbsProjectRecord = require("../models/WbsProjectRecord");
 
-const InventoryNetworkRecord = require("../models/InventoryNetworkRecord");
-const InventoryHardwareRecord = require("../models/InventoryHardwareRecord");
-const InventoryDepartmentRecord = require("../models/InventoryDepartmentRecord");
-const PlantMaterialRecord = require("../models/PlantMaterialRecord");
-const PlantServiceRecord = require("../models/PlantServiceRecord");
-
 
 /* =========================
    Import Excel Package
@@ -98,71 +92,6 @@ router.post("/", async (req, res) => {
 router.get("/", async (req, res) => {
     try {
         const records = await WbsProjectRecord.find().lean();
-        for (const record of records) {
-            if (!record.linkedModule || !record.linkedRecordId) {
-                continue;
-            }
-        
-            let linkedData = null;
-        
-            switch (record.linkedModule) {
-                case "inventory-network":
-                    linkedData = await InventoryNetworkRecord.findById(
-                        record.linkedRecordId,
-                        {
-                            prNum: 1,
-                            poNum: 1
-                        }
-                    ).lean();
-                    break;
-        
-                case "inventory-hardware":
-                    linkedData = await InventoryHardwareRecord.findById(
-                        record.linkedRecordId,
-                        {
-                            prNum: 1,
-                            poNum: 1
-                        }
-                    ).lean();
-                    break;
-        
-                case "inventory-department":
-                    linkedData = await InventoryDepartmentRecord.findById(
-                        record.linkedRecordId,
-                        {
-                            prNum: 1,
-                            poNum: 1
-                        }
-                    ).lean();
-                    break;
-        
-                case "plant-material":
-                    linkedData = await PlantMaterialRecord.findById(
-                        record.linkedRecordId,
-                        {
-                            prNum: 1,
-                            poNum: 1
-                        }
-                    ).lean();
-                    break;
-        
-                case "plant-service":
-                    linkedData = await PlantServiceRecord.findById(
-                        record.linkedRecordId,
-                        {
-                            prNum: 1,
-                            poNum: 1
-                        }
-                    ).lean();
-                    break;
-            }
-        
-            record.linkedInfo = {
-                prNum: linkedData?.prNum || "",
-                poNum: linkedData?.poNum || "",
-                module: record.linkedModule
-            };
-        }
         res.status(200).json(records);
     }
     catch (error) {
