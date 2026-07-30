@@ -15,16 +15,19 @@ const RECIPIENTS = [
 
 async function checkNetworkPOReminders() {
     try {
+        console.log("Entered checkNetworkPOReminders");
+        console.log("About to send test email");
         await sendEmail(
             "yashkumar9926@gmail.com",
             "Test Email",
             "<h1>Testing Email</h1>"
         );
+        console.log("Returned from sendEmail");
         
         console.log("Test email sent");
         return;
 
-        
+
         const records = await NetworkRecord.find({
             renewed: false
         });
