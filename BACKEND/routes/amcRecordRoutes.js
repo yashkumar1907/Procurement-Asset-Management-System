@@ -64,7 +64,7 @@ const storage = multer.diskStorage({
     // Where to store files
     destination: function (req, file, cb) {
         cb(null, uploadDir);
-    },,
+    },
     // File Name
     filename: function (req, file, cb) {
         cb(null, Date.now() + "-" + Math.round(Math.random() * 1e9) + path.extname(file.originalname));
@@ -188,7 +188,7 @@ router.get("/", async (req, res) => {
                 recordId: record._id
             });
         }
-        
+
         res.status(200).json(records);
     }
     catch (error) {
