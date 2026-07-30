@@ -63,7 +63,13 @@ const storage = multer.diskStorage({
     },
     // File Name
     filename: function (req, file, cb) {
-        cb(null, Date.now() + "-" + file.originalname);
+        const uniqueName =
+            Date.now() +
+            "-" +
+            Math.round(Math.random() * 1e9) +
+            path.extname(file.originalname);
+
+        cb(null, uniqueName);
     }
 });
 
@@ -163,6 +169,17 @@ router.post("/",upload.array("documents", 10), async (req, res) => {
         });
     }
     catch (error) {
+        // Delete uploaded files if database operation failed
+        if (req.files && req.files.length > 0) {
+            req.files.forEach(file => {
+                const filePath = path.join(uploadDir, file.filename);
+
+                if (fs.existsSync(filePath)) {
+                    fs.unlinkSync(filePath);
+                }
+            });
+        }
+
         console.log(error);
         res.status(500).json({
             message: "Server Error"

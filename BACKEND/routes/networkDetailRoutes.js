@@ -40,17 +40,30 @@ const NetworkRecord = require("../models/NetworkRecord");
 const NetworkDetail = require("../models/NetworkDetail");
 
 
+const uploadDir = path.join(__dirname, "..", "uploads");
+
+if (!fs.existsSync(uploadDir)) {
+    fs.mkdirSync(uploadDir, { recursive: true });
+}
+
+
 /* =========================
     MULTER CONFIGURATION
 ========================= */
 const storage = multer.diskStorage({
     // Where to store files
     destination: function(req, file, cb) {
-        cb(null, "uploads/");
+        cb(null, uploadDir);
     },
     // File Name
     filename: function(req, file, cb) {
-        cb(null, Date.now() + "-" + file.originalname);
+        const uniqueName =
+            Date.now() +
+            "-" +
+            Math.round(Math.random() * 1e9) +
+            path.extname(file.originalname);
+
+        cb(null, uniqueName);
     }
 });
 
@@ -124,6 +137,15 @@ router.post("/", upload.single("invoicePdf"), async (req, res) => {
         });
     }
     catch(error) {
+        // Delete uploaded invoice PDF if database operation failed
+        if (req.file) {
+            const filePath = path.join(uploadDir, req.file.filename);
+
+            if (fs.existsSync(filePath)) {
+                fs.unlinkSync(filePath);
+            }
+        }
+        
         console.log(error);
         res.status(500).json({
             message: "Server Error"
