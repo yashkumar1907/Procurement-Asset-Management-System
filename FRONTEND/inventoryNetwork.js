@@ -254,6 +254,7 @@ function renderTable() {
             <table id="data-table">
                 <thead>
                     <tr>
+                        <th>S.No.</th>
                         <th>PR Requirement Date</th>
                         <th>PR Number</th>
                         <th>PO Number</th>
@@ -275,9 +276,10 @@ function renderTable() {
                 <tbody>
     `;
 
-    filteredRecords.forEach(item => {
+    filteredRecords.forEach((item, index) => {
         html += `
             <tr>
+                <td>${index + 1}</td>
                 <td>${formatDate(item.prReqDate)}</td>
                 <td>${item.prNum || "-"}</td>
                 <td>${item.poNum || "-"}</td>
