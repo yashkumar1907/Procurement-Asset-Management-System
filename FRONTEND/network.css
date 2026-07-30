@@ -639,7 +639,7 @@ table td a:hover {
     border: 1px solid #d1d5db;
 }
 
-.modal-content button {
+.modal-content button[type="submit"] {
     width: 100%;
     padding: 16px;
     background: linear-gradient(
@@ -914,26 +914,70 @@ table td a:hover {
 }
 
 #invoicePdfPreview {
-    margin-top: 15px;
+    margin-top: 8px;
 }
 
-.invoice-pdf-entry {
-    background: #f8fafc;
-    border: 1px solid #e5e7eb;
-    border-radius: 16px;
-    padding: 15px 20px;
-    margin-bottom: 15px;
-
+.invoice-pdf-entry,
+.document-entry {
     display: flex;
     align-items: center;
     justify-content: space-between;
+
+    gap: 12px;
+
+    padding: 10px 14px;
+    margin-top: 10px;
+    margin-bottom: 8px;
+
+    background: #ffffff;
+    border:1px solid #e3e8ef;
+    border: 1px solid #dbe3ec;
+    border-radius: 10px;
 }
 
-.invoice-pdf-entry span {
+.invoice-pdf-entry span,
+.document-entry span {
+    flex: 1;
+
     font-size: 15px;
     font-weight: 500;
     color: #1e293b;
-    word-break: break-all;
+
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.document-entry:hover,
+.invoice-pdf-entry:hover{
+    border-color:#ff6b00;
+    box-shadow:0 3px 10px rgba(255,107,0,.12);
+}
+
+.remove-document-btn {
+    width: 34px !important;
+    height: 34px !important;
+    min-width: 34px;
+    min-height: 34px;
+    padding: 0 !important;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #dc3545 !important;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    line-height:1;
+    cursor: pointer;
+    flex-shrink: 0;
+    font-size: 16px;
+    font-weight: bold;
+    transition: .2s;
+}
+
+.remove-document-btn:hover{
+    background:#bb2d3b !important;
 }
 
 
@@ -974,7 +1018,7 @@ input[type="file"]::file-selector-button {
     border: 1px solid #d1d5db;
     color: #1e293b;
     box-sizing: border-box;
-    margin-bottom: 15px;
+    margin-bottom: 8px;
 }
 
 .document-fixed-section input[type="file"]::file-selector-button {
