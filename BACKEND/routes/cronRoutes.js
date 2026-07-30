@@ -5,6 +5,9 @@ const { runPOReminderJob } = require("../services/poReminderService");
 
 router.post("/run-po-reminders", async (req, res) => {
 
+    console.log("Header:", req.headers.authorization);
+    console.log("Secret:", process.env.CRON_SECRET);
+
     if (req.headers.authorization !== process.env.CRON_SECRET) {
         return res.status(401).json({
             message: "Unauthorized"
