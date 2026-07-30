@@ -21,8 +21,6 @@ const cors = require("cors");
 ========================= */
 const connectDB = require("./config/db");
 
-const cron = require("node-cron");
-
 
 /* =========================
    Import All Routes
@@ -113,11 +111,6 @@ app.use("/api/cron", cronRoutes);
    CONNECT DATABASE
 ========================= */
 connectDB();
-
-
-cron.schedule("0 10,16 * * *", async () => {
-   await runPOReminderJob();
-});
 
 
 /* =========================
