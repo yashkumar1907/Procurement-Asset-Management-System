@@ -276,63 +276,67 @@ function renderTable() {
                 <tbody>
     `;
 
-    const materials = item.networkDetails || [];
+    filteredRecords.forEach((item, index) => {
+        const materials = item.networkDetails || [];
 
-    materials.forEach((material, i) => {
+        materials.forEach((material, i) => {
+            html += `
+                <tr>
+                    ${i === 0 ? `
+                            <td rowspan="${materials.length}">${index + 1}</td>
+                            <td rowspan="${materials.length}">${formatDate(item.prReqDate)}</td>
+                            <td rowspan="${materials.length}">${item.prNum || "-"}</td>
+                            <td rowspan="${materials.length}">${item.poNum || "-"}</td>
+                        `
+                        : ""
+                    }
+
+                    <td>${material.code || "-"}</td>
+                    <td>${material.desc || "-"}</td>
+                    <td>${material.quantity || "-"}</td>
+
+                    ${i === 0 ? `
+                            <td rowspan="${materials.length}">${item.trackingId || "-"}</td>
+                            <td rowspan="${materials.length}">${item.costCenter || "-"}</td>
+                            <td rowspan="${materials.length}">${item.projectName || "-"}</td>
+                            <td rowspan="${materials.length}">${item.currentProgress || "-"}</td>
+                            <td rowspan="${materials.length}">${item.purchaserName || "-"}</td>
+                            <td rowspan="${materials.length}">${item.srrNumber || "-"}</td>
+                            <td rowspan="${materials.length}">${item.grnNumber || "-"}</td>
+                            <td rowspan="${materials.length}">${item.remark || "-"}</td>
+                            <td rowspan="${materials.length}">
+                                <div class="last-edited">
+                                    <i class="fa-solid fa-user"></i>
+                                    <span>${item.lastEditedBy || "-"}</span>
+                                </div>
+                            </td>
+
+                            <td rowspan="${materials.length}">
+                                ${
+                                    getCurrentPermission() === "edit"
+                                    ? `
+                                        <button class="edit-btn" onclick="editRecord('${item._id}')">Edit</button>
+                                        <button class="delete-btn" onclick="deleteRecord('${item._id}')">Delete</button>
+                                    `
+                                    : ""
+                                }
+                            </td>
+                        `
+                        : ""
+                    }
+
+                </tr>
+            `;
+        });
+
         html += `
-            <tr>
-                ${i === 0 ? `
-                        <td rowspan="${materials.length}">${index + 1}</td>
-                        <td rowspan="${materials.length}">${formatDate(item.prReqDate)}</td>
-                        <td rowspan="${materials.length}">${item.prNum || "-"}</td>
-                        <td rowspan="${materials.length}">${item.poNum || "-"}</td>
-                    `
-                    : ""
-                }
-
-                <td>${material.code || "-"}</td>
-                <td>${material.desc || "-"}</td>
-                <td>${material.quantity || "-"}</td>
-
-                ${i === 0 ? `
-                        <td rowspan="${materials.length}">${item.trackingId || "-"}</td>
-                        <td rowspan="${materials.length}">${item.costCenter || "-"}</td>
-                        <td rowspan="${materials.length}">${item.projectName || "-"}</td>
-                        <td rowspan="${materials.length}">${item.currentProgress || "-"}</td>
-                        <td rowspan="${materials.length}">${item.purchaserName || "-"}</td>
-                        <td rowspan="${materials.length}">${item.srrNumber || "-"}</td>
-                        <td rowspan="${materials.length}">${item.grnNumber || "-"}</td>
-                        <td rowspan="${materials.length}">${item.remark || "-"}</td>
-                        <td rowspan="${materials.length}">
-                            <div class="last-edited">
-                                <i class="fa-solid fa-user"></i>
-                                <span>${item.lastEditedBy || "-"}</span>
-                            </div>
-                        </td>
-
-                        <td rowspan="${materials.length}">
-                            ${
-                                getCurrentPermission() === "edit"
-                                ? `
-                                    <button class="edit-btn" onclick="editRecord('${item._id}')">Edit</button>
-                                    <button class="delete-btn" onclick="deleteRecord('${item._id}')">Delete</button>
-                                `
-                                : ""
-                            }
-                        </td>
-                    `
-                    : ""
-                }
-
-            </tr>
+                    </tbody>
+                </table>
+            </div>
         `;
     });
 
-    html += `
-                </tbody>
-            </table>
-        </div>
-    `;
+    
 
     if (filteredRecords.length === 0) {
         html = html.replace(
