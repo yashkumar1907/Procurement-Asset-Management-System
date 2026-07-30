@@ -20,16 +20,19 @@ const transporter = nodemailer.createTransport({
 // ===============================
 async function sendEmail(to, subject, html) {
     try {
+        console.log("Attempting to send email to:", to);
+
         await transporter.sendMail({
             from: process.env.EMAIL_USER,
             to,
             subject,
             html
         });
+
         console.log("Email Sent Successfully");
     }
     catch (error) {
-        console.error(error);
+        console.error("Email Error:", error);
         throw error;
     }
 }
