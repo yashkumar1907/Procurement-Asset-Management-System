@@ -12,6 +12,14 @@ function poExpiryReminderEmail(record, reminderType) {
             : 
             `This is a reminder that the following Purchase Order (PO) is due to expire within the next <strong>1 month</strong>. If a new PR/PO has not yet been initiated, kindly take the necessary action immediately to avoid service disruption.`;
 
+    const poEndDate = record.poEndDate
+        ? new Date(record.poEndDate).toLocaleDateString("en-GB")
+        : "-";
+        
+    const poAmount = Number.isFinite(Number(record.poAmount))
+        ? `₹${Number(record.poAmount).toLocaleString("en-IN")}`
+        : "-";
+
     const content = `
         <p>Hello,</p>
         <p>${message}</p>
@@ -44,12 +52,12 @@ function poExpiryReminderEmail(record, reminderType) {
 
             <tr>
                 <td>PO End Date</td>
-                <td>${new Date(record.poEndDate).toLocaleDateString("en-GB")}</td>
+                <td>${poEndDate}</td>
             </tr>
 
             <tr>
                 <td>PO Amount</td>
-                <td>₹${Number(record.poAmount).toLocaleString("en-IN")}</td>
+                <td>${poAmount}</td>
             </tr>
         </table>
         <br>

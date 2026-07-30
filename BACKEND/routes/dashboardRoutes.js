@@ -39,6 +39,10 @@ function getPoStatus(records) {
 
         const endDate = new Date(record.poEndDate);
 
+        if (isNaN(endDate)) {
+            return;
+        }
+
         if (endDate < today) {
             expired++;
         }
@@ -149,7 +153,7 @@ router.get("/network", async (req, res) => {
         });
     }
     catch (error) {
-        console.log(error);
+        console.error(error);
         res.status(500).json({
             message: "Server Error"
         });
@@ -198,7 +202,7 @@ router.get("/inventory", async (req, res) => {
             poReceivedRecords
         });
     } catch (error) {
-        console.log(error);
+        console.error(error);
         res.status(500).json({
             message: "Server Error"
         });
@@ -233,7 +237,7 @@ router.get("/plants", async (req, res) => {
         });
     }
     catch (error) {
-        console.log(error);
+        console.error(error);
         res.status(500).json({
             message: "Server Error"
         });
@@ -266,7 +270,7 @@ router.get("/wbs", async (req, res) => {
         });
     }
     catch (error) {
-        console.log(error);
+        console.error(error);
         res.status(500).json({
             message: "Server Error"
         });
@@ -294,7 +298,7 @@ router.get("/po-status", async (req, res) => {
         });
     }
     catch (error) {
-        console.log(error);
+        console.error(error);
         res.status(500).json({
             message: "Server Error"
         });
@@ -326,7 +330,7 @@ router.get("/module-records", async (req, res) => {
         });
     }
     catch (error) {
-        console.log(error);
+        console.error(error);
         res.status(500).json({
             message: "Server Error"
         });
@@ -370,7 +374,7 @@ router.get("/monthly-records", async (req, res) => {
         });
     }
     catch (error) {
-        console.log(error);
+        console.error(error);
         res.status(500).json({
             message: "Server Error"
         });
@@ -392,6 +396,10 @@ function getPoExpiry(records) {
         if (!record.poEndDate) return;
 
         const end = new Date(record.poEndDate);
+
+        if (isNaN(end)) {
+            return;
+        }
 
         const diff =
             Math.ceil(
@@ -436,7 +444,7 @@ router.get("/po-expiry", async (req, res) => {
         res.json(result);
     }
     catch (error) {
-        console.log(error);
+        console.error(error);
         res.status(500).json({
             message: "Server Error"
         });
@@ -473,7 +481,7 @@ router.get("/monthly-po", async (req, res) => {
         });
     }
     catch (error) {
-        console.log(error);
+        console.error(error);
         res.status(500).json({
             message: "Server Error"
         });
@@ -497,6 +505,11 @@ router.get("/payment-report", async (req, res) => {
         const toDate = new Date(to);
         toDate.setHours(23, 59, 59, 999);
 
+        if (isNaN(fromDate) || isNaN(toDate)) {
+            return res.status(400).json({
+                message: "Invalid date format."
+            });
+        }
 
         const networkDetails = await NetworkDetail.find({
             invoiceDate: {
@@ -626,7 +639,7 @@ router.get("/payment-report", async (req, res) => {
 
     }
     catch (error) {
-        console.log(error);
+        console.error(error);
         res.status(500).json({
             message: "Server Error"
         });

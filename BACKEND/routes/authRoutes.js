@@ -50,7 +50,7 @@ router.post("/register", async (req, res) => {
         });
     }
     catch (error) {
-        console.log(error);
+        console.error(error);
         res.status(500).json({
             message: "Server Error"
         });
@@ -80,6 +80,8 @@ router.post("/login", async (req, res) => {
                 message: "Invalid Password"
             });
         }
+
+        const permissions = user.permissions || {};
         
         // LOGIN SUCCESS
         res.status(200).json({
@@ -89,20 +91,20 @@ router.post("/login", async (req, res) => {
                 name: user.name,
                 email: user.email,
                 role: user.role,  
-                networkPermission: user.permissions.network,
-                amcPermission: user.permissions.amc,
-                contractPermission: user.permissions.contract,
-                inventoryNetworkPermission: user.permissions.inventoryNetwork,
-                inventoryHardwarePermission: user.permissions.inventoryHardware,
-                inventoryDepartmentPermission: user.permissions.inventoryDepartment,
-                plantMaterialPermission: user.permissions.plantMaterial,
-                plantServicePermission: user.permissions.plantService,
-                wbsProjectPermission: user.permissions.wbsProject
+                networkPermission: permissions.network,
+                amcPermission: permissions.amc,
+                contractPermission: permissions.contract,
+                inventoryNetworkPermission: permissions.inventoryNetwork,
+                inventoryHardwarePermission: permissions.inventoryHardware,
+                inventoryDepartmentPermission: permissions.inventoryDepartment,
+                plantMaterialPermission: permissions.plantMaterial,
+                plantServicePermission: permissions.plantService,
+                wbsProjectPermission: permissions.wbsProject
             }
         });
     }
     catch (error) {
-        console.log(error);
+        console.error(error);
         res.status(500).json({
             message: "Server Error"
         });
@@ -129,7 +131,7 @@ router.get("/profile/:id", async (req, res) => {
         });
     }
     catch (error) {
-        console.log(error);
+        console.error(error);
         res.status(500).json({
             message: "Server Error"
         });
@@ -182,7 +184,7 @@ router.put("/profile/:id", async (req, res) => {
         });
     }
     catch (error) {
-        console.log(error);
+        console.error(error);
         res.status(500).json({
             message: "Server Error"
         });
@@ -223,7 +225,7 @@ router.put("/change-password/:id", async (req, res) => {
         });
     }
     catch (error) {
-        console.log(error);
+        console.error(error);
         res.status(500).json({
             message: "Server Error"
         });

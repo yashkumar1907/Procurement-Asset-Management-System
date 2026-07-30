@@ -81,7 +81,7 @@ router.post("/", async (req, res) => {
         });
     }
     catch (error) {
-        console.log(error);
+        console.error(error);
         res.status(500).json({
             message: "Server Error"
         });
@@ -98,7 +98,7 @@ router.get("/", async (req, res) => {
         res.status(200).json(records);
     }
     catch (error) {
-        console.log(error);
+        console.error(error);
         res.status(500).json({
             message: "Server Error"
         });
@@ -136,7 +136,7 @@ router.put("/:id", async (req, res) => {
         });
     }
     catch (error) {
-        console.log(error);
+        console.error(error);
         res.status(500).json({
             message: "Server Error"
         });
@@ -163,7 +163,7 @@ router.delete("/:id", async (req, res) => {
         });
     }
     catch (error) {
-        console.log(error);
+        console.error(error);
         res.status(500).json({
             message: "Server Error"
         });
@@ -283,7 +283,7 @@ router.get("/export", async (req, res) => {
         res.send(buffer);
     }
     catch (error) {
-        console.log(error);
+        console.error(error);
         res.status(500).json({
             message: "Export Failed"
         });
@@ -378,7 +378,11 @@ router.post("/import", excelUpload.single("excelFile"), async (req, res) => {
             message: `Import Completed \n Imported Records: ${importedRecords} \n Skipped Records: ${skippedRecords}`});
         }
         catch (error) {
-            console.log(error);
+            if (req.file && fs.existsSync(req.file.path)) {
+                fs.unlinkSync(req.file.path);
+            }
+            
+            console.error(error);
             res.status(500).json({
                 message: "Import Failed"
             });
@@ -405,7 +409,7 @@ router.get("/wbs-selector", async (req, res) => {
         res.status(200).json(records);
     }
     catch (error) {
-        console.log(error);
+        console.error(error);
         res.status(500).json({
             message: "Server Error"
         });

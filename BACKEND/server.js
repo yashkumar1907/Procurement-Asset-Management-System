@@ -118,13 +118,18 @@ connectDB();
 /* =========================
 // Take Port Number from .env file
 ========================= */
-const PORT = process.env.PORT;
+const PORT = process.env.PORT || 5000;
 
 
-cron.schedule("* * * * *", async () => {
-   await checkNetworkPOReminders();
-   await checkAmcPOReminders();
-   await checkContractPOReminders();
+cron.schedule("0 10,16 * * *", async () => {
+   try {
+      await checkNetworkPOReminders();
+      await checkAmcPOReminders();
+      await checkContractPOReminders();
+   }
+   catch (error) {
+      console.error(error);
+   }
 });
 
 

@@ -78,7 +78,7 @@ router.post("/", async (req, res) => {
         });
     }
     catch (error) {
-        console.log(error);
+        console.error(error);
         res.status(500).json({
             message: "Server Error"
         });
@@ -95,7 +95,7 @@ router.get("/", async (req, res) => {
         res.status(200).json(records);
     }
     catch (error) {
-        console.log(error);
+        console.error(error);
         res.status(500).json({
             message: "Server Error"
         });
@@ -127,7 +127,7 @@ router.put("/:id", async (req, res) => {
         });
     }
     catch (error) {
-        console.log(error);
+        console.error(error);
         res.status(500).json({
             message: "Server Error"
         });
@@ -154,7 +154,7 @@ router.delete("/:id", async (req, res) => {
         });
     }
     catch (error) {
-        console.log(error);
+        console.error(error);
         res.status(500).json({
             message: "Server Error"
         });
@@ -173,17 +173,17 @@ router.get("/export", async (req, res) => {
 
         // CREATE EXCEL DATA
         const excelData = records.map(record => ({
-            "WBS Number": record.WbsNum,
-            "Description": record.Description,
-            "Budget": record.Budget,
-            "Transfer": record.Transfer,
-            "Released": record.Released,
-            "Preq Comm": record.PreqComm,
-            "PO Commt": record.POCommt,
-            "Commitment": record.Commitment,
-            "Actual": record.Actual,
-            "Assigned": record.Assigned,
-            "Total Available": record.TotalAvailable
+            "WBS Number": record.wbsNum,
+            "Description": record.description,
+            "Budget": record.budget,
+            "Transfer": record.transfer,
+            "Released": record.released,
+            "Preq Comm": record.preqComm,
+            "PO Commt": record.poCommt,
+            "Commitment": record.commitment,
+            "Actual": record.actual,
+            "Assigned": record.assigned,
+            "Total Available": record.totalAvailable
         }));
 
         // CREATE WORKBOOK
@@ -278,7 +278,7 @@ router.post("/import", excelUpload.single("excelFile"), async (req, res) => {
 
             // CHECK DUPLICATE WBS NUMBER
             const existingRecord = await WbsProjectRecord.findOne({
-                WbsNum: String(row["WBS Number"] || "").trim()
+                wbsNum: String(row["WBS Number"] || "").trim()
             });
 
             if (existingRecord) {
@@ -287,17 +287,17 @@ router.post("/import", excelUpload.single("excelFile"), async (req, res) => {
             }
 
             const record = new WbsProjectRecord({
-                WbsNum: String(row["WBS Number"] || "").trim(),
-                Description: row["Description"] || "",
-                Budget: Number(row["Budget"]) || 0,
-                Transfer: row["Transfer"] || "",
-                Released: row["Released"] || "",
-                PreqComm: row["Preq Comm"] || "",
-                POCommt: row["PO Commt"] || "",
-                Commitment: row["Commitment"] || "",
-                Actual: Number(row["Actual"]) || 0,
-                Assigned: row["Assigned"] || "",
-                TotalAvailable: row["Total Available"] || "",
+                wbsNum: String(row["WBS Number"] || "").trim(),
+                description: row["Description"] || "",
+                budget: Number(row["Budget"]) || 0,
+                transfer: row["Transfer"] || "",
+                released: row["Released"] || "",
+                preqComm: row["Preq Comm"] || "",
+                poCommt: row["PO Commt"] || "",
+                commitment: row["Commitment"] || "",
+                actual: Number(row["Actual"]) || 0,
+                assigned: row["Assigned"] || "",
+                totalAvailable: row["Total Available"] || "",
                 lastEditedBy: req.body.lastEditedBy
             });
 

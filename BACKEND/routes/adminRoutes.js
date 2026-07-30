@@ -37,7 +37,7 @@ router.get("/users", async (req, res) => {
         res.status(200).json(users);
     }
     catch (error) {
-        console.log(error);
+        console.error(error);
         res.status(500).json({
             message: "Server Error"
         });
@@ -68,14 +68,23 @@ router.post("/add-user", async (req, res) => {
         
         await user.save();
 
-        await sendEmail(email, "Welcome to IT Infra Management System", welcomeEmail(name, email, password));
+        try {
+            await sendEmail(
+                email,
+                "Welcome to IT Infra Management System",
+                welcomeEmail(name, email, password)
+            );
+        }
+        catch (emailError) {
+            console.error(emailError);
+        }
 
         res.status(201).json({
             message: "Employee Added Successfully"
         });
     }
     catch (error) {
-        console.log(error);
+        console.error(error);
         res.status(500).json({
             message: "Server Error"
         });
@@ -102,14 +111,23 @@ router.put("/update-permissions/:id", async (req, res) => {
             });
         }
 
-        await sendEmail(updatedUser.email, "Your Permissions Have Been Updated", permissionUpdatedEmail(updatedUser.name, updatedUser.permissions));
-
+        try {
+            await sendEmail(
+                updatedUser.email,
+                "Your Permissions Have Been Updated",
+                permissionUpdatedEmail(updatedUser.name, updatedUser.permissions)
+            );
+        }
+        catch (emailError) {
+            console.error(emailError);
+        }
+        
         res.status(200).json({
             message: "Permissions Updated Successfully"
         });
     }
     catch (error) {
-        console.log(error);
+        console.error(error);
         res.status(500).json({
             message: "Server Error"
         });
@@ -131,18 +149,27 @@ router.delete("/delete-user/:id", async (req, res) => {
             });
         }
         
-        // SEND ACCOUNT DELETED EMAIL
-        await sendEmail(user.email, "Your IT Infra Management System Account Has Been Deleted", accountDeletedEmail(user.name));
-
         // DELETE USER
         await User.findByIdAndDelete(req.params.id);
+
+        // SEND ACCOUNT DELETED EMAIL
+        try {
+            await sendEmail(
+                user.email,
+                "Your IT Infra Management System Account Has Been Deleted",
+                accountDeletedEmail(user.name)
+            );
+        }
+        catch (emailError) {
+            console.error(emailError);
+        }
 
         res.status(200).json({
             message: "User Deleted Successfully"
         });
     }
     catch (error) {
-        console.log(error);
+        console.error(error);
         res.status(500).json({
             message: "Server Error"
         });
