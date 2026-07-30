@@ -281,9 +281,17 @@ function updateStatistics() {
             0
         );
 
+    const totalInvoices =
+        records.reduce(
+            (sum, record) =>
+                sum + Number(record.invoiceCount || 0),
+            0
+        );
+
     document.getElementById("totalRecords").innerText = totalRecords;
     document.getElementById("totalPoAmount").innerText = formatAmount(totalPoAmount);
     document.getElementById("totalBalanceAmount").innerText = formatAmount(totalBalanceAmount);
+    document.getElementById("totalInvoices").innerText = totalInvoices;
 }
 
 
@@ -309,6 +317,7 @@ function renderTable() {
             <table id="data-table">
                 <thead>
                     <tr>
+                        <th>S.No.</th>
                         <th>Vendor Name</th>
                         <th>Vendor Code</th>
                         <th>Purchase Requestor (PR)</th>
@@ -332,10 +341,11 @@ function renderTable() {
     `;
 
 
-    filteredRecords.forEach(item => {
+    filteredRecords.forEach((item, index) => {
         const status = getPOStatus(item);
         html += `
             <tr id="row-${item._id}" class="${status.className}-row">
+                <td>${index + 1}</td>
                 <td>${item.vendorName}</td>
                 <td>${item.vendorCode}</td>
                 <td>${item.pr}</td>

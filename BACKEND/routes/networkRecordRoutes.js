@@ -193,7 +193,14 @@ router.post("/",upload.array("documents", 10), async (req, res) => {
 // ===============================
 router.get("/", async (req, res) => {
     try {
-        const records = await NetworkRecord.find();
+        const records = await NetworkRecord.find().lean();
+
+        for (const record of records) {
+            record.invoiceCount = await NetworkDetail.countDocuments({
+                recordId: record._id
+            });
+        }
+
         res.status(200).json(records);
     }
     catch (error) {
