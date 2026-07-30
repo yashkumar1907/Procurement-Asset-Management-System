@@ -48,9 +48,12 @@ const wbsProjectRecordRoutes = require("./routes/wbsProjectRecordRoutes");
 
 const dashboardRoutes = require("./routes/dashboardRoutes");
 
-const { runPOReminderJob } = require("./services/poReminderService");
 
-const cronRoutes = require("./routes/cronRoutes");
+const cron = require("node-cron");
+
+const {checkNetworkPOReminders, checkAmcPOReminders, checkContractPOReminders} = require("./services/poReminderService");
+
+
 
 /* =========================
    Creates backend application
@@ -104,7 +107,6 @@ app.use("/api/wbs-project-records", wbsProjectRecordRoutes);
 
 app.use("/api/dashboard", dashboardRoutes);
 
-app.use("/api/cron", cronRoutes);
 
 
 /* =========================
@@ -117,6 +119,14 @@ connectDB();
 // Take Port Number from .env file
 ========================= */
 const PORT = process.env.PORT;
+
+
+cron.schedule("0 10,16 * * *", async () => {
+   console.log("Running PO Reminder Job...");
+   await checkNetworkPOReminders();
+   await checkAmcPOReminders();
+   await checkContractPOReminders();
+});
 
 
 /* =========================
