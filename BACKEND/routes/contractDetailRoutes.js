@@ -146,7 +146,7 @@ router.post("/", upload.single("invoicePdf"), async (req, res) => {
 
         // Delete uploaded invoice PDF if database operation failed
         if (req.file) {
-            const filePath = path.join(uploadDir, req.file.filename);
+            const filePath = path.join(uploadsDir, req.file.filename);
 
             if (fs.existsSync(filePath)) {
                 fs.unlinkSync(filePath);
