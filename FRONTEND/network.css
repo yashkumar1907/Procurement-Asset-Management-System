@@ -755,13 +755,13 @@ table td a:hover {
    SERVICE SECTION
 ========================= */
 
-.service-header {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: space-between;
-    gap: 10px;
-    margin-bottom: 15px;
+.service-header{
+
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+
+    margin:18px 0 10px;
 }
 
 .service-header h3,
@@ -859,15 +859,39 @@ table td a:hover {
 
 
 .add-service-btn {
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    width: auto !important;
+    min-width: 170px;
+    height: 42px;
+
+    padding: 0 18px;
+    margin: 0;
+
     background: linear-gradient(
         135deg,
         #ff6b00,
         #ff7f11
-    ) !important;
+    );
 
-    color: white !important;
-    margin-bottom: 20px;
-    font-size: 15px !important;
+    color: white;
+
+    border: none;
+    border-radius: 8px;
+
+    font-size: 15px;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition: .2s;
+}
+
+.add-service-btn:hover{
+    filter: brightness(1.05);
 }
 .add-service-btn:hover {
     filter: brightness(1.05);
