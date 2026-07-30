@@ -15,24 +15,9 @@ const RECIPIENTS = [
 
 async function checkNetworkPOReminders() {
     try {
-        console.log("Entered checkNetworkPOReminders");
-        console.log("About to send test email");
-        await sendEmail(
-            "yashkumar9926@gmail.com",
-            "Test Email",
-            "<h1>Testing Email</h1>"
-        );
-        console.log("Returned from sendEmail");
-        
-        console.log("Test email sent");
-        return;
-
-
         const records = await NetworkRecord.find({
             renewed: false
         });
-
-        console.log("Network records:", records.length);
 
         const today = new Date();
         today.setHours(0,0,0,0);
@@ -41,8 +26,6 @@ async function checkNetworkPOReminders() {
             if (!record.poEndDate) {
                 continue;
             }
-            console.log("Vendor:", record.vendorName);
-            console.log("PO End Date:", record.poEndDate);
 
             const endDate = new Date(record.poEndDate);
             endDate.setHours(0,0,0,0);
@@ -58,7 +41,6 @@ async function checkNetworkPOReminders() {
             oneMonthLater.setMonth(oneMonthLater.getMonth() + 1);
 
             if (endDate <= twoMonthsLater && endDate > oneMonthLater) {
-                console.log("Sending reminder for:", record.vendorName);
                 await sendEmail(
                     RECIPIENTS.join(","),
                     "PO Expiry Reminder - 2 Months Remaining",
@@ -68,7 +50,6 @@ async function checkNetworkPOReminders() {
 
 
             if (endDate <= oneMonthLater && endDate >= today) {
-                console.log("Sending reminder for:", record.vendorName);
                 await sendEmail(
                     RECIPIENTS.join(","),
                     "Urgent: PO Expiry Reminder - 1 Month Remaining",
@@ -76,7 +57,6 @@ async function checkNetworkPOReminders() {
                 );
             }
         }
-        console.log("Network PO reminder check completed.");
     }
     catch(error) {
         console.error("PO Reminder Error:", error);
@@ -129,7 +109,6 @@ async function checkAmcPOReminders() {
             }
 
         }
-        console.log("AMC PO reminder check completed.");
     }
     catch(error) {
         console.error("PO Reminder Error:", error);
@@ -185,7 +164,6 @@ async function checkContractPOReminders() {
             }
 
         }
-        console.log("Contract PO reminder check completed.");
     }
     catch(error) {
         console.error("PO Reminder Error:", error);

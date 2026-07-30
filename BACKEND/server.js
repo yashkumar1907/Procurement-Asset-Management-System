@@ -122,7 +122,6 @@ const PORT = process.env.PORT;
 
 
 cron.schedule("* * * * *", async () => {
-   console.log("Running PO Reminder Job...");
    await checkNetworkPOReminders();
    await checkAmcPOReminders();
    await checkContractPOReminders();
@@ -141,5 +140,5 @@ app.get("/", (req, res) => {
     START SERVER
 ========================= */
 app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
+   console.log(`Server running on port ${PORT}`);
 });
