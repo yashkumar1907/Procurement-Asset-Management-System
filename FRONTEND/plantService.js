@@ -238,9 +238,9 @@ function renderTable() {
                         <th>PR Requirement Date</th>
                         <th>PR Creation Date</th>
                         <th>PR Number</th>
-                        <th>Material Code</th>
-                        <th>Material Text</th>
-                        <th>Material Description</th>
+                        <th>Service Code</th>
+                        <th>Service Text</th>
+                        <th>Service Description</th>
                         <th>Quantity</th>
                         <th>Price Per Quantity</th>
                         <th>PR Amount</th>
@@ -459,7 +459,7 @@ function openAddModal() {
     editingRecordId = null;
     openModal();
     // Plant Service requires at least one row
-    addMaterialRow();
+    addServiceRow();
 }
 
 
@@ -555,7 +555,7 @@ function editRecord(id) {
 
     if (record.plantServiceDetails && record.plantServiceDetails.length > 0) {
         record.plantServiceDetails.forEach(plantService => {
-            addMaterialRow(plantService);
+            addServiceRow(plantService);
         });
     }
 }
@@ -566,9 +566,9 @@ function editRecord(id) {
 // ============================================================================================================================
 
 // ===============================
-// ADD MATERIAL ROW
+// ADD Service ROW
 // ===============================
-function addMaterialRow(material = {}) {
+function addServiceRow(service = {}) {
 
     const container = document.getElementById("serviceContainer");
 
@@ -577,37 +577,37 @@ function addMaterialRow(material = {}) {
     div.className = "plantService-entry";
 
     div.innerHTML = `
-        <button type="button" class="remove-service-btn" onclick="removeMaterialRow(this)">✖</button>
-        <div class="service-title">Material</div>
+        <button type="button" class="remove-service-btn" onclick="removeServiceRow(this)">✖</button>
+        <div class="service-title">Service</div>
 
-        <input type="text" class="codeField" placeholder="Material Code" value="${material.code || ""}" required>
-        <input type="text" class="shortTextField" placeholder="Material Text" value="${material.shortText || ""}" required>
-        <input type="text" class="descField" placeholder="Material Description" value="${material.desc || ""}" required>
-        <input type="number" class="quantityField" placeholder="Quantity" value="${material.quantity || ""}" min="1" required>
-        <input type="number" class="pricePerQuantityField" placeholder="Price Per Quantity" value="${material.pricePerQuantity || ""}" min="0" required>
+        <input type="text" class="codeField" placeholder="Service Code" value="${service.code || ""}" required>
+        <input type="text" class="shortTextField" placeholder="Service Text" value="${service.shortText || ""}" required>
+        <input type="text" class="descField" placeholder="Service Description" value="${service.desc || ""}" required>
+        <input type="number" class="quantityField" placeholder="Quantity" value="${service.quantity || ""}" min="1" required>
+        <input type="number" class="pricePerQuantityField" placeholder="Price Per Quantity" value="${service.pricePerQuantity || ""}" min="0" required>
     `;
 
     container.appendChild(div);
 
-    updateMaterialDeleteButtons();
-    updateMaterialCount();
-    updateMaterialNumbers();
+    updateServiceDeleteButtons();
+    updateServiceCount();
+    updateServiceNumbers();
 }
 
 
 // ===============================
-// REMOVE MATERIAL ROW
+// REMOVE Service ROW
 // ===============================
-function removeMaterialRow(button) {
+function removeServiceRow(button) {
     button.closest(".plantService-entry").remove();
 
-    updateMaterialDeleteButtons();
-    updateMaterialCount();
-    updateMaterialNumbers();
+    updateServiceDeleteButtons();
+    updateServiceCount();
+    updateServiceNumbers();
 }
 
 
-function updateMaterialDeleteButtons() {
+function updateServiceDeleteButtons() {
     const rows = document.querySelectorAll(".plantService-entry");
 
     rows.forEach(row => {
@@ -617,7 +617,7 @@ function updateMaterialDeleteButtons() {
 
 }
 
-function updateMaterialCount() {
+function updateServiceCount() {
     const total = document.querySelectorAll(".plantService-entry").length;
     const countText = document.getElementById("serviceCountText");
 
@@ -626,7 +626,7 @@ function updateMaterialCount() {
     }
 }
 
-function updateMaterialNumbers() {
+function updateServiceNumbers() {
     const rows = document.querySelectorAll(".plantService-entry");
 
     rows.forEach((row, index) => {

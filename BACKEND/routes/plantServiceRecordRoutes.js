@@ -236,9 +236,9 @@ router.get("/export", async (req, res) => {
                     "PR Requirement Date": record.prReqDate,
                     "PR Creation Date": record.prCreationDate,
                     "PR Number": record.prNum,
-                    "Material Code": plantService.code,
-                    "Material Text": plantService.shortText,
-                    "Material Description": plantService.desc,
+                    "Service Code": plantService.code,
+                    "Service Text": plantService.shortText,
+                    "Service Description": plantService.desc,
                     "Quantity": plantService.quantity,
                     "Price Per Quantity": plantService.pricePerQuantity,
                     "PR Amount": record.prAmount,
@@ -256,9 +256,9 @@ router.get("/export", async (req, res) => {
                     "PR Requirement Date",
                     "PR Creation Date",
                     "PR Number",
-                    "Material Code",
-                    "Material Text",
-                    "Material Description",
+                    "Service Code",
+                    "Service Text",
+                    "Service Description",
                     "Quantity",
                     "Price Per Quantity",
                     "PR Amount",
@@ -332,9 +332,9 @@ router.post("/import", excelUpload.single("excelFile"), async (req, res) => {
             }
             
             groupedRecords[prNum].plantServiceDetails.push({
-                code: row["Material Code"],
-                shortText: row["Material Text"],
-                desc: row["Material Description"],
+                code: row["Service Code"],
+                shortText: row["Service Text"],
+                desc: row["Service Description"],
                 quantity: Number(row["Quantity"]),
                 pricePerQuantity: Number(row["Price Per Quantity"])
             });
