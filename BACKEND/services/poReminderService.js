@@ -173,9 +173,21 @@ async function checkContractPOReminders() {
     }
 }
 
+async function runPOReminderJob() {
+
+    console.log("Running PO Reminder Job...");
+
+    await checkNetworkPOReminders();
+    await checkAmcPOReminders();
+    await checkContractPOReminders();
+
+    console.log("PO Reminder Job Completed.");
+}
+
 
 module.exports = {
     checkNetworkPOReminders,
     checkAmcPOReminders,
-    checkContractPOReminders
+    checkContractPOReminders,
+    runPOReminderJob
 };

@@ -21,6 +21,8 @@ const cors = require("cors");
 ========================= */
 const connectDB = require("./config/db");
 
+const cron = require("node-cron");
+
 
 /* =========================
    Import All Routes
@@ -48,8 +50,9 @@ const wbsProjectRecordRoutes = require("./routes/wbsProjectRecordRoutes");
 
 const dashboardRoutes = require("./routes/dashboardRoutes");
 
-const cron = require("node-cron");
-const {checkNetworkPOReminders, checkAmcPOReminders, checkContractPOReminders} = require("./services/poReminderService");
+const { runPOReminderJob } = require("./services/poReminderService");
+
+const cronRoutes = require("./routes/cronRoutes");
 
 /* =========================
    Creates backend application
@@ -103,6 +106,8 @@ app.use("/api/wbs-project-records", wbsProjectRecordRoutes);
 
 app.use("/api/dashboard", dashboardRoutes);
 
+app.use("/api/cron", cronRoutes);
+
 
 /* =========================
    CONNECT DATABASE
@@ -111,10 +116,7 @@ connectDB();
 
 
 cron.schedule("0 10,16 * * *", async () => {
-   console.log("Running PO Reminder Job...");
-   await checkNetworkPOReminders();
-   await checkAmcPOReminders();
-   await checkContractPOReminders();
+   await runPOReminderJob();
 });
 
 
