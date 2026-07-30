@@ -191,7 +191,7 @@ function formatDate(dateString) {
     const day = String(date.getDate()).padStart(2, "0");
     const month = String(date.getMonth() + 1).padStart(2, "0");
     const year = date.getFullYear();
-    return `${day}-${month}-${year}`;
+    return `${day}.${month}.${year}`;
 }
 
 // ===============================
@@ -234,6 +234,7 @@ function renderTable() {
             <table id="data-table">
                 <thead>
                     <tr>
+                        <th>S.No.</th>
                         <th>Year</th>
                         <th>Year / Month</th>
                         <th>Requirement Date</th>
@@ -262,9 +263,10 @@ function renderTable() {
                 <tbody>
     `;
 
-    filteredRecords.forEach(item => {
+    filteredRecords.forEach((item, index) => {
         html += `
             <tr>
+                <td>${index + 1}</td>
                 <td>${item.year || "-"}</td>
                 <td>${item.yearMonth || "-"}</td>
                 <td>${formatDate(item.requirementDate)}</td>
@@ -273,7 +275,7 @@ function renderTable() {
                 <td>${item.requirement || "-"}</td>
                 <td>
                     ${(item.plantMaterialDetails || [])
-                        .map(x => x.materialCode)
+                        .map((x, i) => `${i + 1}. ${x.materialCode}`)
                         .join("<br><br>")}
                 </td>
 
@@ -333,7 +335,7 @@ function renderTable() {
             "</tbody>",
             `
                 <tr>
-                    <td colspan="23" class="no-data">
+                    <td colspan="24" class="no-data">
                         No Records Found
                     </td>
                 </tr>
@@ -544,8 +546,8 @@ async function addRecord(event) {
         const quantity = Number(row.querySelector(".quantityField").value);
         
         plantMaterialDetails.push({
-            materialCode: row.querySelector(".materialCodeField").value.trim(),
-            itemDescription: row.querySelector(".itemDescriptionField").value.trim(),
+            materialCode: row.querySelector(".materialCodeField").value,
+            itemDescription: row.querySelector(".itemDescriptionField").value,
             quantity
         });
     });
@@ -625,8 +627,6 @@ function editRecord(id) {
         record.plantMaterialDetails.forEach(plantMaterial => {
             addMaterialRow(plantMaterial);
         });
-    } else {
-        addMaterialRow();
     }
 }
 

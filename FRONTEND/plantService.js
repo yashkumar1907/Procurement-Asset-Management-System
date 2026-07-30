@@ -191,7 +191,7 @@ function formatDate(dateString) {
     const day = String(date.getDate()).padStart(2, "0");
     const month = String(date.getMonth() + 1).padStart(2, "0");
     const year = date.getFullYear();
-    return `${day}-${month}-${year}`;
+    return `${day}.${month}.${year}`;
 }
 
 // ===============================
@@ -234,6 +234,7 @@ function renderTable() {
             <table id="data-table">
                 <thead>
                     <tr>
+                        <th>S.No.</th>
                         <th>PR Requirement Date</th>
                         <th>PR Creation Date</th>
                         <th>PR Number</th>
@@ -252,13 +253,14 @@ function renderTable() {
                 <tbody>
     `;
 
-    filteredRecords.forEach(item => {
+    filteredRecords.forEach((item, index) => {
         html += `
             <tr>
+                <td>${index + 1}</td>
                 <td>${formatDate(item.prReqDate)}</td>
                 <td>${formatDate(item.prCreationDate)}</td>
                 <td>${item.prNum || "-"}</td>
-                <td>${(item.plantServiceDetails || []).map(x => x.code).join("<br><br>")}</td>
+                <td>${(item.plantServiceDetails || []).map((x, i) => `${i + 1}. ${x.code}`).join("<br><br>")}</td>
                 <td>${(item.plantServiceDetails || []).map(x => x.shortText).join("<br><br>")}</td>
                 <td>${(item.plantServiceDetails || []).map(x => x.desc).join("<br><br>")}</td>
                 <td>${(item.plantServiceDetails || []).map(x => x.quantity).join("<br><br>")}</td>
@@ -295,7 +297,7 @@ function renderTable() {
             "</tbody>",
             `
                 <tr>
-                    <td colspan="13" class="no-data">
+                    <td colspan="14" class="no-data">
                         No Records Found
                     </td>
                 </tr>
@@ -497,9 +499,9 @@ async function addRecord(event) {
         prAmount += quantity * pricePerQuantity;
 
         plantServiceDetails.push({
-            code: row.querySelector(".codeField").value.trim(),
-            shortText: row.querySelector(".shortTextField").value.trim(),
-            desc: row.querySelector(".descField").value.trim(),
+            code: row.querySelector(".codeField").value,
+            shortText: row.querySelector(".shortTextField").value,
+            desc: row.querySelector(".descField").value,
             quantity,
             pricePerQuantity
         });
@@ -555,8 +557,6 @@ function editRecord(id) {
         record.plantServiceDetails.forEach(plantService => {
             addMaterialRow(plantService);
         });
-    } else {
-        addMaterialRow();
     }
 }
 
