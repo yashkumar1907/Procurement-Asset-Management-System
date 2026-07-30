@@ -40,17 +40,23 @@ const AmcRecord = require("../models/AmcRecord");
 const AmcDetail = require("../models/AmcDetail");
 
 
+// Create uploads folder if it doesn't exist
+const uploadDir = path.join(__dirname, "../uploads");
+if (!fs.existsSync(uploadDir)) {
+    fs.mkdirSync(uploadDir, { recursive: true });
+}
+
 /* =========================
    MULTER CONFIGURATION
 ========================= */
 const storage = multer.diskStorage({
     // Where to store files
     destination: function(req, file, cb) {
-        cb(null, "uploads/");
+        cb(null, uploadDir);
     },
     // File Name
     filename: function(req, file, cb) {
-        cb(null, Date.now() + "-" + file.originalname);
+        cb(null, Date.now() + "-" + Math.round(Math.random() * 1e9) + path.extname(file.originalname));
     }
 });
 
@@ -58,7 +64,16 @@ const storage = multer.diskStorage({
 /* ===============================
     Upload middleware
 =============================== */
-const upload = multer({storage});
+const upload = multer({
+    storage,
+    fileFilter: function(req, file, cb) {
+        if (file.mimetype === "application/pdf") {
+            cb(null, true);
+        } else {
+            cb(new Error("Only PDF files allowed"), false);
+        }
+    }
+});
 
 
 // ===============================

@@ -45,17 +45,29 @@ const AmcDetail = require("../models/AmcDetail");
 const XLSX = require("xlsx");
 
 
+// Create uploads folder if it doesn't exist
+const uploadDir = path.join(__dirname, "../uploads");
+if (!fs.existsSync(uploadDir)) {
+    fs.mkdirSync(uploadDir, { recursive: true });
+}
+
+// Create temp folder if it doesn't exist
+const tempDir = path.join(__dirname, "../temp");
+if (!fs.existsSync(tempDir)) {
+    fs.mkdirSync(tempDir, { recursive: true });
+}
+
 /* =========================
    MULTER CONFIGURATION
 ========================= */
 const storage = multer.diskStorage({
     // Where to store files
     destination: function (req, file, cb) {
-        cb(null, 'uploads/');
-    },
+        cb(null, uploadDir);
+    },,
     // File Name
     filename: function (req, file, cb) {
-        cb(null, Date.now() + "-" + file.originalname);
+        cb(null, Date.now() + "-" + Math.round(Math.random() * 1e9) + path.extname(file.originalname));
     }
 });
 
@@ -76,7 +88,7 @@ const upload = multer({
 });
 
 const excelUpload = multer({
-    dest: "temp/"
+    dest: tempDir
 });
 
 
@@ -107,6 +119,24 @@ router.get("/reference-pos", async (req, res) => {
 // ===============================
 router.post("/",upload.array("documents", 10), async (req, res) => {
     try {
+        const referencePO = req.body.referencePO || null;
+
+        if (referencePO) {
+            const referenceRecord = await AmcRecord.findById(referencePO);
+
+            if (!referenceRecord) {
+                return res.status(400).json({
+                    message: "Selected Reference PO does not exist"
+                });
+            }
+
+            if (referenceRecord.renewed) {
+                return res.status(400).json({
+                    message: "Selected Reference PO is already renewed"
+                });
+            }
+        }
+
         // JSON.parse converts string into array
         const documentTypes = req.body.documentTypes ? JSON.parse(req.body.documentTypes): [];
 
@@ -116,7 +146,7 @@ router.post("/",upload.array("documents", 10), async (req, res) => {
         // Create new record
         const record = new AmcRecord({
             ...req.body,
-            referencePO: req.body.referencePO || null,
+            referencePO,
             lastEditedBy: req.body.lastEditedBy,
             balanceAmount: Number(req.body.poAmount || 0),
             documents
@@ -151,7 +181,14 @@ router.post("/",upload.array("documents", 10), async (req, res) => {
 // ===============================
 router.get("/", async (req, res) => {
     try {
-        const records = await AmcRecord.find();
+        const records = await AmcRecord.find().lean();
+
+        for (const record of records) {
+            record.invoiceCount = await AmcDetail.countDocuments({
+                recordId: record._id
+            });
+        }
+        
         res.status(200).json(records);
     }
     catch (error) {
@@ -190,6 +227,34 @@ router.put("/:id", upload.array("documents", 10), async (req, res) => {
         }
 
         const newReferencePO = req.body.referencePO || null;
+
+        // Prevent selecting the same PO as reference
+        if (newReferencePO && newReferencePO === req.params.id) {
+            return res.status(400).json({
+                message: "A PO cannot reference itself"
+            });
+        }
+
+        // Validate selected Reference PO
+        if (newReferencePO) {
+            const referenceRecord = await AmcRecord.findById(newReferencePO);
+
+            if (!referenceRecord) {
+                return res.status(400).json({
+                    message: "Selected Reference PO does not exist"
+                });
+            }
+
+            if (
+                referenceRecord.renewed &&
+                (!existingRecord.referencePO ||
+                existingRecord.referencePO.toString() !== newReferencePO)
+            ) {
+                return res.status(400).json({
+                    message: "Selected Reference PO is already renewed"
+                });
+            }
+        }
 
         const oldReferencePO = existingRecord.referencePO
             ? existingRecord.referencePO.toString()
@@ -324,6 +389,17 @@ router.delete("/:id", async (req, res) => {
             return res.status(404).json({
                 message: "Record not found"
             });
+        }
+
+        // Restore previous Reference PO if this record was a renewal
+        if (record.referencePO) {
+            await AmcRecord.findByIdAndUpdate(
+                record.referencePO,
+                {
+                    renewed: false,
+                    renewedWith: null
+                }
+            );
         }
 
         // DELETE ALL UPLOADED PDFs

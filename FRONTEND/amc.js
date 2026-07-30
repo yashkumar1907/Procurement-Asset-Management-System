@@ -215,9 +215,16 @@ function updateStatistics() {
     const totalPoAmount = records.reduce((sum, record) => sum + Number(record.poAmount || 0), 0);
     const totalBalanceAmount = records.reduce((sum, record) => sum + Number(record.balanceAmount || 0), 0);
 
+    const totalInvoices = records.reduce(
+        (sum, record) => sum + Number(record.invoiceCount || 0),
+        0
+    );
+
+
     document.getElementById("totalRecords").innerText = totalRecords;
     document.getElementById("totalPoAmount").innerText = formatAmount(totalPoAmount);
     document.getElementById("totalBalanceAmount").innerText = formatAmount(totalBalanceAmount);
+    document.getElementById("totalInvoices").innerText = totalInvoices;
 }
 
 
@@ -242,6 +249,7 @@ function renderTable() {
             <table id="data-table">
                 <thead>
                     <tr>
+                        <th>S.No.</th>
                         <th>Vendor Name</th>
                         <th>Vendor Code</th>
                         <th>Purchase Requestor (PR)</th>
@@ -262,10 +270,11 @@ function renderTable() {
     `;
 
 
-    filteredRecords.forEach(item => {
+    filteredRecords.forEach((item, index) => {
         const status = getPOStatus(item);
         html += `
             <tr id="row-${item._id}" class="${status.className}-row">
+                <td>${index + 1}</td>
                 <td>${item.vendorName}</td>
                 <td>${item.vendorCode}</td>
                 <td>${item.pr}</td>
@@ -329,6 +338,7 @@ function renderTable() {
                     <table class="details-table">
                         <thead>
                             <tr>
+                                <th>S.No.</th>
                                 <th>Invoice / External Number</th>
                                 <th>Invoice Date</th>
                                 <th>Tracking Number</th>
@@ -343,7 +353,7 @@ function renderTable() {
 
                         <tbody id="details-body-${item._id}">
                             <tr>
-                                <td colspan="9">
+                                <td colspan="10">
                                     Loading...
                                 </td>
                             </tr>
@@ -940,6 +950,9 @@ async function saveDetail(event) {
     formData.append("lastEditedBy", localStorage.getItem("loggedInUserName"));
     if (invoicePdf) {
         formData.append("invoicePdf", invoicePdf);
+        
+        // New PDF selected, so don't remove it
+        removeInvoicePdfFlag = false;
     }
     try {
         const baseUrl = `${API_BASE_URL}/api/amc-details`;
@@ -1120,7 +1133,7 @@ async function loadDetails(recordId) {
         if (!details.length) {
             tbody.innerHTML = `
                 <tr>
-                    <td colspan="9" style="text-align:center;">
+                    <td colspan="10" style="text-align:center;">
                         No Details Added Yet
                     </td>
                 </tr>
@@ -1129,8 +1142,9 @@ async function loadDetails(recordId) {
         }
 
         tbody.innerHTML =
-            details.map(detail => `
+            details.map((detail, index) => `
                 <tr>
+                    <td>${index + 1}</td>
                     <td>${detail.invoiceNumber}</td>
                     <td>${formatDate(detail.invoiceDate)}</td>
                     <td>${detail.trackingNumber || "-"}</td>
