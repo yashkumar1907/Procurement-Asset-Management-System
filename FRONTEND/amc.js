@@ -452,7 +452,7 @@ async function loadReferencePOs() {
         });
     }
     catch(error){
-        console.log(error);
+        console.error(error);
     }
 }
 
@@ -946,6 +946,17 @@ async function saveDetail(event) {
         return;
     }
 
+    if (Number(invoiceAmount) <= 0) {
+        showToast("warning", "Invoice Amount must be greater than 0");
+        return;
+    }
+
+    if (invoicePeriodEndDate < invoicePeriodStartDate) {
+        showToast("warning", "Invoice End Date cannot be before Start Date");
+        return;
+    }
+
+
     const formData = new FormData();
 
     formData.append("recordId", recordId);
@@ -1002,7 +1013,7 @@ async function saveDetail(event) {
         }
     }
     catch(error) {
-        console.log(error);
+        console.error(error);
         showToast("error", "Server Error");
     }
 }
@@ -1062,7 +1073,7 @@ async function editDetail(id) {
         document.getElementById("detailModal").style.display = "block";
     }
     catch(error) {
-        console.log(error);
+        console.error(error);
         showToast("error", "Server Error");
     }
 }
@@ -1114,7 +1125,7 @@ async function deleteDetail(id) {
         }
     }
     catch(error) {
-        console.log(error);
+        console.error(error);
         showToast("error", "Server Error");
     }
 }
@@ -1183,7 +1194,7 @@ async function loadDetails(recordId) {
             `).join("");
     }
     catch(error) {
-        console.log(error);
+        console.error(error);
     }
 }
 
@@ -1354,7 +1365,7 @@ async function importExcel(input) {
         await loadRecords();
     }
     catch(error) {
-        console.log(error);
+        console.error(error);
         showToast("error", "Import Failed");
     }
     input.value = "";

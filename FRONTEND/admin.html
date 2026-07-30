@@ -19,7 +19,7 @@
         </div>
         <div class="nav-right">
             <span id="adminName">Welcome, Admin</span>
-            <button class="logout-btn" onclick="logout()">Logout</button>
+            <button type="button" class="logout-btn" onclick="logout()">Logout</button>
         </div>
     </div>
 
@@ -32,9 +32,9 @@
             SIDEBAR
         ========================= -->
         <div class="sidebar">
-            <button class="sidebar-btn active" id="profileBtn" onclick="showSection('profileSection', this)">&#128100; View Profile</button>
-            <button class="sidebar-btn" onclick="showSection('addEmployeeSection', this)">&#10133; Add Employee</button>
-            <button class="sidebar-btn" onclick="showSection('employeeListSection', this)">&#128203; Employee List</button>
+            <button type="button" class="sidebar-btn active" id="profileBtn" onclick="showSection('profileSection', this)">&#128100; View Profile</button>
+            <button type="button" class="sidebar-btn" onclick="showSection('addEmployeeSection', this)">&#10133; Add Employee</button>
+            <button type="button" class="sidebar-btn" onclick="showSection('employeeListSection', this)">&#128203; Employee List</button>
         </div>
 
         <!-- =========================
@@ -52,10 +52,10 @@
                         <h2>Admin Profile</h2>
                 
                         <div class="profile-actions">
-                            <button class="edit-profile-btn" onclick="openEditProfileModal()">
+                            <button type="button" class="edit-profile-btn" onclick="openEditProfileModal()">
                                 ✏️ Edit Profile
                             </button>
-                            <button class="change-password-btn" onclick="openPasswordModal()">
+                            <button type="button" class="change-password-btn" onclick="openPasswordModal()">
                                 🔒 Change Password
                             </button>
                         </div>
@@ -162,7 +162,7 @@
                                 </select>
                         </div>
                     </div>
-                    <button onclick="addUser()">Add Employee</button>
+                    <button type="button" onclick="addUser()">Add Employee</button>
                 </div>
             </div>
 
@@ -281,7 +281,7 @@
                     <option value="edit">Edit</option>
                 </select>
             </div>
-            <button onclick="savePermissions()">Save Permissions</button>
+            <button type="button" onclick="savePermissions()">Save Permissions</button>
         </div>
     </div>
 
@@ -315,11 +315,11 @@
             <div id="deletePermissionsContainer"></div>
 
             <div style="margin-top:20px; display:flex; gap:10px;">
-                <button id="confirmDeleteBtn" class="delete-btn" style="flex:1;">
+                <button type="button" id="confirmDeleteBtn" class="delete-btn" style="flex:1;">
                     Delete
                 </button>
 
-                <button onclick="closeDeleteModal()" class="edit-btn" style="flex:1;">
+                <button type="button" onclick="closeDeleteModal()" class="edit-btn" style="flex:1;">
                     Cancel
                 </button>
             </div>

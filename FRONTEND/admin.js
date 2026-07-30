@@ -79,6 +79,10 @@ async function updateProfile(event) {
     const name = document.getElementById("editName").value.trim();
     const email = document.getElementById("editEmail").value.trim();
 
+    const saveButton = document.querySelector("#editProfileModal .save-btn");
+
+    saveButton.disabled = true;
+
     try {
         const response =
             await fetch(
@@ -116,8 +120,11 @@ async function updateProfile(event) {
         showToast("success", data.message);
     }
     catch (error) {
-        console.log(error);
+        console.error(error);
         showToast("error", "Server Error");
+    }
+    finally {
+        saveButton.disabled = false;
     }
 }
 
@@ -127,9 +134,9 @@ async function updateProfile(event) {
 async function changePassword(event) {
     event.preventDefault();
 
-    const currentPassword = document.getElementById("currentPassword").value;
-    const newPassword = document.getElementById("newPassword").value;
-    const confirmPassword = document.getElementById("confirmPassword").value;
+    const currentPassword = document.getElementById("currentPassword").value.trim();
+    const newPassword = document.getElementById("newPassword").value.trim();
+    const confirmPassword = document.getElementById("confirmPassword").value.trim();
 
     if (newPassword.length < 6) {
         showToast("warning", "Password must be at least 6 characters.");
@@ -140,6 +147,10 @@ async function changePassword(event) {
         showToast("warning", "New Password and Confirm Password do not match.");
         return;
     }
+
+    const updateButton = document.querySelector("#passwordModal .save-btn");
+
+    updateButton.disabled = true;
 
     try {
         const response =
@@ -168,8 +179,11 @@ async function changePassword(event) {
         closePasswordModal();
     }
     catch (error) {
-        console.log(error);
+        console.error(error);
         showToast("error", "Server Error");
+    }
+    finally {
+        updateButton.disabled = false;
     }
 }
 
@@ -235,7 +249,7 @@ async function fetchUsers() {
         });
     }
     catch (error) {
-        console.log(error);
+        console.error(error);
         showToast("error", "Failed to fetch users");
     }
 }
@@ -245,9 +259,9 @@ async function fetchUsers() {
 // ADD USER
 // ===============================
 async function addUser() {
-    const name = document.getElementById("name").value;
-    const email = document.getElementById("email").value;
-    const password = document.getElementById("password").value;
+    const name = document.getElementById("name").value.trim();
+    const email = document.getElementById("email").value.trim();
+    const password = document.getElementById("password").value.trim();
     const networkPermission = document.getElementById("networkPermission").value;
     const amcPermission = document.getElementById("amcPermission").value;
     const contractPermission = document.getElementById("contractPermission").value;
@@ -262,6 +276,9 @@ async function addUser() {
         showToast("warning", "Please fill all fields");
         return;
     }
+
+    const addButton = document.querySelector("#addEmployeeSection button");
+    addButton.disabled = true;
 
     try {
         const response =
@@ -299,6 +316,16 @@ async function addUser() {
                 document.getElementById("email").value = "";
                 document.getElementById("password").value = "";
 
+                document.getElementById("networkPermission").value = "none";
+                document.getElementById("amcPermission").value = "none";
+                document.getElementById("contractPermission").value = "none";
+                document.getElementById("inventoryNetworkPermission").value = "none";
+                document.getElementById("inventoryHardwarePermission").value = "none";
+                document.getElementById("inventoryDepartmentPermission").value = "none";
+                document.getElementById("plantMaterialPermission").value = "none";
+                document.getElementById("plantServicePermission").value = "none";
+                document.getElementById("wbsProjectPermission").value = "none";
+
                 fetchUsers();  
                 showSection("employeeListSection",document.querySelectorAll(".sidebar-btn")[2]);
             }
@@ -307,8 +334,11 @@ async function addUser() {
             }
     }
     catch (error) {
-        console.log(error);
+        console.error(error);
         showToast("error", "Server Error");
+    }
+    finally {
+        addButton.disabled = false;
     }
 }
 
@@ -377,6 +407,9 @@ function deleteUser(id) {
 
 
 async function confirmDeleteUser() {
+    const deleteButton = document.getElementById("confirmDeleteBtn");
+
+    deleteButton.disabled = true;
     try {
         const response =
             await fetch(
@@ -398,8 +431,11 @@ async function confirmDeleteUser() {
         }
     }
     catch (error) {
-        console.log(error);
+        console.error(error);
         showToast("error", "Server Error");
+    }
+    finally {
+        deleteButton.disabled = false;
     }
 }
 
@@ -457,6 +493,9 @@ async function savePermissions() {
     const plantService = document.getElementById("editPlantServicePermission").value;
     const wbsProject = document.getElementById("editWbsProjectPermission").value;
 
+    const saveButton = document.querySelector("#permissionModal button");
+    saveButton.disabled = true;
+
     try {
         const response =
             await fetch(
@@ -481,8 +520,11 @@ async function savePermissions() {
         }
     }
     catch (error) {
-        console.log(error);
+        console.error(error);
         showToast("error", "Server Error");
+    }
+    finally {
+        saveButton.disabled = false;
     }
 }
 
