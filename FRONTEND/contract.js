@@ -352,7 +352,7 @@ function renderTable() {
                 <td>${item.po}</td>
                 <td>${formatDate(item.poDate)}</td>
                 <td>${item.poDescription}</td>
-                <td>${(item.serviceDetails || []).map(x => x.itemType === "service" ? "Service" : "Material").join("<br><br>")}</td>
+                <td>${(item.serviceDetails || []).map((x, index) => `${index + 1}. ${x.itemType === "service" ? "Service" : "Material"}`).join("<br><br>")}</td>
                 <td>${item.serviceDetails?.map(x => x.code).join("<br><br>")}</td>
                 <td>${item.serviceDetails ?.map(x => x.shortText).join("<br><br>")}</td>
                 <td>${formatDate(item.poStartDate)} to ${formatDate(item.poEndDate)}</td>
