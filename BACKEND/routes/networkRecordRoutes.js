@@ -46,13 +46,20 @@ const NetworkDetail = require("../models/NetworkDetail");
 const XLSX = require("xlsx");
 
 
+const uploadDir = path.join(__dirname, "..", "uploads");
+
+if (!fs.existsSync(uploadDir)) {
+    fs.mkdirSync(uploadDir, { recursive: true });
+}
+
+
 /* =========================
    MULTER CONFIGURATION
 ========================= */
 const storage = multer.diskStorage({
     // Where to store files
     destination: function (req, file, cb) {
-        cb(null, 'uploads/');
+        cb(null, uploadDir);
     },
     // File Name
     filename: function (req, file, cb) {
