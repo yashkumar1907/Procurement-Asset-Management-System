@@ -319,6 +319,7 @@ function renderTable() {
                         <th>S.No.</th>
                         <th>Vendor Name</th>
                         <th>Vendor Code</th>
+                        <th>Total Invoices Paid</th>
                         <th>Purchase Requestor (PR)</th>
                         <th>Purchase Order (PO)</th>
                         <th>PO Date</th>
@@ -346,6 +347,7 @@ function renderTable() {
                 <td>${index + 1}</td>
                 <td>${item.vendorName}</td>
                 <td>${item.vendorCode}</td>
+                <td>${item.invoiceCount || 0}</td>
                 <td>${item.pr}</td>
                 <td>${item.po}</td>
                 <td>${formatDate(item.poDate)}</td>
