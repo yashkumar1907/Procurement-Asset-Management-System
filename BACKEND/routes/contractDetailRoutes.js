@@ -108,37 +108,22 @@ router.post("/", upload.single("invoicePdf"), async (req, res) => {
             });
         }
 
+        const serviceCodes = JSON.parse(req.body.serviceCodes || "[]");
+
         // Take data of new invoice and stores
         const detail = new ContractDetail({
             recordId: req.body.recordId,
-        
-            serviceCode: req.body.serviceCode,
-        
+            serviceCodes,
             invoiceNumber: req.body.invoiceNumber,
             invoiceDate: req.body.invoiceDate,
-        
             trackingNumber: req.body.trackingNumber,
-        
-            invoicePeriodStartDate:
-                req.body.invoicePeriodStartDate,
-        
-            invoicePeriod:
-                req.body.invoicePeriod,
-        
-            invoicePeriodEndDate:
-                req.body.invoicePeriodEndDate,
-        
-            invoiceAmount:
-                req.body.invoiceAmount,
-        
-            serviceEntryNumber:
-                req.body.serviceEntryNumber,
-        
-            documentNumber:
-                req.body.documentNumber,
-        
-            invoicePdf:
-                req.file ? req.file.filename : ""
+            invoicePeriodStartDate: req.body.invoicePeriodStartDate,
+            invoicePeriod: req.body.invoicePeriod,
+            invoicePeriodEndDate: req.body.invoicePeriodEndDate,
+            invoiceAmount: req.body.invoiceAmount,
+            serviceEntryNumber: req.body.serviceEntryNumber,
+            documentNumber: req.body.documentNumber,
+            invoicePdf: req.file ? req.file.filename : ""
         });
 
         // Save the detail data
@@ -243,7 +228,9 @@ router.put("/:id", upload.single("invoicePdf"), async (req, res) => {
                 message: "Contract Record not found"
             });
         }
+
         const newInvoiceAmount = Number(req.body.invoiceAmount || 0);
+        const serviceCodes = JSON.parse(req.body.serviceCodes || "[]");
         const allowedAmount = (record.balanceAmount || 0) + oldInvoiceAmount;
         if (newInvoiceAmount > allowedAmount) {
             return res.status(400).json({
@@ -252,7 +239,7 @@ router.put("/:id", upload.single("invoicePdf"), async (req, res) => {
         }
 
         // Updating the fields
-        detail.serviceCode = req.body.serviceCode;
+        detail.serviceCodes = serviceCodes;
         detail.serviceEntryNumber = req.body.serviceEntryNumber;
         detail.invoiceNumber = req.body.invoiceNumber;
         detail.trackingNumber = req.body.trackingNumber;

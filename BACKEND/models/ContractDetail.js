@@ -7,9 +7,10 @@ const contractDetailSchema = new mongoose.Schema({
         required: true,
         index: true
     },
-    serviceCode: {
-        type: String,
-        required: true
+    serviceCodes: {
+        type: [String],
+        required: true,
+        default: []
     },
     invoiceNumber: {
         type: String,

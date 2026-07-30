@@ -1141,23 +1141,19 @@ function addDetailRow(recordId) {
     document.getElementById("detailRecordId").value = recordId;
 
     const record = records.find(r => r._id === recordId);
-    const serviceDropdown = document.getElementById("serviceCode");
     const serviceGroup = document.getElementById("serviceCodeGroup");
-
+    const serviceList = document.getElementById("serviceCodeList");
+    
     serviceGroup.style.display = "block";
-
-    serviceDropdown.innerHTML = `
-        <option value="">
-            Select Service / Material Code
-        </option>
-    `;
-
+    serviceList.innerHTML = "";
+    
     if (record?.serviceDetails) {
-        record.serviceDetails.forEach(service => {
-            serviceDropdown.innerHTML += `
-                <option value="${service.code}">
-                    ${service.code} (${service.shortText})
-                </option>
+        record.serviceDetails.forEach((service, index) => {
+            serviceList.innerHTML += `
+                <label class="service-checkbox-item">
+                    <input type="checkbox" class="serviceCodeCheckbox" value="${service.code}">
+                    ${index + 1}. ${service.code} (${service.shortText})
+                </label>
             `;
         });
     }
@@ -1172,9 +1168,12 @@ async function saveDetail(event) {
 
     const detailId = document.getElementById("detailId").value;
     const recordId = document.getElementById("detailRecordId").value;
-    const serviceCode = document.getElementById("serviceCode").value;
-    if (!serviceCode) {
-        showToast("warning", "Please select Service / Material Code");
+    const selectedServices = Array.from(
+        document.querySelectorAll(".serviceCodeCheckbox:checked")
+    ).map(checkbox => checkbox.value);
+    
+    if (selectedServices.length === 0) {
+        showToast("warning", "Please select at least one Service / Material Code");
         return;
     }
     const serviceEntryNumber = document.getElementById("serviceEntryNumber").value.trim();
@@ -1197,7 +1196,7 @@ async function saveDetail(event) {
     const formData = new FormData();
 
     formData.append("recordId", recordId);
-    formData.append("serviceCode", serviceCode);
+    formData.append("serviceCodes", JSON.stringify(selectedServices));
     formData.append("serviceEntryNumber", serviceEntryNumber);
     formData.append("invoiceNumber", invoiceNumber);
     formData.append("trackingNumber", trackingNumber);
@@ -1277,27 +1276,37 @@ async function editDetail(id) {
         document.getElementById("detailRecordId").value = detail.recordId;
 
         const record = records.find(r => r._id === detail.recordId);
-        const serviceDropdown = document.getElementById("serviceCode");
-        const serviceGroup = document.getElementById("serviceCodeGroup");
-        serviceGroup.style.display = "block";
-        
-        serviceDropdown.innerHTML = `
-            <option value="">
-                Select Service / Material Code
-            </option>
-        `;
 
+        const serviceGroup = document.getElementById("serviceCodeGroup");
+        const serviceList = document.getElementById("serviceCodeList");
+        
+        serviceGroup.style.display = "block";
+        serviceList.innerHTML = "";
+        
+        const selectedServices = detail.serviceCodes || [];
+        
         if (record?.serviceDetails) {
-            record.serviceDetails.forEach(service => {
-                serviceDropdown.innerHTML += `
-                    <option value="${service.code}">
-                        ${service.code} (${service.shortText})
-                    </option>
+            record.serviceDetails.forEach((service, index) => {
+        
+                const checked = selectedServices.includes(service.code)
+                    ? "checked"
+                    : "";
+        
+                serviceList.innerHTML += `
+                    <label class="service-checkbox-item">
+                        <input
+                            type="checkbox"
+                            class="serviceCodeCheckbox"
+                            value="${service.code}"
+                            ${checked}
+                        >
+        
+                        ${index + 1}. ${service.code} (${service.shortText})
+                    </label>
                 `;
             });
         }
-
-        document.getElementById("serviceCode").value = detail.serviceCode || "";
+        
         document.getElementById("serviceEntryNumber").value = detail.serviceEntryNumber;
         document.getElementById("invoiceNumber").value = detail.invoiceNumber;
         document.getElementById("trackingNumber").value = detail.trackingNumber || "";
@@ -1425,7 +1434,7 @@ async function loadDetails(recordId) {
             details.map((detail, index) => `
                 <tr>
                     <td>${index + 1}</td>
-                    <td>${detail.serviceCode || "-"}</td>
+                    <td>${Array.isArray(detail.serviceCodes) && detail.serviceCodes.length? detail.serviceCodes.join("<br>"): "-"}</td>
                     <td>${detail.invoiceNumber}</td>
                     <td>${formatDate(detail.invoiceDate)}</td>
                     <td>${detail.trackingNumber || "-"}</td>
