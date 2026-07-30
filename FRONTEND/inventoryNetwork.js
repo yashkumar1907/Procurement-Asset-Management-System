@@ -340,7 +340,7 @@ function renderTable() {
             "</tbody>",
             `
                 <tr>
-                    <td colspan="16" class="no-data">
+                    <td colspan="17" class="no-data">
                         No Records Found
                     </td>
                 </tr>
