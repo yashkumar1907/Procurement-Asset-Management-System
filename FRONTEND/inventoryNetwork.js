@@ -293,13 +293,13 @@ function renderTable() {
     
                 <td>
                     ${(item.networkDetails || [])
-                        .map((x, i) => `${i + 1}. ${x.desc}`)
+                        .map(x => x.desc)
                         .join("<br><br>")}
                 </td>
     
                 <td>
                     ${(item.networkDetails || [])
-                        .map((x, i) => `${i + 1}. ${x.quantity}`)
+                        .map(x => x.quantity)
                         .join("<br><br>")}
                 </td>
     
