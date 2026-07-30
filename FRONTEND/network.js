@@ -412,6 +412,7 @@ function renderTable() {
                 <table class="details-table">
                     <thead>
                         <tr>
+                            <th>S.No.</th>
                             <th>Invoice / External Number</th>
                             <th>Invoice Date</th>
                             <th>Tracking Number</th>
@@ -426,7 +427,7 @@ function renderTable() {
 
                     <tbody id="details-body-${item._id}">
                         <tr>
-                            <td colspan="9">
+                            <td colspan="10">
                                 Loading...
                             </td>
                         </tr>
@@ -1228,7 +1229,7 @@ async function loadDetails(recordId) {
         if (!details.length) {
             tbody.innerHTML = `
                 <tr>
-                    <td colspan="9" style="text-align:center;">
+                    <td colspan="10" style="text-align:center;">
                         No Details Added Yet
                     </td>
                 </tr>
@@ -1237,8 +1238,9 @@ async function loadDetails(recordId) {
         }
 
         tbody.innerHTML =
-            details.map(detail => `
+            details.map((detail, index) => `
                 <tr>
+                    <td>${index + 1}</td>
                     <td>${detail.invoiceNumber}</td>
                     <td>${formatDate(detail.invoiceDate)}</td>
                     <td>${detail.trackingNumber || "-"}</td>
