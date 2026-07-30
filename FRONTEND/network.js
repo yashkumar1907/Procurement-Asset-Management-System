@@ -320,6 +320,7 @@ function renderTable() {
                         <th>S.No.</th>
                         <th>Vendor Name</th>
                         <th>Vendor Code</th>
+                        <th>Total Invoices Paid</th>
                         <th>Purchase Requestor (PR)</th>
                         <th>Purchase Order (PO)</th>
                         <th>PO Date</th>
@@ -348,6 +349,7 @@ function renderTable() {
                 <td>${index + 1}</td>
                 <td>${item.vendorName}</td>
                 <td>${item.vendorCode}</td>
+                <td>${item.invoiceCount || 0}</td>
                 <td>${item.pr}</td>
                 <td>${item.po}</td>
                 <td>${formatDate(item.poDate)}</td>
@@ -404,17 +406,10 @@ function renderTable() {
         <tr id="details-${item._id}" class="details-row" style="display:none;">
             <td colspan="100%">
             <div class="detail-section">
-                <div class="detail-toolbar">
-                    ${getCurrentPermission() === "edit" ? `
-                        <button class="add-btn" onclick="addDetailRow('${item._id}')">
-                            + Add Detail
-                        </button>
-                    ` : ""}
-
-                    <span class="invoice-count">
-                        Total Invoices: ${item.invoiceCount || 0}
-                    </span>
-                </div>
+                ${getCurrentPermission() === "edit" ? `
+                    <button class="add-btn" onclick="addDetailRow('${item._id}')">+ Add Detail</button>
+                    ` : ""
+                }
                 <div id="detail-form-${item._id}"></div>
                 <table class="details-table">
                     <thead>
