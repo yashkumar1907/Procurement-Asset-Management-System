@@ -198,12 +198,12 @@ function updateStatistics() {
     const totalRecords = records.length;
 
     const totalBudget = records.reduce(
-        (sum, record) => sum + Number(record.Budget || 0),
+        (sum, record) => sum + Number(record.budget || 0),
         0
     );
 
     const totalActual = records.reduce(
-        (sum, record) => sum + Number(record.Actual || 0),
+        (sum, record) => sum + Number(record.actual || 0),
         0
     );
 
