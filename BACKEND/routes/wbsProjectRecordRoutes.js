@@ -288,16 +288,16 @@ router.post("/import", excelUpload.single("excelFile"), async (req, res) => {
 
             const record = new WbsProjectRecord({
                 wbsNum: String(row["WBS Number"] || "").trim(),
-                description: row["Description"] || "",
+                description: row["Description"] ?? "",
                 budget: Number(row["Budget"]) || 0,
-                transfer: row["Transfer"] || "",
-                released: row["Released"] || "",
-                preqComm: row["Preq Comm"] || "",
-                poCommt: row["PO Commt"] || "",
-                commitment: row["Commitment"] || "",
+                transfer: row["Transfer"] ?? "",
+                released: row["Released"] ?? "",
+                preqComm: row["Preq Comm"] ?? "",
+                poCommt: row["PO Commt"] ?? "",
+                commitment: row["Commitment"] ?? "",
                 actual: Number(row["Actual"]) || 0,
-                assigned: row["Assigned"] || "",
-                totalAvailable: row["Total Available"] || "",
+                assigned: row["Assigned"] ?? "",
+                totalAvailable: row["Total Available"] ?? "",
                 lastEditedBy: req.body.lastEditedBy
             });
 
