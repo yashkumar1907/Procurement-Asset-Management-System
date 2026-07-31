@@ -213,6 +213,10 @@ function updateStatistics() {
 }
 
 
+function displayValue(value) {
+    return value === "" || value === null || value === undefined ? "-" : value;
+}
+
 // ===============================
 // RENDER TABLE
 // ===============================
@@ -269,20 +273,20 @@ function renderTable() {
             <tr>
                 <td>${index + 1}</td>
                 <td>${record.wbsNum}</td>
-                <td>${record.description || "-"}</td>
+                <td>${displayValue(record.description)}</td>
                 <td>${formatAmount(record.budget)}</td>
-                <td>${record.transfer || "-"}</td>
-                <td>${record.released || "-"}</td>
+                <td>${displayValue(record.transfer)}</td>
+                <td>${displayValue(record.released)}</td>
                 <td title="PR Number: ${record.linkedInfo?.prNum || "Not Linked"}">
-                    ${record.preqComm || "-"}
+                    ${displayValue(record.preqComm)}
                 </td>
                 <td title="PO Number: ${record.linkedInfo?.poNum || "Not Linked"}">
-                    ${record.poCommt || "-"}
+                    ${displayValue(record.poCommt)}
                 </td>
-                <td>${record.commitment || "-"}</td>
+                <td>${displayValue(record.commitment)}</td>
                 <td>${formatAmount(record.actual)}</td>
-                <td>${record.assigned || "-"}</td>
-                <td>${record.totalAvailable || "-"}</td>
+                <td>${displayValue(record.assigned)}</td>
+                <td>${displayValue(record.totalAvailable)}</td>
                 <td>
                     <div class="last-edited">
                         <i class="fa-solid fa-user"></i>
