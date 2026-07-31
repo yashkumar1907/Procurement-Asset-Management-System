@@ -1,0 +1,21 @@
+name: PO Reminder
+
+on:
+  schedule:
+    # 11:00 AM IST (05:30 UTC)
+    - cron: "30 5 * * *"
+
+    # 11:30 AM IST (6:00 UTC)
+    - cron: "0 6 * * *"
+
+  workflow_dispatch:
+
+jobs:
+  send-reminders:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Call Reminder API
+        run: |
+          curl -X GET "${{ secrets.REMINDER_URL }}" \
+            -H "Authorization: Bearer ${{ secrets.REMINDER_SECRET }}"
