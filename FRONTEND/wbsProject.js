@@ -228,7 +228,7 @@ function renderTable() {
 
     const filteredRecords = records.filter(record => {
         return (
-            String(record.WbsNum || "")
+            String(record.wbsNum || "")
                 .toLowerCase()
                 .includes(searchText)
 
@@ -268,21 +268,21 @@ function renderTable() {
         html += `
             <tr>
                 <td>${index + 1}</td>
-                <td>${record.WbsNum}</td>
-                <td>${record.Description || "-"}</td>
-                <td>${formatAmount(record.Budget)}</td>
-                <td>${record.Transfer || "-"}</td>
-                <td>${record.Released || "-"}</td>
+                <td>${record.wbsNum}</td>
+                <td>${record.description || "-"}</td>
+                <td>${formatAmount(record.budget)}</td>
+                <td>${record.transfer || "-"}</td>
+                <td>${record.released || "-"}</td>
                 <td title="PR Number: ${record.linkedInfo?.prNum || "Not Linked"}">
-                    ${record.PreqComm || "-"}
+                    ${record.preqComm || "-"}
                 </td>
                 <td title="PO Number: ${record.linkedInfo?.poNum || "Not Linked"}">
-                    ${record.POCommt || "-"}
+                    ${record.poCommt || "-"}
                 </td>
-                <td>${record.Commitment || "-"}</td>
-                <td>${formatAmount(record.Actual)}</td>
-                <td>${record.Assigned || "-"}</td>
-                <td>${record.TotalAvailable || "-"}</td>
+                <td>${record.commitment || "-"}</td>
+                <td>${formatAmount(record.actual)}</td>
+                <td>${record.assigned || "-"}</td>
+                <td>${record.totalAvailable || "-"}</td>
                 <td>
                     <div class="last-edited">
                         <i class="fa-solid fa-user"></i>
@@ -533,17 +533,17 @@ function editRecord(id) {
 
     openModal();
 
-    document.getElementById("WbsNum").value = record.WbsNum || "";
-    document.getElementById("Description").value = record.Description || "";
-    document.getElementById("Budget").value = record.Budget || "";
-    document.getElementById("Transfer").value = record.Transfer || "";
-    document.getElementById("Released").value = record.Released || "";
-    document.getElementById("PreqComm").value = record.PreqComm || "";
-    document.getElementById("POCommt").value = record.POCommt || "";
-    document.getElementById("Commitment").value = record.Commitment || "";
-    document.getElementById("Actual").value = record.Actual || "";
-    document.getElementById("Assigned").value = record.Assigned || "";
-    document.getElementById("TotalAvailable").value = record.TotalAvailable || "";
+    document.getElementById("WbsNum").value = record.wbsNum || "";
+    document.getElementById("Description").value = record.description || "";
+    document.getElementById("Budget").value = record.budget || "";
+    document.getElementById("Transfer").value = record.transfer || "";
+    document.getElementById("Released").value = record.released || "";
+    document.getElementById("PreqComm").value = record.preqComm || "";
+    document.getElementById("POCommt").value = record.poCommt || "";
+    document.getElementById("Commitment").value = record.commitment || "";
+    document.getElementById("Actual").value = record.actual || "";
+    document.getElementById("Assigned").value = record.assigned || "";
+    document.getElementById("TotalAvailable").value = record.totalAvailable || "";
 }
 
 // ============================================================================================================================
