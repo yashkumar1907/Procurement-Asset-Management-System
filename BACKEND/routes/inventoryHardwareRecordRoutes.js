@@ -70,7 +70,6 @@ router.post("/", async (req, res) => {
         const record =
             new InventoryHardwareRecord({
                 ...req.body,
-                lastEditedBy: req.body.lastEditedBy,
                 hardwareDetails: parsedHardwareDetails
             });
 
@@ -119,8 +118,7 @@ router.put("/:id", async (req, res) => {
         }
 
         const updateData = {
-            ...req.body,
-            lastEditedBy: req.body.lastEditedBy
+            ...req.body
         };
 
         const updatedHardwares =

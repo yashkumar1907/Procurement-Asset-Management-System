@@ -38,9 +38,9 @@ window.onload = function () {
 
     document.querySelector(".user-info").innerHTML = `
         Welcome, <strong>${userName}</strong>
-        <a href="#" class="logout-btn" onclick="logout(event)">
+        <button type="button" class="logout-btn" onclick="logout(event)">
             Logout
-        </a>
+        </button>
     `;
 
     const searchBox = document.getElementById("searchBox");
@@ -308,7 +308,7 @@ function renderTable() {
 
     const filteredRecords =
         records.filter(record => {
-            const matchesSearch = (record.vendorName || "").toLowerCase().includes(searchText) || (record.po || "").toLowerCase().includes(searchText);
+            const matchesSearch = String(record.vendorName || "").toLowerCase().includes(searchText) || String(record.po || "").toLowerCase().includes(searchText);
             return matchesSearch;
         });
 
@@ -364,7 +364,7 @@ function renderTable() {
                 <td>${item.poDescription}</td>
                 <td>${(item.serviceDetails || []).map((x, index) => `${index + 1}. ${x.itemType === "service" ? "Service" : "Material"}`).join("<br><br>")}</td>
                 <td>${item.serviceDetails?.map(x => x.code).join("<br><br>")}</td>
-                <td>${item.serviceDetails ?.map(x => x.shortText).join("<br><br>")}</td>
+                <td>${item.serviceDetails?.map(x => x.shortText).join("<br><br>")}</td>
                 <td>${formatDate(item.poStartDate)} to ${formatDate(item.poEndDate)}</td>
                 <td>
                     <span class="status-badge ${status.className}">

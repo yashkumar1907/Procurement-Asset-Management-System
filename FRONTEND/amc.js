@@ -35,7 +35,9 @@ window.onload = function () {
 
     document.querySelector(".user-info").innerHTML = `
         Welcome <strong>${userName}</strong>
-        <a href="#" class="logout-btn" onclick="logout(event)">Logout</a>
+        <button type="button" class="logout-btn" onclick="logout(event)">
+            Logout
+        </button>
     `;
 
     applyPermissions();
@@ -239,8 +241,8 @@ function renderTable() {
     const searchText = document.getElementById("searchBox")?.value.toLowerCase().trim() || "";
 
     const filteredRecords = records.filter(record => {
-        const vendorName = (record.vendorName || "").toLowerCase();
-        const po = (record.po || "").toLowerCase();
+        const vendorName = String(record.vendorName || "").toLowerCase();
+        const po = String(record.po || "").toLowerCase();
 
         return (vendorName.includes(searchText) || po.includes(searchText));
     });

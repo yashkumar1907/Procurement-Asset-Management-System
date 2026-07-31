@@ -70,7 +70,6 @@ router.post("/", async (req, res) => {
         const record =
             new InventoryNetworkRecord({
                 ...req.body,
-                lastEditedBy: req.body.lastEditedBy,
                 networkDetails: parsedNetworkDetails
             });
 
@@ -119,8 +118,7 @@ router.put("/:id", async (req, res) => {
         }
 
         const updateData = {
-            ...req.body,
-            lastEditedBy: req.body.lastEditedBy
+            ...req.body
         };
 
         const updatedNetworks =

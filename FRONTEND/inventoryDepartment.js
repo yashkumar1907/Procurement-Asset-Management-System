@@ -2,7 +2,6 @@
 // GLOBAL VARIABLES
 // ===============================
 let records = [];
-let currentOption = "Inventory Department";
 let editingRecordId = null;
 
 
@@ -21,9 +20,9 @@ window.onload = function () {
 
     document.querySelector(".user-info").innerHTML = `
         Welcome, <strong>${userName}</strong>
-        <a href="#" class="logout-btn" onclick="logout(event)">
+        <button type="button" class="logout-btn" onclick="logout(event)">
             Logout
-        </a>
+        </button>
     `;
 
     const searchBox = document.getElementById("searchBox");
@@ -244,10 +243,10 @@ function renderTable() {
 
     const searchText = document.getElementById("searchBox")?.value.toLowerCase().trim() || "";
 
-    const filteredRecords =
-        records.filter(record => {
-            return ( (record.prNum || "").toLowerCase().includes(searchText) || (record.poNum || "").toLowerCase().includes(searchText));
-        });
+    const filteredRecords = records.filter(record =>
+        String(record.prNum || "").toLowerCase().includes(searchText) ||
+        String(record.poNum || "").toLowerCase().includes(searchText)
+    );
 
 
     let html = `

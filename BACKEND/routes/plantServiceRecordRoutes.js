@@ -42,7 +42,7 @@ const storage = multer.diskStorage({
 
 
 const excelUpload = multer({
-    storage: storage,
+    storage,
 
     fileFilter: function (req, file, cb) {
         const allowedTypes = [
@@ -75,7 +75,6 @@ router.post("/", async (req, res) => {
         const record =
             new PlantServiceRecord({
                 ...req.body,
-                lastEditedBy: req.body.lastEditedBy,
                 prAmount: totalPrAmount,
                 plantServiceDetails: parsedPlantServiceDetails
             });
@@ -125,8 +124,7 @@ router.put("/:id", async (req, res) => {
         }
 
         const updateData = {
-            ...req.body,
-            lastEditedBy: req.body.lastEditedBy
+            ...req.body
         };
 
         const updatedPlantServices =

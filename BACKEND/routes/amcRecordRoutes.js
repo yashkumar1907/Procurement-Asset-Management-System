@@ -76,7 +76,7 @@ const storage = multer.diskStorage({
    CHECKING THE TYPE OF FILE, ONLY PDF FILE CAN BE UPLOADED
 ========================= */
 const upload = multer({
-    storage: storage,
+    storage,
     fileFilter: function (req, file, cb) {
         if (file.mimetype === "application/pdf") {
             cb(null, true);
@@ -147,7 +147,6 @@ router.post("/", upload.array("documents", 10), async (req, res) => {
         const record = new AmcRecord({
             ...req.body,
             referencePO,
-            lastEditedBy: req.body.lastEditedBy,
             balanceAmount: Number(req.body.poAmount || 0),
             documents
         });
@@ -263,8 +262,7 @@ router.put("/:id", upload.array("documents", 10), async (req, res) => {
 
         const updateData = {
             ...req.body,
-            referencePO: newReferencePO,
-            lastEditedBy: req.body.lastEditedBy
+            referencePO: newReferencePO
         };
 
         if (req.body.poEndDate && new Date(req.body.poEndDate).getTime() !== new Date(existingRecord.poEndDate).getTime()) {

@@ -18,9 +18,9 @@ window.onload = function () {
 
     document.querySelector(".user-info").innerHTML = `
         Welcome, <strong>${userName}</strong>
-        <a href="#" class="logout-btn" onclick="logout(event)">
+        <button type="button" class="logout-btn" onclick="logout(event)">
             Logout
-        </a>
+        </button>
     `;
 
     applyPermissions();

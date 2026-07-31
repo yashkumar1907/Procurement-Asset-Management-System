@@ -42,7 +42,7 @@ const storage = multer.diskStorage({
 
 
 const excelUpload = multer({
-    storage: storage,
+    storage,
 
     fileFilter: function (req, file, cb) {
         const allowedTypes = [
@@ -65,11 +65,7 @@ const excelUpload = multer({
 // ===============================
 router.post("/", async (req, res) => {
     try {
-        const record =
-            new WbsProjectRecord({
-                ...req.body,
-                lastEditedBy: req.body.lastEditedBy
-            });
+        const record = new WbsProjectRecord(req.body);
 
         await record.save();
 
@@ -115,10 +111,7 @@ router.put("/:id", async (req, res) => {
             });
         }
 
-        const updateData = {
-            ...req.body,
-            lastEditedBy: req.body.lastEditedBy
-        };
+        const updateData = req.body;
 
         await WbsProjectRecord.findByIdAndUpdate(req.params.id, updateData);
 

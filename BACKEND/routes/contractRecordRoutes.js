@@ -81,7 +81,7 @@ const storage = multer.diskStorage({
    CHECKING THE TYPE OF FILE, ONLY PDF FILE CAN BE UPLOADED
 ========================= */
 const upload = multer({
-    storage: storage,
+    storage,
     fileFilter: function (req, file, cb) {
         if (file.mimetype === "application/pdf") {
             cb(null, true);
@@ -94,7 +94,7 @@ const upload = multer({
 
 
 const excelUpload = multer({
-    storage: storage,
+    storage,
     fileFilter: function(req, file, cb) {
         const allowedTypes = [
             "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
@@ -172,7 +172,6 @@ router.post("/", upload.array("documents", 10), async (req, res) => {
         const record = new ContractRecord({
             ...req.body,
             referencePO: req.body.referencePO || null,
-            lastEditedBy: req.body.lastEditedBy,
             poAmount: totalPoAmount,
             balanceAmount: totalPoAmount,
             serviceDetails: parsedServiceDetails,
@@ -277,8 +276,7 @@ router.put("/:id", upload.array("documents", 10), async (req, res) => {
 
         const updateData = {
             ...req.body,
-            referencePO: newReferencePO,
-            lastEditedBy: req.body.lastEditedBy
+            referencePO: newReferencePO
         };
 
         if (req.body.poEndDate && new Date(req.body.poEndDate).getTime() !== new Date(existingRecord.poEndDate).getTime()) {
@@ -746,7 +744,6 @@ router.post("/import", excelUpload.single("excelFile"), async (req, res) => {
                     poAmount,
                     balanceAmount: poAmount,
                     serviceDetails: recordData.serviceDetails,
-
                     lastEditedBy: req.body.lastEditedBy,
                     
                     documents: []

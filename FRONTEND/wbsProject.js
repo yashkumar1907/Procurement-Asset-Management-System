@@ -2,7 +2,6 @@
 // GLOBAL VARIABLES
 // ===============================
 let records = [];
-let linkedRecords = [];
 let editingRecordId = null;
 
 
@@ -21,10 +20,10 @@ window.onload = function () {
 
     document.querySelector(".user-info").innerHTML = `
         Welcome, <strong>${userName}</strong>
-        <a href="#" class="logout-btn" onclick="logout(event)">
+        <button type="button" class="logout-btn" onclick="logout(event)">
             Logout
-        </a>
-    `;
+        </button>
+        `;
 
     const searchBox = document.getElementById("searchBox");
     
@@ -156,40 +155,11 @@ async function importExcel(input) {
 // ============================================================================================================================
 
 // ===============================
-// FORMAT AMOUNT INPUT
-// ===============================
-function formatAmountInput(input) {
-    let value = input.value.replace(/,/g, "");
-    if (value === "") {
-        input.value = "";
-        return;
-    }
-    input.value = Number(value).toLocaleString("en-IN");
-}
-
-// ===============================
 // FORMAT AMOUNT
 // ===============================
 function formatAmount(amount) {
     return `Rs. ${Number(amount).toLocaleString("en-IN", {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
 }
-
-
-// ===============================
-// FORMAT DATE
-// ===============================
-function formatDate(dateString) {
-    if (!dateString) {
-        return "-";
-    }
-
-    const date = new Date(dateString);
-    const day = String(date.getDate()).padStart(2, "0");
-    const month = String(date.getMonth() + 1).padStart(2, "0");
-    const year = date.getFullYear();
-    return `${day}.${month}.${year}`;
-}
-
 
 // ===============================
 // UPDATE STATISTICS
@@ -238,7 +208,7 @@ function renderTable() {
 
             ||
 
-            String(record.Description || "")
+            String(record.description || "")
                 .toLowerCase()
                 .includes(searchText)
         );
@@ -507,14 +477,6 @@ async function addRecord(event) {
     };
 
     await saveRecord(recordData);
-}
-
-
-function formatDateForInput(dateValue) {
-    if (!dateValue) {
-        return "";
-    }
-    return new Date(dateValue).toISOString().split("T")[0];
 }
 
 
