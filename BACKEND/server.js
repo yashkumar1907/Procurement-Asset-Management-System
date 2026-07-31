@@ -48,9 +48,6 @@ const wbsProjectRecordRoutes = require("./routes/wbsProjectRecordRoutes");
 
 const dashboardRoutes = require("./routes/dashboardRoutes");
 
-const reminderRoutes = require("./routes/reminderRoutes");
-
-
 const cron = require("node-cron");
 
 const {checkNetworkPOReminders, checkAmcPOReminders, checkContractPOReminders} = require("./services/poReminderService");
@@ -108,8 +105,6 @@ app.use("/api/plant-service-records", plantServiceRecordRoutes);
 app.use("/api/wbs-project-records", wbsProjectRecordRoutes);
 
 app.use("/api/dashboard", dashboardRoutes);
-
-app.use("/api/reminder", reminderRoutes);
 
 
 

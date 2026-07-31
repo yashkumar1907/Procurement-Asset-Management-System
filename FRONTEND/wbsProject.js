@@ -489,17 +489,17 @@ async function addRecord(event) {
     event.preventDefault();
 
     const recordData = {
-        WbsNum: document.getElementById("WbsNum").value.trim(),
-        Description: document.getElementById("Description").value.trim(),
-        Budget: Number(document.getElementById("Budget").value),
-        Transfer: document.getElementById("Transfer").value.trim(),
-        Released: document.getElementById("Released").value.trim(),
-        PreqComm: document.getElementById("PreqComm").value.trim(),
-        POCommt: document.getElementById("POCommt").value.trim(),
-        Commitment: document.getElementById("Commitment").value.trim(),
-        Actual: Number(document.getElementById("Actual").value),
-        Assigned: document.getElementById("Assigned").value.trim(),
-        TotalAvailable: document.getElementById("TotalAvailable").value.trim()
+        wbsNum: document.getElementById("WbsNum").value.trim(),
+        description: document.getElementById("Description").value.trim(),
+        budget: Number(document.getElementById("Budget").value),
+        transfer: document.getElementById("Transfer").value.trim(),
+        released: document.getElementById("Released").value.trim(),
+        preqComm: document.getElementById("PreqComm").value.trim(),
+        poCommt: document.getElementById("POCommt").value.trim(),
+        commitment: document.getElementById("Commitment").value.trim(),
+        actual: Number(document.getElementById("Actual").value),
+        assigned: document.getElementById("Assigned").value.trim(),
+        totalAvailable: document.getElementById("TotalAvailable").value.trim()
     };
 
     await saveRecord(recordData);
