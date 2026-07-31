@@ -7,10 +7,8 @@ const sendEmail = require("./emailService");
 const poExpiryReminderEmail = require("../templates/poExpiryReminderEmail");
 
 const RECIPIENTS = [
-    // "sanchit.jain@jindalstainless.com",
-    // "karan.singh@jindalstainless.com"
-    "yashkumar9926@gmail.com",
-    "y37047614@gmail.com"
+    "sanchit.jain@jindalstainless.com",
+    "karan.singh@jindalstainless.com"
 ];
 
 async function checkNetworkPOReminders() {

@@ -279,9 +279,9 @@ async function updateProfile(event) {
 
         document.querySelector(".user-info").innerHTML = `
             Welcome, <strong>${data.user.name}</strong>
-            <a href="#" class="logout-btn" onclick="logout(event)">
+            <button type="button" href="#" class="logout-btn" onclick="logout(event)">
                 Logout
-            </a>
+            </button>
         `;
 
         closeEditProfileModal();
