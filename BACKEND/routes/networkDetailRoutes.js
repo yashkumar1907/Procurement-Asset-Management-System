@@ -145,7 +145,6 @@ router.post("/", upload.single("invoicePdf"), async (req, res) => {
                 fs.unlinkSync(filePath);
             }
         }
-        
         console.error(error);
         res.status(500).json({
             message: "Server Error"

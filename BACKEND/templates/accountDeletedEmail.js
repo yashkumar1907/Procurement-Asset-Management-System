@@ -1,5 +1,6 @@
 const emailLayout = require("./emailLayout");
 
+
 function accountDeletedEmail(name) {
     const content = `
         <p>Hello <strong>${name}</strong>,</p>

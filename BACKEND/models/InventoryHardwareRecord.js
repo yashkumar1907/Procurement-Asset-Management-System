@@ -80,4 +80,5 @@ const inventoryHardwareRecordSchema = new mongoose.Schema({
     }
 );
 
+
 module.exports = mongoose.model("InventoryHardwareRecord", inventoryHardwareRecordSchema);

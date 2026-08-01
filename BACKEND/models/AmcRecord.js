@@ -92,4 +92,5 @@ const amcRecordSchema = new mongoose.Schema({
     timestamps: true
 });
 
+
 module.exports = mongoose.model("AmcRecord", amcRecordSchema);

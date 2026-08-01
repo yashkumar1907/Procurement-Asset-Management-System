@@ -134,10 +134,8 @@ async function checkAmcPOReminders() {
                 }
                 catch (emailError) {
                     console.error(emailError);
-                }
-                
+                }   
             }
-
         }
     }
     catch(error) {

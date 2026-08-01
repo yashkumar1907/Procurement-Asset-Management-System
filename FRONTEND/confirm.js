@@ -37,6 +37,7 @@ function showConfirm({
             document.body.appendChild(overlay);
         }
 
+        
         document.getElementById("confirmTitle").innerText = title;
         document.getElementById("confirmMessage").innerText = message;
 

@@ -805,6 +805,7 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
     }
 
+    
     plantBtn.addEventListener("click", () => {
 
         const sidebar = document.querySelector(".sidebar");

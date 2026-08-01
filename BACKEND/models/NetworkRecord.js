@@ -92,4 +92,5 @@ const networkRecordSchema = new mongoose.Schema({
     timestamps: true
 });
 
+
 module.exports = mongoose.model("NetworkRecord", networkRecordSchema);

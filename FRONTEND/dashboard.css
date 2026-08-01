@@ -534,50 +534,35 @@ body {
 /* =========================
    DASHBOARD ALERTS
 ========================= */
-
 #dashboardAlerts{
-
     display:flex;
-
     flex-direction:column;
-
     gap:15px;
-
     width:100%;
-
 }
 
 
 /* =========================
    TOP VENDORS
 ========================= */
-
 #topVendorsTable{
-
     width:100%;
-
 }
 
 
 /* =========================
    RECENT ACTIVITIES
 ========================= */
-
 #recentActivitiesList{
-
     display:flex;
-
     flex-direction:column;
-
     gap:15px;
-
 }
 
 
 /* =========================
    RECENT ACTIVITY
 ========================= */
-
 .activity-card{
     background:white;
     border-radius:18px;
@@ -585,23 +570,14 @@ body {
     padding:45px;
 }
 
-
-
-
 /* =========================
    KPI HEADER
 ========================= */
-
 .kpi-top {
-
     display: flex;
-
     justify-content: space-between;
-
     align-items: center;
-
     margin-bottom: 12px;
-
 }
 
 .kpi-title{

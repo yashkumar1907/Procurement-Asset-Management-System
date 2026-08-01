@@ -66,7 +66,6 @@ function poExpiryReminderEmail(record, reminderType) {
         Regards,<br>
         IT Admin
     `;
-
     return emailLayout(title, content);
 }
 

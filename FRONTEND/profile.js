@@ -222,7 +222,6 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 
-
 // ===============================
 // OPEN EDIT PROFILE MODAL
 // ===============================

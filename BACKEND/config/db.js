@@ -11,6 +11,7 @@ const connectDB = async () => {
     }
 };
 
+
 /* =========================
     Export route so that we can use it anywhere
 ========================= */

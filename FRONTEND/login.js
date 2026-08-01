@@ -93,6 +93,7 @@ function togglePassword() {
         passwordInput.type = "text";
         toggleBtn.innerText = "Hide";
     }
+    
     // HIDE PASSWORD
     else {
         passwordInput.type = "password";

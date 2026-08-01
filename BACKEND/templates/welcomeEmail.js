@@ -23,4 +23,5 @@ function welcomeEmail(name, email, password) {
     return emailLayout(`Welcome ${name}!`, content);
 }
 
+
 module.exports = welcomeEmail;

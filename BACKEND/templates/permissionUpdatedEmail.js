@@ -1,7 +1,6 @@
 const emailLayout = require("./emailLayout");
 
 function permissionUpdatedEmail(name, permissions) {
-
     const content = `
         <p>Hello <strong>${name}</strong>,</p>
         <p>Your system permissions have been updated by the administrator.</p>

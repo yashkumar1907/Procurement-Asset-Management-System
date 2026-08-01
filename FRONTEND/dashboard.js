@@ -176,7 +176,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     inventoryBtn.addEventListener("click", () => {
-
         const sidebar = document.querySelector(".sidebar");
     
         // Expand sidebar automatically

@@ -80,4 +80,5 @@ const inventoryDepartmentRecordSchema = new mongoose.Schema({
     }
 );
 
+
 module.exports = mongoose.model("InventoryDepartmentRecord", inventoryDepartmentRecordSchema);

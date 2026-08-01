@@ -31,6 +31,7 @@ function showToast(type, message) {
             break;
     }
 
+    
     const toast = document.createElement("div");
     toast.className = `toast ${type}`;
 

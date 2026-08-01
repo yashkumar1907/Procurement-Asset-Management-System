@@ -20,21 +20,15 @@
 .toast {
     min-width: 300px;
     max-width: 420px;
-
     padding: 14px 18px;
-
     border-radius: 8px;
-
     color: white;
     font-size: 15px;
     font-weight: 500;
-
     box-shadow: 0 6px 20px rgba(0,0,0,0.18);
-
     display: flex;
     justify-content: space-between;
     align-items: center;
-
     animation: slideIn 0.35s ease;
 }
 

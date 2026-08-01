@@ -50,4 +50,5 @@ const networkDetailSchema = new mongoose.Schema({
     timestamps: true
 });
 
+
 module.exports = mongoose.model("NetworkDetail", networkDetailSchema);

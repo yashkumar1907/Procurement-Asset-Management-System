@@ -276,7 +276,6 @@ router.put("/:id", upload.array("documents", 10), async (req, res) => {
             updateData.oneMonthReminderSentAt = null;
         }
 
-
         // If PO amount is updated than update the balance amount
         if (req.body.poAmount) {
             updateData.balanceAmount = Number(req.body.poAmount) - totalPaidAmount;

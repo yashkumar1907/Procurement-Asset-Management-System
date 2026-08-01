@@ -440,6 +440,7 @@ async function confirmDeleteUser() {
 }
 
 
+
 function closeDeleteModal() {
     document.getElementById("deleteUserModal").style.display = "none";
     deletingUserId = null;
