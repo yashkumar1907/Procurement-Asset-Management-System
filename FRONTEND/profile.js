@@ -137,17 +137,17 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (currentPage === "inventoryNetwork.html" || currentPage === "inventoryHardware.html" || currentPage === "inventoryDepartment.html") {
         inventorySubMenu.classList.add("show");
-        inventoryBtn.innerHTML = "📦 IT Inventory ▲";
+        inventoryBtn.innerHTML = "📦 IT Procurement ▲";
     }
 
     inventoryBtn.addEventListener("click", () => {
         inventorySubMenu.classList.toggle("show");
 
         if (inventorySubMenu.classList.contains("show")) {
-            inventoryBtn.innerHTML = "📦 IT Inventory ▲";
+            inventoryBtn.innerHTML = "📦 IT Procurement ▲";
         }
         else {
-            inventoryBtn.innerHTML = "📦 IT Inventory ▼";
+            inventoryBtn.innerHTML = "📦 IT Procurement ▼";
         }
     });
 });

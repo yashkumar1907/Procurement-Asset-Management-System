@@ -740,10 +740,10 @@ document.addEventListener("DOMContentLoaded", () => {
         inventorySubMenu.classList.toggle("show");
 
         if (inventorySubMenu.classList.contains("show")) {
-            inventoryBtn.innerHTML = "📦 IT Inventory ▲";
+            inventoryBtn.innerHTML = "📦 IT Procurement ▲";
         }
         else {
-            inventoryBtn.innerHTML = "📦 IT Inventory ▼";
+            inventoryBtn.innerHTML = "📦 IT Procurement ▼";
         }
     });
 });
