@@ -1,10 +1,8 @@
-let poStatusChart;
-let moduleRecordsChart;
-let paymentVsPoChart;
-let monthlyTrendChart;
-let inventoryProgressChart;
-let poExpiryChart;
-let monthlyPoChart;
+let paymentVsPoChart = null;
+let monthlyPoChart = null;
+let poExpiryChart = null;
+let spendByModuleChart = null;
+
 
 // ===============================
 // PAGE INITIALIZATION
@@ -24,8 +22,43 @@ window.onload = function () {
     `;
 
     applyPermissions();
+
+    // Executive Summary
+    loadExecutiveSummary();
+
+    // Charts
+    loadMonthlyProcurementChart();
+    loadPaymentVsProcurementChart();
+    loadPoExpiryChart();
+    loadSpendByModule();
+
+    // Dashboard Widgets
+    loadDashboardAlerts();
+    loadTopVendors();
+    loadRecentActivities();
+
+    const exportBtn = document.getElementById("exportPaymentReportBtn");
+    if (exportBtn) {
+        exportBtn.addEventListener("click", openPaymentReportModal);
+    }
+
+    const cancelBtn = document.getElementById("cancelPaymentReportBtn");
+    if (cancelBtn) {
+        cancelBtn.addEventListener("click", closePaymentReportModal);
+    }
+
+    const downloadBtn = document.getElementById("downloadPaymentReportBtn");
+    if (downloadBtn) {
+        downloadBtn.addEventListener("click", downloadPaymentReport);
+    }
 };
 
+
+
+const today = new Date().toISOString().split("T")[0];
+
+document.getElementById("paymentFromDate").max = today;
+document.getElementById("paymentToDate").max = today;
 
 // ===============================
 // APPLY PERMISSIONS
@@ -88,8 +121,7 @@ function logout(event) {
 // ===============================
 // SIDEBAR TOGGLE
 // ===============================
-const toggleBtn =
-    document.getElementById("toggleSidebarBtn");
+const toggleBtn = document.getElementById("toggleSidebarBtn");
 
     if (toggleBtn) {
         toggleBtn.addEventListener("click", () => {
@@ -97,7 +129,6 @@ const toggleBtn =
         }
     );
 }
-
 
 
 // ===============================
@@ -112,7 +143,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // ===============================
-        // AUTO OPEN INVENTORY MENU
+    // AUTO OPEN INVENTORY MENU
     // ===============================
     const currentPage = window.location.pathname.split("/").pop();
 
@@ -165,525 +196,441 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 
-async function loadNetworkDashboard() {
+// ===============================
+// LOAD EXECUTIVE SUMMARY
+// ===============================
+async function loadExecutiveSummary() {
     try {
-        const response = await fetch(`${API_BASE_URL}/api/dashboard/network`);
+        const response = await fetch(`${API_BASE_URL}/api/dashboard/summary`);
+        if (!response.ok) {
+            throw new Error("Failed to load executive summary.");
+        }
 
         const data = await response.json();
-
-        document.getElementById("networkRecords").textContent = data.totalRecords;
-        document.getElementById("networkPoAmount").textContent = "₹" + Number(data.totalPoAmount).toLocaleString("en-IN");
-        document.getElementById("networkPayment").textContent = "₹" + Number(data.totalPayment).toLocaleString("en-IN");
+        
+        document.getElementById("totalProcurement").textContent = "₹" + Number(data.totalProcurement).toLocaleString("en-IN");
+        document.getElementById("totalPayments").textContent = "₹" + Number(data.totalPayment).toLocaleString("en-IN");
+        document.getElementById("activePOs").textContent = data.activePOs;
+        document.getElementById("expiringPOs").textContent = data.expiringSoon;
+        document.getElementById("expiredPOs").textContent = data.expiredPOs;
+        document.getElementById("activeContracts").textContent = data.activeContracts;
+        document.getElementById("totalVendors").textContent = data.totalVendors;
+        document.getElementById("wbsProjects").textContent = data.wbsProjects;
     }
     catch (error) {
-        console.log(error);
+        console.error(error);
     }
 }
 
 
 // ===============================
-// LOAD INVENTORY DASHBOARD
+// MONTHLY PROCUREMENT TREND
 // ===============================
-async function loadInventoryDashboard() {
+async function loadMonthlyProcurementChart() {
     try {
-        const response = await fetch(`${API_BASE_URL}/api/dashboard/inventory`);
+        const response = await fetch(`${API_BASE_URL}/api/dashboard/monthly-po`);
+        if (!response.ok) {
+            throw new Error("Failed to load monthly procurement data.");
+        }
 
         const data = await response.json();
 
-        document.getElementById("inventoryRecords").textContent = data.totalRecords;
-        document.getElementById("inventoryDraftRecords").textContent = data.draftRecords;
-        document.getElementById("inventoryReleasedRecords").textContent = data.releasedRecords;
-        document.getElementById("inventoryPoReceivedRecords").textContent = data.poReceivedRecords;
-    } catch (error) {
-        console.log(error);
-    }
-}
+        const ctx = document.getElementById("monthlyProcurementChart").getContext("2d");
 
-// ===============================
-// LOAD PLANT DASHBOARD
-// ===============================
-async function loadPlantDashboard() {
-    try {
-        const response = await fetch(`${API_BASE_URL}/api/dashboard/plants`);
-        const data = await response.json();
+        if (monthlyPoChart) {
+            monthlyPoChart.destroy();
+        }
 
-        document.getElementById("plantMaterialRecords").textContent = data.materialRecords;
-        document.getElementById("plantServiceRecords").textContent = data.serviceRecords;
-        document.getElementById("plantPrCount").textContent = data.totalPr;
-        document.getElementById("plantPoCount").textContent = data.totalPo;
+        monthlyPoChart = new Chart(ctx, {
+            type: "line",
+            data: {
+                labels: data.labels,
+                datasets: [{
+                    label: "Procurement Value (₹)",
+                    data: data.data,
+                    borderColor: "#ff6b00",
+                    backgroundColor: "rgba(255,107,0,0.12)",
+                    borderWidth: 3,
+                    fill: true,
+                    tension: 0.35,
+                    pointRadius: 4,
+                    pointHoverRadius: 6,
+                    pointBackgroundColor: "#ff6b00",
+                    pointBorderColor: "#ffffff",
+                    pointBorderWidth: 2,
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label(context) {
+                                return "₹" + Number(context.raw).toLocaleString("en-IN");
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback(value) {
+                                if (value >= 10000000) {
+                                    return "₹" + (value / 10000000).toFixed(1) + " Cr";
+                                }
+                        
+                                if (value >= 100000) {
+                                    return "₹" + (value / 100000).toFixed(1) + " L";
+                                }
+                        
+                                return "₹" + value.toLocaleString("en-IN");
+                            }
+                        }
+                    }
+                }
+            }
+        });
     }
     catch (error) {
-        console.log(error);
+        console.error(error);
     }
 }
 
-// ===============================
-// LOAD WBS DASHBOARD
-// ===============================
-async function loadWbsDashboard() {
-    try {
-        const response = await fetch(`${API_BASE_URL}/api/dashboard/wbs`);
-        const data = await response.json();
 
-        document.getElementById("wbsProjects").textContent = data.totalProjects;
-        document.getElementById("wbsLinkedPr").textContent = data.linkedPr;
-        document.getElementById("wbsLinkedPo").textContent = data.linkedPo;
+// ===============================
+// PAYMENT VS PROCUREMENT CHART
+// ===============================
+async function loadPaymentVsProcurementChart() {
+    try {
+        const response = await fetch(`${API_BASE_URL}/api/dashboard/payment-vs-procurement`);
+
+        if (!response.ok) {
+            throw new Error("Failed to load payment vs procurement data.");
+        }
+
+        const data = await response.json();
+        const ctx = document.getElementById("paymentVsProcurementChart").getContext("2d");
+
+        if (paymentVsPoChart) {
+            paymentVsPoChart.destroy();
+        }
+        
+        paymentVsPoChart = new Chart(ctx, {
+            type: "bar",
+            data: {
+                labels: data.labels,
+                datasets: [
+                    {
+                        label: "Procurement",
+                        data: data.procurement,
+                        backgroundColor: "#ff6b00"
+                    },
+                    {
+                        label: "Payments",
+                        data: data.payments,
+                        backgroundColor: "#1e88e5"
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: "top"
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback(value) {
+                                if (value >= 10000000) {
+                                    return "₹" + (value / 10000000).toFixed(1) + " Cr";
+                                }
+                        
+                                if (value >= 100000) {
+                                    return "₹" + (value / 100000).toFixed(1) + " L";
+                                }
+                        
+                                return "₹" + Number(value).toLocaleString("en-IN");
+                            }
+                        }
+                    }
+                }
+            }
+        });
     }
     catch (error) {
-        console.log(error);
+        console.error(error);
     }
 }
 
 
-
-// GRAPHS 
-
 // ===============================
-// LOAD PO STATUS CHART
+// SPEND BY MODULE
 // ===============================
-async function loadPoStatusChart() {
+async function loadSpendByModule() {
     try {
-        const response = await fetch(`${API_BASE_URL}/api/dashboard/po-status`);
+        const response = await fetch(`${API_BASE_URL}/api/dashboard/spend-by-module`);
+        if (!response.ok) {
+            throw new Error("Failed to load spend by module data.");
+        }
+
         const data = await response.json();
 
-        renderPoStatusChart(
-            data.active,
-            data.expiringSoon,
-            data.expired
-        );
+        if (spendByModuleChart) {
+            spendByModuleChart.destroy();
+        }
+
+        const ctx = document.getElementById("moduleSpendChart").getContext("2d");
+
+        spendByModuleChart = new Chart(ctx, {
+            type: "doughnut",
+            data: {
+                labels: data.labels,
+                datasets: [{
+                    data: data.data,
+                    backgroundColor: [
+                        "#ff6b00",
+                        "#1e88e5",
+                        "#22c55e"
+                    ],  
+                    borderWidth: 2,
+                    borderColor: "#ffffff"                
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: "bottom"
+                    }
+                }
+            }
+        });
     }
     catch (error) {
-        console.log(error);
-    }
-}
-
-// ===============================
-// LOAD MODULE RECORDS CHART
-// ===============================
-async function loadModuleRecordsChart() {
-    try {
-        const response = await fetch(`${API_BASE_URL}/api/dashboard/module-records`);
-        const data = await response.json();
-        renderModuleRecordsChart(data);
-    }
-    catch (error) {
-        console.log(error);
-    }
-}
-
-// ===============================
-// LOAD PAYMENT VS PO CHART
-// ===============================
-async function loadPaymentVsPoChart() {
-    try {
-        const response = await fetch(`${API_BASE_URL}/api/dashboard/network`);
-        const data = await response.json();
-
-        renderPaymentVsPoChart(data);
-    }
-    catch (error) {
-        console.log(error);
+        console.error(error);
     }
 }
 
 
 // ===============================
-// LOAD MONTHLY TREND CHART
-// ===============================
-async function loadMonthlyTrendChart() {
-    try {
-        const response = await fetch(`${API_BASE_URL}/api/dashboard/monthly-records`);
-        const data = await response.json();
-
-        renderMonthlyTrendChart(data);
-    }
-    catch (error) {
-        console.log(error);
-    }
-}
-
-// ===============================
-// LOAD INVENTORY PROGRESS CHART
-// ===============================
-async function loadInventoryProgressChart() {
-    try {
-        const response = await fetch(`${API_BASE_URL}/api/dashboard/inventory`);
-        const data = await response.json();
-
-        renderInventoryProgressChart(data);
-    }
-    catch (error) {
-        console.log(error);
-    }
-}
-
-// ===============================
-// LOAD PO EXPIRY CHART
+// PO EXPIRY CHART
 // ===============================
 async function loadPoExpiryChart() {
     try {
         const response = await fetch(`${API_BASE_URL}/api/dashboard/po-expiry`);
         const data = await response.json();
-        renderPoExpiryChart(data);
+
+        const ctx = document.getElementById("poExpiryChart").getContext("2d");
+
+        if (poExpiryChart) {
+            poExpiryChart.destroy();
+        }
+
+        poExpiryChart = new Chart(ctx, {
+            type: "bar",
+            data: {
+                labels: data.labels,
+                datasets: [{
+                    label: "PO Count",
+                    data: data.data,
+                    backgroundColor: [
+                        "#ef4444",
+                        "#f59e0b",
+                        "#3b82f6",
+                        "#22c55e"
+                    ],
+                    borderRadius: 6
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            precision: 0
+                        }
+                    }
+                }
+            }
+        });
     }
     catch (error) {
-        console.log(error);
+        console.error(error);
     }
 }
 
 
 // ===============================
-// LOAD MONTHLY PO AMOUNT CHART
+// DASHBOARD ALERTS
 // ===============================
-async function loadMonthlyPoChart() {
+async function loadDashboardAlerts() {
     try {
-        const response = await fetch(`${API_BASE_URL}/api/dashboard/monthly-po`);
+        const response = await fetch(`${API_BASE_URL}/api/dashboard/dashboard-alerts`);
         const data = await response.json();
-        renderMonthlyPoChart(data);
+
+        const container = document.getElementById("dashboardAlerts");
+
+        container.innerHTML = "";
+
+        const alerts = [];
+
+        if (data.expiredPOs > 0) {
+            alerts.push({
+                title: "Expired POs",
+                message: `${data.expiredPOs} Purchase Orders have expired.`
+            });
+        }
+
+        if (data.expiringPOs > 0) {
+            alerts.push({
+                title: "Expiring Soon",
+                message: `${data.expiringPOs} Purchase Orders expire within 30 days.`
+            });
+        }
+
+        if (data.draftInventory > 0) {
+            alerts.push({
+                title: "Inventory Drafts",
+                message: `${data.draftInventory} inventory requests are still in Draft.`
+            });
+        }
+
+        if (alerts.length === 0) {
+            container.innerHTML = "<p>No alerts available.</p>";
+            return;
+        }
+
+        let html = "";
+
+        alerts.forEach(alert => {
+            html += `
+                <div class="alert-card">
+                    <strong>${alert.title}</strong>
+                    <p>${alert.message}</p>
+                </div>
+            `;
+        });
+        container.innerHTML = html;
+    }
+    catch (error) {
+        console.error(error);
+    }
+}
+
+
+// ===============================
+// TOP VENDORS
+// ===============================
+async function loadTopVendors() {
+    try {
+        const response = await fetch(`${API_BASE_URL}/api/dashboard/top-vendors`);
+        const vendors = await response.json();
+
+        const table = document.getElementById("topVendorsTable");
+
+        table.innerHTML = "";
+
+        if (vendors.length === 0) {
+            table.innerHTML = "<p>No vendors found.</p>";
+            return;
+        }
+
+        table.innerHTML = `
+            <div class="vendor-table-wrapper">
+                <table class="vendor-table">
+                    <thead>
+                        <tr>
+                            <th>Vendor</th>
+                            <th>Amount</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        ${vendors.map(v => `
+                            <tr>
+                                <td>${v.vendorName || "-"}</td>
+                                <td>₹${Number(v.totalAmount || 0).toLocaleString("en-IN")}</td>
+                            </tr>
+                        `).join("")}
+                    </tbody>
+                </table>
+            </div>
+        `;
     }
 
     catch (error) {
-        console.log(error);
+        console.error(error);
     }
-}
-
-
-
-function renderPoStatusChart(active, expiringSoon, expired) {
-    const ctx = document.getElementById("poStatusChart").getContext("2d");
-
-    if (poStatusChart) {
-        poStatusChart.destroy();
-    }
-
-    poStatusChart = new Chart(ctx, {
-        type: "pie",
-        data: {
-            labels: ["Active", "Expiring Soon", "Expired"],
-
-            datasets: [{
-                data: [active, expiringSoon, expired],
-
-                backgroundColor: ["#22c55e", "#facc15", "#ef4444"],
-
-                borderWidth: 2
-            }]
-        },
-
-        options: {
-            responsive: true,
-
-            plugins: {
-                legend: {
-                    position: "bottom"
-                }
-            }
-        }
-    });
-}
-
-
-function renderModuleRecordsChart(data) {
-    const ctx = document.getElementById("moduleRecordsChart").getContext("2d");
-
-    if (moduleRecordsChart) {
-        moduleRecordsChart.destroy();
-    }
-
-    moduleRecordsChart = new Chart(ctx, {
-        type: "bar",
-        data: {
-            labels: [
-                "Network",
-                "Inventory",
-                "Plants",
-                "WBS"
-            ],
-            datasets: [{
-                label: "Records",
-                data: [data.network, data.inventory, data.plants, data.wbs],
-                backgroundColor: ["#3b82f6", "#22c55e", "#f59e0b", "#ef4444"],
-                borderRadius: 8
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    display: false
-                }
-            },
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    min: 0,
-                    max: 100,
-                    ticks: {
-                        stepSize: 10,
-                        precision: 0
-                    }
-                }
-            }
-        }
-    });
-}
-
-
-function renderPaymentVsPoChart(data) {
-    const ctx = document.getElementById("paymentVsPoChart").getContext("2d");
-
-    if (paymentVsPoChart) {
-        paymentVsPoChart.destroy();
-    }
-
-    paymentVsPoChart = new Chart(ctx, {
-        type: "bar",
-        data: {
-            labels: ["PO Amount", "Payment"],
-            datasets: [{
-                data: [data.totalPoAmount, data.totalPayment],
-                backgroundColor: ["#2563eb", "#22c55e"],
-                borderRadius: 10
-            }]
-        },
-
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    display: false
-                },
-                tooltip: {
-                    callbacks: {
-                        label: function(context) {
-                            return "₹" + Number(context.raw).toLocaleString("en-IN");
-                        }
-                    }
-                }
-            },
-
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    ticks: {
-                        callback: function(value) {
-                            return "₹" + Number(value).toLocaleString("en-IN");
-                        }
-                    }
-                }
-            }
-        }
-    });
-}
-
-
-
-function renderMonthlyTrendChart(chartData) {
-    const ctx = document.getElementById("monthlyTrendChart").getContext("2d");
-
-    if (monthlyTrendChart) {
-        monthlyTrendChart.destroy();
-    }
-
-    monthlyTrendChart = new Chart(ctx, {
-        type: "line",
-        data: {
-            labels: chartData.labels,
-
-            datasets: [{
-                label: "Records",
-                data: chartData.data,
-                borderColor: "#ff6b00",
-                backgroundColor: "rgba(255,107,0,0.15)",
-                fill: true,
-                tension: 0.35,
-                pointRadius: 5,
-                pointHoverRadius: 7
-            }]
-        },
-
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    display: false
-                }
-            },
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    ticks: {
-                        precision: 0
-                    }
-                }
-            }
-        }
-    });
-}
-
-
-function renderInventoryProgressChart(data) {
-    const ctx = document.getElementById("inventoryProgressChart").getContext("2d");
-
-    if (inventoryProgressChart) {
-        inventoryProgressChart.destroy();
-    }
-
-    inventoryProgressChart = new Chart(ctx, {
-        type: "doughnut",
-        data: {
-            labels: ["Draft", "Released", "PO Received"],
-
-            datasets: [{
-                data: [data.draftRecords, data.releasedRecords, data.poReceivedRecords],
-                backgroundColor: ["#f59e0b", "#3b82f6", "#22c55e"],
-                borderWidth: 2,
-                borderColor: "#ffffff"
-            }]
-        },
-
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            cutout: "60%",
-            plugins: {
-                legend: {
-                    position: "bottom"
-                },
-                tooltip: {
-                    callbacks: {
-                        label: function(context) {
-                            return `${context.label}: ${context.raw}`;
-                        }
-                    }
-                }
-            }
-        }
-    });
-}
-
-
-function renderPoExpiryChart(data) {
-    const ctx = document.getElementById("poExpiryChart").getContext("2d");
-
-    if (poExpiryChart) {
-        poExpiryChart.destroy();
-    }
-
-    poExpiryChart = new Chart(ctx, {
-        type: "bar",
-
-        data: {
-            labels: ["Expired", "0-30 Days", "31-60 Days", "60+ Days"],
-
-            datasets: [{
-                data: [data.expired, data.days30, data.days60, data.more60],
-
-                backgroundColor: ["#ef4444", "#f59e0b", "#3b82f6", "#22c55e"],
-
-                borderRadius: 8
-            }]
-        },
-
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    display: false
-                }
-            },
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    min: 0,
-                    max: 100,
-                    ticks: {
-                        stepSize: 10,
-                        precision: 0
-                    }
-                }
-            }
-        }
-    });
-}
-
-function renderMonthlyPoChart(chartData) {
-    const ctx = document.getElementById("monthlyPoChart").getContext("2d");
-
-    if (monthlyPoChart) {
-        monthlyPoChart.destroy();
-    }
-
-    monthlyPoChart = new Chart(ctx, {
-        type: "line",
-
-        data: {
-            labels: chartData.labels,
-
-            datasets: [{
-                label: "PO Amount",
-                data: chartData.data,
-                borderColor: "#2563eb",
-                backgroundColor: "rgba(37,99,235,0.15)",
-                fill: true,
-                tension: 0.35,
-                pointRadius: 5
-            }]
-        },
-
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    display: false
-                }
-            },
-
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    ticks: {
-                        callback: function(value) {
-                            return "₹" + Number(value).toLocaleString("en-IN");
-                        }
-                    }
-                }
-            }
-        }
-    });
 }
 
 
 // ===============================
-// PAYMENT REPORT MODAL
+// RECENT ACTIVITIES
 // ===============================
-const paymentReportBtn = document.getElementById("paymentReportBtn");
-const paymentReportModal = document.getElementById("paymentReportModal");
-const cancelPaymentReportBtn = document.getElementById("cancelPaymentReportBtn");
+async function loadRecentActivities() {
+    try {
+        const response = await fetch(`${API_BASE_URL}/api/dashboard/recent-activities`);
+        const activities = await response.json();
 
-paymentReportBtn.addEventListener("click", () => {
-    paymentReportModal.style.display = "flex";
-});
+        const container = document.getElementById("recentActivitiesList");
 
-cancelPaymentReportBtn.addEventListener("click", () => {
-    paymentReportModal.style.display = "none";
-});
+        container.innerHTML = "";
 
-window.addEventListener("click", (event) => {
-    if (event.target === paymentReportModal) {
-        paymentReportModal.style.display = "none";
+        if (activities.length === 0) {
+            container.innerHTML = "<p>No recent activities.</p>";
+            return;
+        }
+
+        let html = "";
+
+        activities.forEach(activity => {
+            html += `
+                <div class="activity-card">
+                    <strong>${activity.title}</strong>
+                    <p>${activity.action}</p>
+                    <small>${new Date(activity.date).toLocaleString("en-IN")}</small>
+                </div>
+            `;
+        });
+        container.innerHTML = html;
     }
-});
+    catch (error) {
+        console.error(error);
+    }
+}
 
 
-const downloadPaymentReportBtn = document.getElementById("downloadPaymentReportBtn");
 
-downloadPaymentReportBtn.addEventListener("click", () => {
+// ===============================
+// PAYMENT REPORT
+// ===============================
+function openPaymentReportModal() {
+    document.getElementById("paymentReportModal").style.display = "flex";
+}
+
+function closePaymentReportModal() {
+    document.getElementById("paymentReportModal").style.display = "none";
+}
+
+async function downloadPaymentReport() {
+
     const from = document.getElementById("paymentFromDate").value;
     const to = document.getElementById("paymentToDate").value;
 
@@ -692,27 +639,24 @@ downloadPaymentReportBtn.addEventListener("click", () => {
         return;
     }
 
-    if (from > to) {
-        alert("From Date cannot be greater than To Date.");
+    if (new Date(from) > new Date(to)) {
+        alert("From Date cannot be after To Date.");
         return;
     }
 
-    const url = `${API_BASE_URL}/api/dashboard/payment-report?from=${from}&to=${to}`;
+    window.location.href =
+        `${API_BASE_URL}/api/dashboard/payment-report?from=${from}&to=${to}`;
 
-    window.open(url, "_blank");
-    paymentReportModal.style.display = "none";
-});
+    closePaymentReportModal();
+}
 
 
-loadNetworkDashboard();
-loadInventoryDashboard();
-loadPlantDashboard();
-loadWbsDashboard();
+const paymentModal = document.getElementById("paymentReportModal");
 
-loadPoStatusChart();
-loadModuleRecordsChart();
-loadPaymentVsPoChart();
-loadMonthlyTrendChart();
-loadInventoryProgressChart();
-loadPoExpiryChart();
-loadMonthlyPoChart();
+if (paymentModal) {
+    paymentModal.addEventListener("click", function (event) {
+        if (event.target === paymentModal) {
+            closePaymentReportModal();
+        }
+    });
+}

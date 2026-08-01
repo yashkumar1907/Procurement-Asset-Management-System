@@ -1,26 +1,20 @@
 const express = require("express");
-
 const XLSX = require("xlsx");
-
 const router = express.Router();
 
 const NetworkRecord = require("../models/NetworkRecord");
 const NetworkDetail = require("../models/NetworkDetail");
-
 const AmcRecord = require("../models/AmcRecord");
 const AmcDetail = require("../models/AmcDetail");
-
 const ContractRecord = require("../models/ContractRecord");
 const ContractDetail = require("../models/ContractDetail");
-
 const InventoryNetworkRecord = require("../models/InventoryNetworkRecord");
 const InventoryHardwareRecord = require("../models/InventoryHardwareRecord");
 const InventoryDepartmentRecord = require("../models/InventoryDepartmentRecord");
-
 const PlantMaterialRecord = require("../models/PlantMaterialRecord");
 const PlantServiceRecord = require("../models/PlantServiceRecord");
-
 const WbsProjectRecord = require("../models/WbsProjectRecord");
+
 
 function getPoStatus(records) {
     let active = 0;
@@ -39,7 +33,7 @@ function getPoStatus(records) {
 
         const endDate = new Date(record.poEndDate);
 
-        if (isNaN(endDate)) {
+        if (isNaN(endDate.getTime())) {
             return;
         }
 
@@ -57,248 +51,94 @@ function getPoStatus(records) {
     return {active, expiringSoon, expired};
 }
 
+
+async function getAllProcurementRecords() {
+    const [network, amc, contract] = await Promise.all([
+        NetworkRecord.find(),
+        AmcRecord.find(),
+        ContractRecord.find()
+    ]);
+    
+    return [...network, ...amc, ...contract];
+}
+
+
 // ===============================
-// NETWORK DASHBOARD
+// EXECUTIVE SUMMARY
 // ===============================
-router.get("/network", async (req, res) => {
-    try {
-        // Total Network Records
-        const networkRecords = await NetworkRecord.countDocuments();
-        const amcRecords = await AmcRecord.countDocuments();
-        const contractRecords = await ContractRecord.countDocuments();
-        
-        const totalRecords = networkRecords + amcRecords + contractRecords;
+router.get("/summary", async (req, res) => {
 
-        
-        const networkPo = await NetworkRecord.aggregate([
-            {
-                $group: {
-                    _id: null,
-                    total: {
-                        $sum: "$poAmount"
-                    }
-                }
+    try{
+        const [procurementRecords, networkDetails, amcDetails, contractDetails, wbsProjects] = await Promise.all([getAllProcurementRecords(), NetworkDetail.find(), AmcDetail.find(), ContractDetail.find(), WbsProjectRecord.find()]);
+
+        // -------------------------------
+        // Total Procurement
+        // -------------------------------
+        let totalProcurement = 0;
+
+        procurementRecords.forEach(record => {
+            totalProcurement += Number(record.poAmount || 0);
+        });
+
+        totalProcurement = Math.round(totalProcurement);
+
+        // -------------------------------
+        // Total Payments
+        // -------------------------------
+        let totalPayment = 0;
+
+        [
+            ...networkDetails,
+            ...amcDetails,
+            ...contractDetails
+        ].forEach(detail => {
+            totalPayment += Number(detail.invoiceAmount || 0);
+        });
+
+        totalPayment = Math.round(totalPayment);
+
+        // -------------------------------
+        // PO Status
+        // -------------------------------
+        const poStatus = getPoStatus(procurementRecords);
+
+        // -------------------------------
+        // Active Contracts
+        // -------------------------------
+        const activeContracts = procurementRecords.length;
+
+        // -------------------------------
+        // Total Vendors
+        // -------------------------------
+        const uniqueVendors = new Set();
+
+        procurementRecords.forEach(record => {
+            if (record.vendorCode) {
+                uniqueVendors.add(record.vendorCode);
             }
-        ]);
-        
-        const amcPo = await AmcRecord.aggregate([
-            {
-                $group: {
-                    _id: null,
-                    total: {
-                        $sum: "$poAmount"
-                    }
-                }
-            }
-        ]);
-        
-        const contractPo = await ContractRecord.aggregate([
-            {
-                $group: {
-                    _id: null,
-                    total: {
-                        $sum: "$poAmount"
-                    }
-                }
-            }
-        ]);
+        });
 
-        // Total PO Amount
-        const totalPoAmount = (networkPo[0]?.total || 0) + (amcPo[0]?.total || 0) + (contractPo[0]?.total || 0);
-
-
-        
-        const networkPayment = await NetworkDetail.aggregate([
-            {
-                $group: {
-                    _id: null,
-                    total: {
-                        $sum: "$invoiceAmount"
-                    }
-                }
-            }
-        ]);
-        
-        const amcPayment = await AmcDetail.aggregate([
-            {
-                $group: {
-                    _id: null,
-                    total: {
-                        $sum: "$invoiceAmount"
-                    }
-                }
-            }
-        ]);
-        
-        const contractPayment = await ContractDetail.aggregate([
-            {
-                $group: {
-                    _id: null,
-                    total: {
-                        $sum: "$invoiceAmount"
-                    }
-                }
-            }
-        ]);
-
-        // Total Payment (Invoice Amount)
-        const totalPayment = (networkPayment[0]?.total || 0) + (amcPayment[0]?.total || 0) + (contractPayment[0]?.total || 0);
-
-
+        // -------------------------------
+        // Response
+        // -------------------------------
         res.json({
-            totalRecords,
-            totalPoAmount,
+            totalProcurement,
+            totalPayment,
 
-            totalPayment
+            activePOs: poStatus.active,
+            expiringSoon: poStatus.expiringSoon,
+            expiredPOs: poStatus.expired,
+
+            activeContracts,
+
+            totalVendors: uniqueVendors.size,
+
+            wbsProjects: wbsProjects.length
         });
     }
     catch (error) {
         console.error(error);
-        res.status(500).json({
-            message: "Server Error"
-        });
-    }
-});
 
-// ===============================
-// INVENTORY DASHBOARD
-// ===============================
-router.get("/inventory", async (req, res) => {
-    try {
-        // Total Records
-        const networkRecords = await InventoryNetworkRecord.countDocuments();
-        const hardwareRecords = await InventoryHardwareRecord.countDocuments();
-        const departmentRecords = await InventoryDepartmentRecord.countDocuments();
-
-        const totalRecords = networkRecords + hardwareRecords + departmentRecords;
-
-        // Draft Records
-        const networkDraft = await InventoryNetworkRecord.countDocuments({currentProgress: "Draft"});
-        const hardwareDraft = await InventoryHardwareRecord.countDocuments({currentProgress: "Draft"});
-        const departmentDraft = await InventoryDepartmentRecord.countDocuments({currentProgress: "Draft"});
-
-        const draftRecords = networkDraft + hardwareDraft + departmentDraft;
-
-        // Released Records
-        const releasedStatuses = ["Release for Indentor","Release for Sec / Head", "Release for Dept HOD", "Release for Store", "Release for Unit Head", "Release for Functional Head", "Release / Mapped to Purchaser"];
-
-        const networkReleased = await InventoryNetworkRecord.countDocuments({currentProgress: { $in: releasedStatuses }});
-        const hardwareReleased = await InventoryHardwareRecord.countDocuments({currentProgress: { $in: releasedStatuses }});
-        const departmentReleased = await InventoryDepartmentRecord.countDocuments({currentProgress: { $in: releasedStatuses }});
-
-        const releasedRecords = networkReleased + hardwareReleased + departmentReleased;
-
-        // PO Received Records
-        const networkPoReceived = await InventoryNetworkRecord.countDocuments({currentProgress: "PO Received"});
-        const hardwarePoReceived = await InventoryHardwareRecord.countDocuments({currentProgress: "PO Received"});
-        const departmentPoReceived = await InventoryDepartmentRecord.countDocuments({currentProgress: "PO Received"});
-
-        const poReceivedRecords = networkPoReceived + hardwarePoReceived + departmentPoReceived;
-
-        res.json({
-            totalRecords,
-            draftRecords,
-            releasedRecords,
-            poReceivedRecords
-        });
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({
-            message: "Server Error"
-        });
-    }
-});
-
-
-// ===============================
-// PLANT DASHBOARD
-// ===============================
-router.get("/plants", async (req, res) => {
-    try {
-        const materialRecords = await PlantMaterialRecord.find();
-        const serviceRecords = await PlantServiceRecord.find();
-
-        let totalPr = 0;
-        let totalPo = 0;
-
-        [...materialRecords, ...serviceRecords].forEach(record => {
-            if (record.prNum)
-                totalPr++;
-
-            if (record.poNum)
-                totalPo++;
-        });
-
-        res.json({
-            materialRecords: materialRecords.length,
-            serviceRecords: serviceRecords.length,
-            totalPr,
-            totalPo
-        });
-    }
-    catch (error) {
-        console.error(error);
-        res.status(500).json({
-            message: "Server Error"
-        });
-    }
-});
-
-
-// ===============================
-// WBS DASHBOARD
-// ===============================
-router.get("/wbs", async (req, res) => {
-    try {
-        const projects = await WbsProjectRecord.find();
-
-        let linkedPr = 0;
-        let linkedPo = 0;
-
-        projects.forEach(project => {
-            if (project.prNum)
-                linkedPr++;
-
-            if (project.poNum)
-                linkedPo++;
-        });
-
-        res.json({
-            totalProjects: projects.length,
-            linkedPr,
-            linkedPo
-        });
-    }
-    catch (error) {
-        console.error(error);
-        res.status(500).json({
-            message: "Server Error"
-        });
-    }
-});
-
-
-// ===============================
-// PO STATUS CHART
-// ===============================
-router.get("/po-status", async (req, res) => {
-
-    try {
-        const networkRecords = await NetworkRecord.find();
-        const amcRecords = await AmcRecord.find();
-        const contractRecords = await ContractRecord.find();
-        const networkStatus = getPoStatus(networkRecords);
-        const amcStatus = getPoStatus(amcRecords);
-        const contractStatus = getPoStatus(contractRecords);
-
-        res.json({
-            active: networkStatus.active + amcStatus.active + contractStatus.active,
-            expiringSoon: networkStatus.expiringSoon + amcStatus.expiringSoon + contractStatus.expiringSoon,
-            expired: networkStatus.expired + amcStatus.expired + contractStatus.expired
-        });
-    }
-    catch (error) {
-        console.error(error);
         res.status(500).json({
             message: "Server Error"
         });
@@ -307,71 +147,36 @@ router.get("/po-status", async (req, res) => {
 
 
 
+
 // ===============================
-// RECORDS BY MODULE
+// MONTHLY PROCUREMENT TREND
 // ===============================
-router.get("/module-records", async (req, res) => {
+router.get("/monthly-po", async (req, res) => {
     try {
-        const network = await NetworkRecord.countDocuments();
-        const amc = await AmcRecord.countDocuments();
-        const contract = await ContractRecord.countDocuments();
-        const inventoryNetwork = await InventoryNetworkRecord.countDocuments();
-        const inventoryHardware = await InventoryHardwareRecord.countDocuments();
-        const inventoryDepartment = await InventoryDepartmentRecord.countDocuments();
-        const plantMaterial = await PlantMaterialRecord.countDocuments();
-        const plantService = await PlantServiceRecord.countDocuments();
-        const wbs = await WbsProjectRecord.countDocuments();
+        const records = await getAllProcurementRecords();
 
-        res.json({
-            network: network + amc + contract,
-            inventory: inventoryNetwork + inventoryHardware + inventoryDepartment,
-            plants: plantMaterial + plantService,
-            wbs
-        });
-    }
-    catch (error) {
-        console.error(error);
-        res.status(500).json({
-            message: "Server Error"
-        });
-    }
-});
-
-
-// ===============================
-// MONTHLY RECORD CREATION TREND
-// ===============================
-router.get("/monthly-records", async (req, res) => {
-    try {
-        const records = [
-            ...(await NetworkRecord.find()),
-            ...(await AmcRecord.find()),
-            ...(await ContractRecord.find()),
-
-            ...(await InventoryNetworkRecord.find()),
-            ...(await InventoryHardwareRecord.find()),
-            ...(await InventoryDepartmentRecord.find()),
-
-            ...(await PlantMaterialRecord.find()),
-            ...(await PlantServiceRecord.find()),
-
-            ...(await WbsProjectRecord.find())
+        const labels = [
+            "Jan","Feb","Mar","Apr","May","Jun",
+            "Jul","Aug","Sep","Oct","Nov","Dec"
         ];
 
-        const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-
-        const monthlyData = new Array(12).fill(0);
+        const monthlyAmount = new Array(12).fill(0);
 
         records.forEach(record => {
-            if (!record.createdAt) return;
+            if (!record.poDate) {
+                return;
+            }
 
-            const month = new Date(record.createdAt).getMonth();
-            monthlyData[month]++;
+            const month = new Date(record.poDate).getMonth();
+            monthlyAmount[month] += Number(record.poAmount || 0);
+
         });
+
         res.json({
-            labels: monthNames,
-            data: monthlyData
+            labels,
+            data: monthlyAmount
         });
+
     }
     catch (error) {
         console.error(error);
@@ -382,51 +187,59 @@ router.get("/monthly-records", async (req, res) => {
 });
 
 
+// ===============================
+// PAYMENT VS PROCUREMENT
+// ===============================
+router.get("/payment-vs-procurement", async (req, res) => {
+    try {
+        const labels = [
+            "Jan","Feb","Mar","Apr","May","Jun",
+            "Jul","Aug","Sep","Oct","Nov","Dec"
+        ];
 
+        const procurement = new Array(12).fill(0);
+        const payments = new Array(12).fill(0);
 
-function getPoExpiry(records) {
-    let expired = 0;
-    let days30 = 0;
-    let days60 = 0;
-    let more60 = 0;
+        const [procurementRecords, networkDetails, amcDetails, contractDetails] = await Promise.all([getAllProcurementRecords(), NetworkDetail.find(), AmcDetail.find(), ContractDetail.find()]);
+        
+        const paymentRecords = [
+            ...networkDetails,
+            ...amcDetails,
+            ...contractDetails
+        ];
 
-    const today = new Date();
+        procurementRecords.forEach(record => {
+            if (!record.poDate) {
+                return;
+            }
 
-    records.forEach(record => {
-        if (!record.poEndDate) return;
+            const month = new Date(record.poDate).getMonth();
+            procurement[month] += Number(record.poAmount || 0);
+        });
 
-        const end = new Date(record.poEndDate);
+        paymentRecords.forEach(record => {
+            if (!record.invoiceDate) {
+                return;
+            }
 
-        if (isNaN(end)) {
-            return;
-        }
+            const month = new Date(record.invoiceDate).getMonth();
+            payments[month] += Number(record.invoiceAmount || 0);
+        });
 
-        const diff =
-            Math.ceil(
-                (end - today) /
-                (1000 * 60 * 60 * 24)
-            );
+        res.json({
+            labels,
+            procurement,
+            payments
+        });
+    }
+    catch (error) {
+        console.error(error);
+        res.status(500).json({
+            message: "Server Error"
+        });
+    }
+});
 
-        if (diff < 0)
-            expired++;
-
-        else if (diff <= 30)
-            days30++;
-
-        else if (diff <= 60)
-            days60++;
-
-        else
-            more60++;
-    });
-
-    return {
-        expired,
-        days30,
-        days60,
-        more60
-    };
-}
 
 
 // ===============================
@@ -434,14 +247,61 @@ function getPoExpiry(records) {
 // ===============================
 router.get("/po-expiry", async (req, res) => {
     try {
-        const records = [
-            ...(await NetworkRecord.find()),
-            ...(await AmcRecord.find()),
-            ...(await ContractRecord.find())
-        ];
+        const today = new Date();
 
-        const result = getPoExpiry(records);
-        res.json(result);
+        const d7  = new Date(today);
+        d7.setDate(today.getDate() + 7);
+
+        const d15 = new Date(today);
+        d15.setDate(today.getDate() + 15);
+
+        const d30 = new Date(today);
+        d30.setDate(today.getDate() + 30);
+
+        const records = await getAllProcurementRecords();
+
+        let bucket0to7 = 0;
+        let bucket8to15 = 0;
+        let bucket16to30 = 0;
+        let bucket30plus = 0;
+
+        records.forEach(record => {
+            if (!record.poEndDate) return;
+
+            const end = new Date(record.poEndDate);
+
+            if (end < today) {
+                return;
+            }
+
+            if (end <= d7) {
+                bucket0to7++;
+            }
+            else if (end <= d15) {
+                bucket8to15++;
+            }
+            else if (end <= d30) {
+                bucket16to30++;
+            }
+            else {
+                bucket30plus++;
+            }
+        });
+
+        res.json({
+            labels: [
+                "0-7 Days",
+                "8-15 Days",
+                "16-30 Days",
+                ">30 Days"
+            ],
+            data: [
+                bucket0to7,
+                bucket8to15,
+                bucket16to30,
+                bucket30plus
+            ]
+        });
     }
     catch (error) {
         console.error(error);
@@ -453,31 +313,50 @@ router.get("/po-expiry", async (req, res) => {
 
 
 // ===============================
-// MONTHLY PO AMOUNT
+// SPEND BY MODULE
 // ===============================
-router.get("/monthly-po", async (req, res) => {
+router.get("/spend-by-module", async (req, res) => {
     try {
-        const records = [
-            ...(await NetworkRecord.find()),
-            ...(await AmcRecord.find()),
-            ...(await ContractRecord.find())
-        ];
-
-        const labels = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
-
-        const monthlyAmount = new Array(12).fill(0);
-
-        records.forEach(record => {
-            if (!record.createdAt) return;
-
-            const month = new Date(record.createdAt).getMonth();
-
-            monthlyAmount[month] += Number(record.poAmount || 0);
-        });
+        const [network, amc, contract] = await Promise.all([
+            NetworkRecord.aggregate([
+                {
+                    $group: {
+                        _id: null,
+                        total: {
+                            $sum: "$poAmount"
+                        }
+                    }
+                }
+            ]),
+            AmcRecord.aggregate([
+                {
+                    $group: {
+                        _id: null,
+                        total: {
+                            $sum: "$poAmount"
+                        }
+                    }
+                }
+            ]),
+            ContractRecord.aggregate([
+                {
+                    $group: {
+                        _id: null,
+                        total: {
+                            $sum: "$poAmount"
+                        }
+                    }
+                }
+            ])
+        ]);
 
         res.json({
-            labels,
-            data: monthlyAmount
+            labels: ["Network", "AMC", "Contract"],
+            data: [
+                network[0]?.total || 0,
+                amc[0]?.total || 0,
+                contract[0]?.total || 0
+            ]
         });
     }
     catch (error) {
@@ -505,38 +384,38 @@ router.get("/payment-report", async (req, res) => {
         const toDate = new Date(to);
         toDate.setHours(23, 59, 59, 999);
 
-        if (isNaN(fromDate) || isNaN(toDate)) {
+        if (isNaN(fromDate.getTime()) || isNaN(toDate.getTime())) {
             return res.status(400).json({
                 message: "Invalid date format."
             });
         }
 
-        const networkDetails = await NetworkDetail.find({
-            invoiceDate: {
-                $gte: fromDate,
-                $lte: toDate
-            }
-        }).populate("recordId");
+        const [networkDetails, amcDetails, contractDetails] = await Promise.all([
+            NetworkDetail.find({
+                invoiceDate: {
+                    $gte: fromDate,
+                    $lte: toDate
+                }
+            }).populate("recordId"),
         
-        const amcDetails = await AmcDetail.find({
-            invoiceDate: {
-                $gte: fromDate,
-                $lte: toDate
-            }
-        }).populate("recordId");
+            AmcDetail.find({
+                invoiceDate: {
+                    $gte: fromDate,
+                    $lte: toDate
+                }
+            }).populate("recordId"),
         
-        const contractDetails = await ContractDetail.find({
-            invoiceDate: {
-                $gte: fromDate,
-                $lte: toDate
-            }
-        }).populate("recordId");
+            ContractDetail.find({
+                invoiceDate: {
+                    $gte: fromDate,
+                    $lte: toDate
+                }
+            }).populate("recordId")
+        ]);
 
         const paymentData = [];
 
-
         networkDetails.forEach(detail => {
-
             paymentData.push({
                 "Module": "Network",
                 "Vendor Name": detail.recordId?.vendorName || "",
@@ -555,7 +434,6 @@ router.get("/payment-report", async (req, res) => {
         });
 
         amcDetails.forEach(detail => {
-
             paymentData.push({
                 "Module": "AMC",
                 "Vendor Name": detail.recordId?.vendorName || "",
@@ -574,7 +452,6 @@ router.get("/payment-report", async (req, res) => {
         });
 
         contractDetails.forEach(detail => {
-
             paymentData.push({
                 "Module": "Contract",
                 "Vendor Name": detail.recordId?.vendorName || "",
@@ -646,5 +523,225 @@ router.get("/payment-report", async (req, res) => {
     }
 });
 
+
+// ===============================
+// RECENT ACTIVITIES
+// ===============================
+router.get("/recent-activities", async (req, res) => {
+    try {
+        const activities = [];
+
+        const [ networkRecords, amcRecords, contractRecords, networkInvoices, amcInvoices, contractInvoices, projects] = await Promise.all([
+            NetworkRecord.find().sort({ createdAt: -1 }).limit(5),
+            AmcRecord.find().sort({ createdAt: -1 }).limit(5),
+            ContractRecord.find().sort({ createdAt: -1 }).limit(5),
+            NetworkDetail.find().sort({ createdAt: -1 }).limit(5),
+            AmcDetail.find().sort({ createdAt: -1 }).limit(5),
+            ContractDetail.find().sort({ createdAt: -1 }).limit(5),
+            WbsProjectRecord.find().sort({ createdAt: -1 }).limit(5)
+        ]);
+
+        networkRecords.forEach(record => {
+            activities.push({
+                module: "Network",
+                action: "PO Created",
+                title: record.po,
+                date: record.createdAt
+            });
+        });
+
+        amcRecords.forEach(record => {
+
+            activities.push({
+                module: "AMC",
+                action: "PO Created",
+                title: record.po,
+                date: record.createdAt
+            });
+
+        });
+
+        contractRecords.forEach(record => {
+
+            activities.push({
+                module: "Contract",
+                action: "PO Created",
+                title: record.po,
+                date: record.createdAt
+            });
+
+        });
+
+        networkInvoices.forEach(invoice => {
+
+            activities.push({
+                module: "Network",
+                action: "Invoice Added",
+                title: invoice.invoiceNumber,
+                date: invoice.createdAt
+            });
+
+        });
+
+        amcInvoices.forEach(invoice => {
+
+            activities.push({
+                module: "AMC",
+                action: "Invoice Added",
+                title: invoice.invoiceNumber,
+                date: invoice.createdAt
+            });
+
+        });
+
+
+        contractInvoices.forEach(invoice => {
+
+            activities.push({
+                module: "Contract",
+                action: "Invoice Added",
+                title: invoice.invoiceNumber,
+                date: invoice.createdAt
+            });
+
+        });
+
+        projects.forEach(project => {
+
+            activities.push({
+                module: "WBS",
+                action: "Project Added",
+                title: `${project.wbsNum} - ${project.description}`,
+                date: project.createdAt
+            });
+
+        });
+
+        activities.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+        res.json(
+            activities.slice(0, 10)
+        );
+
+    }
+
+    catch (error) {
+
+        console.error(error);
+
+        res.status(500).json({
+            message: "Server Error"
+        });
+
+    }
+
+});
+
+
+// ===============================
+// DASHBOARD ALERTS
+// ===============================
+router.get("/dashboard-alerts", async (req, res) => {
+    try {
+        const [procurementRecords, networkDraft, hardwareDraft, departmentDraft] = await Promise.all([
+            getAllProcurementRecords(),
+            InventoryNetworkRecord.countDocuments({ currentProgress: "Draft" }),
+            InventoryHardwareRecord.countDocuments({ currentProgress: "Draft" }),
+            InventoryDepartmentRecord.countDocuments({ currentProgress: "Draft" })
+        ]);
+        
+        const draftInventory = networkDraft + hardwareDraft + departmentDraft;
+
+        const today = new Date();
+
+        const thirtyDaysLater = new Date(today);
+        thirtyDaysLater.setDate(today.getDate() + 30);
+
+        let expiredPOs = 0;
+        let expiringPOs = 0;
+
+        procurementRecords.forEach(record => {
+            if (!record.poEndDate) {
+                return;
+            }
+
+            const endDate = new Date(record.poEndDate);
+
+            if (endDate < today) {
+                expiredPOs++;
+            }
+            else if (endDate <= thirtyDaysLater) {
+                expiringPOs++;
+            }
+
+        });
+
+        res.json({
+            expiredPOs,
+            expiringPOs,
+            draftInventory
+        });
+    }
+    catch (error) {
+        console.error(error);
+        res.status(500).json({
+            message: "Server Error"
+        });
+    }
+});
+
+
+// ===============================
+// TOP VENDORS
+// ===============================
+router.get("/top-vendors", async (req, res) => {
+
+    try {
+
+        const records = await getAllProcurementRecords();
+
+        const vendors = {};
+
+        records.forEach(record => {
+
+            const vendorCode = record.vendorCode || "N/A";
+
+            if (!vendors[vendorCode]) {
+
+                vendors[vendorCode] = {
+
+                    vendorName: record.vendorName,
+                    vendorCode: record.vendorCode,
+                    totalAmount: 0,
+                    totalPOs: 0
+
+                };
+
+            }
+
+            vendors[vendorCode].totalAmount += Number(record.poAmount || 0);
+            vendors[vendorCode].totalPOs++;
+
+        });
+
+        const topVendors = Object.values(vendors)
+            .sort((a, b) => b.totalAmount - a.totalAmount)
+            .slice(0, 10);
+
+        res.json(topVendors);
+
+    }
+
+    catch (error) {
+
+        console.error(error);
+
+        res.status(500).json({
+            message: "Server Error"
+        });
+
+    }
+
+});
 
 module.exports = router;

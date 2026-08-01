@@ -58,176 +58,303 @@
             <button class="sidebar-btn" onclick="window.location.href='profile.html'">👤 View Profile</button>
         </div>
 
-        <!-- CONTENT -->
-        <div class="content-area">
+        <!-- MAIN CONTENT -->
+        <main class="dashboard-main">
 
-            <div class="dashboard-heading">
+            <div class="dashboard-container">
 
-                <h1>DASHBOARD</h1>
-            
-                <button
-                    id="paymentReportBtn"
-                    class="export-payment-btn">
-                    📄 Export Payment Report
-                </button>
-            
-            </div>
-        
-            <div class="dashboard-grid">
-        
-                <!-- Network -->
-                <div class="dashboard-card">
-                    <h2>🌐 IT Contracts & POs</h2>
-        
-                    <div class="dashboard-item">
-                        <span>Total Records</span>
-                        <strong id="networkRecords">0</strong>
-                    </div>
-        
-                    <div class="dashboard-item">
-                        <span>Total PO Amount</span>
-                        <strong id="networkPoAmount">₹0</strong>
+                <!-- ===============================
+                    DASHBOARD HEADER
+                ================================ -->
+                <div class="dashboard-header">
+
+                    <div>
+                        <h1>Procurement & Asset Management Dashboard</h1>
+
+                        <p>
+                            Real-time overview of procurement, payments and operational status.
+                        </p>
                     </div>
 
-                    <div class="dashboard-item">
-                        <span>Total Payment</span>
-                        <strong id="networkPayment">₹0</strong>
-                    </div>
+                    <button class="export-report-btn" id="exportPaymentReportBtn">
+                        <i class="fa-solid fa-file-export"></i>
+                        Export Payment Report
+                    </button>
+
                 </div>
 
-                <!-- Inventory -->
-                <div class="dashboard-card">
-                    <h2>📦 IT Procurement</h2>
-        
-                    <div class="dashboard-item">
-                        <span>Total Records</span>
-                        <strong id="inventoryRecords">0</strong>
-                    </div>
-        
-                    <div class="dashboard-item">
-                        <span>Draft Records</span>
-                        <strong id="inventoryDraftRecords">0</strong>
-                    </div>
+                <!-- ===============================
+                    KPI CARDS
+                ================================ -->
+                <div class="kpi-grid">
+
+                    <div class="kpi-card">
+
+                        <div class="kpi-top">
                     
-                    <div class="dashboard-item">
-                        <span>Released Records</span>
-                        <strong id="inventoryReleasedRecords">0</strong>
-                    </div>
+                            <span class="kpi-title">
+                                Total Procurement
+                            </span>
                     
-                    <div class="dashboard-item">
-                        <span>PO Received Records</span>
-                        <strong id="inventoryPoReceivedRecords">0</strong>
+                            <i class="fa-solid fa-cart-shopping"></i>
+                    
+                        </div>
+                    
+                        <h2 id="totalProcurement">
+                            ₹0
+                        </h2>
+                    
+                        <p>
+                            Overall PO Value
+                        </p>
+                    
                     </div>
+
+                    <div class="kpi-card">
+                        <div class="kpi-top">
+                    
+                            <span class="kpi-title">
+                                Total Payments
+                            </span>
+                    
+                            <i class="fa-solid fa-money-bill-wave"></i>
+                    
+                        </div>
+                        <h2 id="totalPayments">₹0</h2>
+                        <p>Total invoice payments</p>
+                    </div>
+
+                    <div class="kpi-card">
+                        <div class="kpi-top">
+                    
+                            <span class="kpi-title">
+                                Active POs
+                            </span>
+                    
+                            <i class="fa-solid fa-box"></i>
+                    
+                        </div>
+                        <h2 id="activePOs">0</h2>
+                        <p>Currently active purchase orders</p>
+                    </div>
+
+                    <div class="kpi-card">
+                        <div class="kpi-top">
+                    
+                            <span class="kpi-title">
+                                Expiring Soon
+                            </span>
+                    
+                            <i class="fa-solid fa-hourglass-half"></i>
+                    
+                        </div>
+                        <h2 id="expiringPOs">0</h2>
+                        <p>POs expiring within 30 days</p>
+                    </div>
+
+                    <div class="kpi-card">
+                        <div class="kpi-top">
+                    
+                            <span class="kpi-title">
+                                Expired POs
+                            </span>
+                    
+                            <i class="fa-solid fa-triangle-exclamation"></i>
+                    
+                        </div>
+                        <h2 id="expiredPOs">0</h2>
+                        <p>Require immediate attention</p>
+                    </div>
+
+                    <div class="kpi-card">
+                        <div class="kpi-top">
+                    
+                            <span class="kpi-title">
+                                Active Contracts
+                            </span>
+                    
+                            <i class="fa-solid fa-file-contract"></i>
+                    
+                        </div>
+                        <h2 id="activeContracts">0</h2>
+                        <p>Network + AMC + Contract</p>
+                    </div>
+
+                    <div class="kpi-card">
+                        <div class="kpi-top">
+                    
+                            <span class="kpi-title">
+                                Total Vendors
+                            </span>
+                    
+                            <i class="fa-solid fa-building"></i>
+                    
+                        </div>
+                        <h2 id="totalVendors">0</h2>
+                        <p>Unique vendors</p>
+                    </div>
+
+                    <div class="kpi-card">
+                        <div class="kpi-top">
+                    
+                            <span class="kpi-title">
+                                WBS Projects
+                            </span>
+                    
+                            <i class="fa-solid fa-folder-open"></i>
+                    
+                        </div>
+                        <h2 id="wbsProjects">0</h2>
+                        <p>Current project count</p>
+                    </div>
+
                 </div>
-        
-                <!-- Plants -->
-                <div class="dashboard-card">
-                    <h2>🏭 Plants Procurement</h2>
-        
-                    <div class="dashboard-item">
-                        <span>Material Records</span>
-                        <strong id="plantMaterialRecords">0</strong>
+
+
+                <!-- ===============================
+                    FINANCIAL OVERVIEW
+                ================================ -->
+                <section class="dashboard-section" id="financialOverview">
+
+                    <div class="section-header">
+                        <h2>Financial Overview</h2>
+                        <p>Procurement and payment analytics</p>
                     </div>
-        
-                    <div class="dashboard-item">
-                        <span>Service Records</span>
-                        <strong id="plantServiceRecords">0</strong>
+
+                    <div class="chart-grid">
+
+                        <div class="chart-card">
+
+                            <div class="card-header">
+                                <h3>Monthly Procurement Trend</h3>
+                            </div>
+
+                            <div class="chart-body">
+                                <canvas id="monthlyProcurementChart"></canvas>
+                            </div>
+
+                        </div>
+
+                        <div class="chart-card">
+
+                            <div class="card-header">
+                                <h3>Payment vs Procurement</h3>
+                            </div>
+
+                            <div class="chart-body">
+                                <canvas id="paymentVsProcurementChart"></canvas>
+                            </div>
+
+                        </div>
+
                     </div>
-        
-                    <div class="dashboard-item">
-                        <span>Total PR</span>
-                        <strong id="plantPrCount">0</strong>
+
+                </section>
+
+
+
+                <!-- ===============================
+                    OPERATIONS
+                ================================ -->
+                <section class="dashboard-section" id="operationsOverview">
+
+                    <div class="section-header">
+                        <h2>Operations Overview</h2>
+                        <p>Purchase order monitoring</p>
                     </div>
-        
-                    <div class="dashboard-item">
-                        <span>Total PO</span>
-                        <strong id="plantPoCount">0</strong>
+
+                    <div class="chart-grid">
+
+                        <div class="chart-card" id="poExpiryCard">
+
+                            <div class="card-header">
+
+                                <h3>PO Expiry Timeline</h3>
+                            
+                            </div>
+
+                            <div class="chart-body">
+                                <canvas id="poExpiryChart"></canvas>
+                            </div>
+
+                        </div>
+
+                        <div class="chart-card" id="dashboardAlertsCard">
+
+                            <div class="card-header">
+                                <h3>Dashboard Alerts</h3>
+                            </div>
+
+                            <div class="chart-body">
+                                <div id="dashboardAlerts"></div>
+                            </div>
+
+                        </div>
+
                     </div>
-                </div>
-        
-                <!-- WBS -->
-                <div class="dashboard-card">
-                    <h2>📁 WBS</h2>
-        
-                    <div class="dashboard-item">
-                        <span>Total Projects</span>
-                        <strong id="wbsProjects">0</strong>
+
+                </section>
+
+                <!-- ===============================
+                    VENDOR & SPEND INSIGHTS
+                ================================ -->
+                <section class="dashboard-section" id="vendorOverview">
+
+                    <div class="section-header">
+                        <h2>Vendor & Spend Insights</h2>
+                        <p>Vendor analysis and procurement distribution</p>
                     </div>
-        
-                    <div class="dashboard-item">
-                        <span>Linked PR</span>
-                        <strong id="wbsLinkedPr">0</strong>
+
+                    <div class="chart-grid">
+
+                        <div class="chart-card" id="topVendorsCard">
+
+                            <div class="card-header">
+                                <h3>Top Vendors</h3>
+                            </div>
+
+                            <div class="chart-body">
+                                <div id="topVendorsTable"></div>
+                            </div>
+
+                        </div>
+
+                        <div class="chart-card" id="moduleSpendCard">
+
+                            <div class="card-header">
+                                <h3>Spend by Module</h3>
+                            </div>
+
+                            <div class="chart-body">
+                                <canvas id="moduleSpendChart"></canvas>
+                            </div>
+
+                        </div>
+
                     </div>
-        
-                    <div class="dashboard-item">
-                        <span>Linked PO</span>
-                        <strong id="wbsLinkedPo">0</strong>
+
+                </section>
+
+
+                <!-- ===============================
+                    RECENT ACTIVITY
+                ================================ -->
+                <section class="dashboard-section" id="recentActivities">
+
+                    <div class="section-header">
+                        <h2>Recent Activities</h2>
+                        <p>Latest procurement updates</p>
                     </div>
-                </div>
-        
+
+                    <div class="activity-card">
+                        <div id="recentActivitiesList"></div>                    
+                    </div>
+
+                </section>
+            
             </div>
 
-            <!-- =========================
-                DASHBOARD CHARTS
-            ========================= -->
-
-            <div class="dashboard-charts">
-
-                <!-- Graph 1 -->
-                <div class="chart-card">
-                    <h2>PO Status Distribution</h2>
-
-                    <div class="chart-container">
-                        <canvas id="poStatusChart"></canvas>
-                    </div>
-                </div>
-
-                <div class="chart-card">
-
-                    <h2>Records by Module</h2>
-                
-                    <div class="chart-container">
-                        <canvas id="moduleRecordsChart"></canvas>
-                    </div>
-                
-                </div>
-
-                <div class="chart-card">
-                    <h2>PO Amount vs Payment</h2>
-                    <div class="chart-container">
-                        <canvas id="paymentVsPoChart"></canvas>
-                    </div>
-                </div>
-
-                <div class="chart-card">
-                    <h2>Monthly Record Creation Trend</h2>
-                    <div class="chart-container">
-                        <canvas id="monthlyTrendChart"></canvas>
-                    </div>                
-                </div>
-
-                <div class="chart-card">
-                    <h2>PR Progress</h2>
-                    <div class="chart-container">
-                        <canvas id="inventoryProgressChart"></canvas>
-                    </div>
-                </div>
-
-                <div class="chart-card">
-                    <h2>PO Expiry Timeline</h2>
-                    <div class="chart-container">
-                        <canvas id="poExpiryChart"></canvas>
-                    </div>
-                </div>
-                
-                <div class="chart-card">
-                    <h2>Monthly PO Amount Trend</h2>
-                    <div class="chart-container">
-                        <canvas id="monthlyPoChart"></canvas>
-                    </div>
-                </div>
-            </div>
-        </div>
+        </main>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
