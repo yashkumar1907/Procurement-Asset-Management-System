@@ -332,6 +332,12 @@ function renderTable() {
         `;
     });
 
+    html += `
+                </tbody>
+            </table>
+        </div>
+        `;
+
     
 
     if (filteredRecords.length === 0) {
