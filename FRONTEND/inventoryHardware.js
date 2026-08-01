@@ -178,26 +178,6 @@ async function importExcel(input) {
 // ============================================================================================================================
 
 // ===============================
-// FORMAT AMOUNT INPUT
-// ===============================
-function formatAmountInput(input) {
-    let value = input.value.replace(/,/g, "");
-    if (value === "") {
-        input.value = "";
-        return;
-    }
-    input.value = Number(value).toLocaleString("en-IN");
-}
-
-// ===============================
-// FORMAT AMOUNT
-// ===============================
-function formatAmount(amount) {
-    return `Rs. ${Number(amount).toLocaleString("en-IN", {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
-}
-
-
-// ===============================
 // FORMAT DATE
 // ===============================
 function formatDate(dateString) {
@@ -218,17 +198,7 @@ function formatDate(dateString) {
 function updateStatistics() {
     const totalRecords = records.length;
 
-    // const totalPrAmount =
-    //     records.reduce(
-    //         (sum, record) => sum + Number(record.prAmount || 0), 0);
-
-    // const totalPoAmount =
-    //     records.reduce(
-    //         (sum, record) => sum + Number(record.poAmount || 0), 0);
-
     document.getElementById("totalRecords").innerText = totalRecords;
-    // document.getElementById("totalPrAmount").innerText =formatAmount(totalPrAmount);
-    // document.getElementById("totalPoAmount").innerText = formatAmount(totalPoAmount);
 }
 
 
@@ -525,7 +495,7 @@ async function addRecord(event) {
         return;
     }
 
-    let hardwareDetails = [];
+    const hardwareDetails = [];
 
     hardwareRows.forEach(row => {
         const quantity = Number(row.querySelector(".quantityField").value);
@@ -593,7 +563,7 @@ function editRecord(id) {
     const predefinedProgress = [
         "",
         "Draft",
-        "Release for Indntor",
+        "Release for Indentor",
         "Release for Sec / Head",
         "Release for Dept HOD",
         "Release for Store",
