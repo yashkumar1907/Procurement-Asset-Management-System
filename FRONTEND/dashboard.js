@@ -176,8 +176,16 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     inventoryBtn.addEventListener("click", () => {
-        inventorySubMenu.classList.toggle("show");
 
+        const sidebar = document.querySelector(".sidebar");
+    
+        // Expand sidebar automatically
+        if (sidebar.classList.contains("collapsed")) {
+            sidebar.classList.remove("collapsed");
+        }
+    
+        inventorySubMenu.classList.toggle("show");
+    
         if (inventorySubMenu.classList.contains("show")) {
             inventoryBtn.innerHTML = "📦 IT Procurement ▲";
         }
@@ -207,8 +215,16 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     plantBtn.addEventListener("click", () => {
-        plantSubMenu.classList.toggle("show");
 
+        const sidebar = document.querySelector(".sidebar");
+    
+        // Expand sidebar automatically
+        if (sidebar.classList.contains("collapsed")) {
+            sidebar.classList.remove("collapsed");
+        }
+    
+        plantSubMenu.classList.toggle("show");
+    
         if (plantSubMenu.classList.contains("show")) {
             plantBtn.innerHTML = "📦 Plants ▲";
         }
