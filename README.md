@@ -26,6 +26,7 @@ The application eliminates manual record keeping by providing role-based access,
 ## 🔐 Authentication & User Management
 
 - Secure Login
+
 - Password Encryption
 - Role-Based Access Control
 - Dynamic Permission Management
