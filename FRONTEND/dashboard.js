@@ -123,11 +123,34 @@ function logout(event) {
 // ===============================
 const toggleBtn = document.getElementById("toggleSidebarBtn");
 
-    if (toggleBtn) {
-        toggleBtn.addEventListener("click", () => {
-            document.querySelector(".sidebar").classList.toggle("collapsed");
+if (toggleBtn) {
+    toggleBtn.addEventListener("click", () => {
+
+        const sidebar = document.querySelector(".sidebar");
+
+        sidebar.classList.toggle("collapsed");
+
+        // Auto close all expanded menus
+        if (sidebar.classList.contains("collapsed")) {
+
+            const inventorySubMenu = document.getElementById("inventorySubMenu");
+            const plantSubMenu = document.getElementById("plantSubMenu");
+
+            inventorySubMenu?.classList.remove("show");
+            plantSubMenu?.classList.remove("show");
+
+            const inventoryBtn = document.getElementById("inventoryToggleBtn");
+            const plantBtn = document.getElementById("plantToggleBtn");
+
+            if (inventoryBtn) {
+                inventoryBtn.innerHTML = "📦 IT Procurement ▼";
+            }
+
+            if (plantBtn) {
+                plantBtn.innerHTML = "📦 Plants ▼";
+            }
         }
-    );
+    });
 }
 
 
