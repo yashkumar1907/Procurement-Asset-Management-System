@@ -166,7 +166,7 @@ async function importExcel(input) {
         await loadRecords();
     }
     catch(error) {
-        console.log(error);
+        console.error(error);
         showToast("error", "Import Failed");
     }
     input.value = "";
@@ -528,7 +528,7 @@ async function loadReferencePOs() {
         });
     }
     catch(error){
-        console.log(error);
+        console.error(error);
     }
 }
 
@@ -1098,7 +1098,7 @@ async function saveDetail(event) {
         }
     }
     catch(error) {
-        console.log(error);
+        console.error(error);
         showToast("error", "Server Error");
     }
 }
@@ -1158,7 +1158,7 @@ async function editDetail(id) {
         document.getElementById("detailModal").style.display = "block";
     }
     catch(error) {
-        console.log(error);
+        console.error(error);
         showToast("error", "Server Error");
     }
 }
@@ -1210,7 +1210,7 @@ async function deleteDetail(id) {
         }
     }
     catch(error) {
-        console.log(error);
+        console.error(error);
         showToast("error", "Server Error");
     }
 }
@@ -1279,7 +1279,7 @@ async function loadDetails(recordId) {
             `).join("");
     }
     catch(error) {
-        console.log(error);
+        console.error(error);
     }
 }
 
@@ -1385,12 +1385,6 @@ if (poAmountInput) {
 
 }
 
-function removeInvoicePdf() {
-    currentInvoicePdf = null;
-
-    document.getElementById("invoicePdf").value = "";
-    document.getElementById("invoicePdfPreview").innerHTML = "";
-}
 
 function removeExistingInvoicePdf() {
     removeInvoicePdfFlag = true;
@@ -1416,8 +1410,6 @@ function renderInvoicePdfPreview() {
     preview.innerHTML = `
         <div class="invoice-pdf-entry">
             <span>${currentInvoicePdf.name}</span>
-
-            <button type="button" class="remove-document-btn" onclick="removeInvoicePdf()">✖</button>
         </div>
     `;
 }
@@ -1429,7 +1421,6 @@ if (invoicePdfInput) {
         function () {
             currentInvoicePdf = this.files[0];
     
-            // A new PDF has been selected, so don't remove it.
             removeInvoicePdfFlag = false;
     
             renderInvoicePdfPreview();

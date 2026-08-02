@@ -53,6 +53,39 @@ if (!fs.existsSync(uploadDir)) {
 }
 
 
+// ===============================
+// DELETE FILE
+// ===============================
+function deleteFile(filePath) {
+    if (fs.existsSync(filePath)) {
+        fs.unlinkSync(filePath);
+    }
+}
+
+
+// ===============================
+// MAP DOCUMENTS
+// ===============================
+function mapDocuments(files, documentTypes) {
+    if (!files || files.length === 0) {
+        return [];
+    }
+
+    return files.map((file, index) => ({
+        type: documentTypes[index],
+        fileName: file.filename
+    }));
+}
+
+
+// ===============================
+// PARSE DOCUMENT TYPES
+// ===============================
+function parseDocumentTypes(documentTypes) {
+    return documentTypes ? JSON.parse(documentTypes) : [];
+}
+
+
 /* =========================
    MULTER CONFIGURATION
 ========================= */
@@ -128,11 +161,11 @@ router.get("/reference-pos", async (req, res) => {
 // ===============================
 router.post("/", upload.array("documents", 10), async (req, res) => {
     try {
-        // JSON.parse converts string into array
-        const documentTypes = req.body.documentTypes ? JSON.parse(req.body.documentTypes): [];
+        // Parse document types
+        const documentTypes = parseDocumentTypes(req.body.documentTypes);
 
         // Used to map files to their types (means justification.pdf maps to Justification type))
-        const documents = req.files ? req.files.map((file, index) => ({type: documentTypes[index], fileName: file.filename})): [];
+        const documents = mapDocuments(req.files, documentTypes);
 
         // Create new record
         const record = new NetworkRecord({
@@ -173,9 +206,7 @@ router.post("/", upload.array("documents", 10), async (req, res) => {
             req.files.forEach(file => {
                 const filePath = path.join(uploadDir, file.filename);
 
-                if (fs.existsSync(filePath)) {
-                    fs.unlinkSync(filePath);
-                }
+                deleteFile(filePath);
             });
         }
 
@@ -296,8 +327,8 @@ router.put("/:id", upload.array("documents", 10), async (req, res) => {
         }
         
         if (req.files && req.files.length > 0) {
-            const documentTypes = req.body.documentTypes ? JSON.parse(req.body.documentTypes): [];
-            const newDocuments = req.files.map((file, index) => ({type: documentTypes[index], fileName: file.filename}));
+            const documentTypes = parseDocumentTypes(req.body.documentTypes);
+            const newDocuments = mapDocuments(req.files, documentTypes);
         
             updateData.documents = [
                 ...(updateData.documents || []),
@@ -358,12 +389,10 @@ router.delete("/:id/document/:filename", async (req, res) => {
         }
 
         const filename = decodeURIComponent(req.params.filename);
-        const filePath = path.join(__dirname, "../uploads", filename);
+        const filePath = path.join(uploadDir, filename);
 
         // Remove file path (means delete pdf from folder)
-        if (fs.existsSync(filePath)) {
-            fs.unlinkSync(filePath);
-        }
+        deleteFile(filePath);
 
         record.documents = record.documents.filter(doc => doc.fileName !== filename);
 
@@ -396,12 +425,10 @@ router.delete("/:id", async (req, res) => {
         // DELETE ALL UPLOADED PDFs
         if (record.documents && record.documents.length > 0) {
             record.documents.forEach(doc => {
-                const filePath = path.join(__dirname, "../uploads", doc.fileName);
+                const filePath = path.join(uploadDir, doc.fileName);
 
                 // Remove all files path
-                if (fs.existsSync(filePath)) {
-                    fs.unlinkSync(filePath);
-                }
+                deleteFile(filePath);
             });
         }
 
@@ -411,10 +438,8 @@ router.delete("/:id", async (req, res) => {
         // DELETE INVOICE PDFs
         details.forEach(detail => {
             if (detail.invoicePdf) {
-                const filePath = path.join(__dirname, "../uploads", detail.invoicePdf);
-                if (fs.existsSync(filePath)) {
-                    fs.unlinkSync(filePath);
-                }
+                const filePath = path.join(uploadDir, detail.invoicePdf);
+                deleteFile(filePath);
             }
         });
 
@@ -456,6 +481,9 @@ router.delete("/:id", async (req, res) => {
 });
 
 
+// ===============================
+// PARSE EXCEL DATE
+// ===============================
 function parseExcelDate(value) {
     if (!value) {
         return null;
@@ -690,26 +718,30 @@ router.post("/import", excelUpload.single("excelFile"), async (req, res) => {
                     documentNumber: row["Document Number"]
                 });
 
-                await detail.save();
-
-                const record = await NetworkRecord.findById(recordId);
-                if (record) {
-                    record.balanceAmount = Number(record.balanceAmount) - invoiceAmount;
-                    await record.save();
-                }
-                importedInvoices++;
+            await detail.save();
+            
+            const record = await NetworkRecord.findById(recordId);
+            if (record) {
+                record.balanceAmount = Number(record.balanceAmount) - invoiceAmount;
+                await record.save();
             }
-            fs.unlinkSync(req.file.path);
-            res.status(200).json({
-                message: `Import Completed\n\nImported Records: ${importedRecords}\nImported Invoices: ${importedInvoices}\nSkipped Records: ${skippedRecords}`
-            });
+            importedInvoices++;
         }
-        catch (error) {
-            console.error(error);
-            res.status(500).json({
-                message: "Import Failed"
-            });
+        deleteFile(req.file.path);
+        res.status(200).json({
+            message: `Import Completed\n\nImported Records: ${importedRecords}\nImported Invoices: ${importedInvoices}\nSkipped Records: ${skippedRecords}`
+        });
+    }
+    catch (error) {
+
+        if (req.file) {
+            deleteFile(req.file.path);
         }
+        console.error(error);
+        res.status(500).json({
+            message: "Import Failed"
+        });
+    }
 });
 
 

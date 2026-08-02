@@ -41,9 +41,18 @@ const NetworkDetail = require("../models/NetworkDetail");
 
 
 const uploadDir = path.join(__dirname, "..", "uploads");
-
 if (!fs.existsSync(uploadDir)) {
     fs.mkdirSync(uploadDir, { recursive: true });
+}
+
+
+// ===============================
+// DELETE FILE
+// ===============================
+function deleteFile(filePath) {
+    if (fs.existsSync(filePath)) {
+        fs.unlinkSync(filePath);
+    }
 }
 
 
@@ -57,12 +66,7 @@ const storage = multer.diskStorage({
     },
     // File Name
     filename: function(req, file, cb) {
-        const uniqueName =
-            Date.now() +
-            "-" +
-            Math.round(Math.random() * 1e9) +
-            path.extname(file.originalname);
-
+        const uniqueName = Date.now() + "-" + Math.round(Math.random() * 1e9) + path.extname(file.originalname);
         cb(null, uniqueName);
     }
 });
@@ -124,13 +128,9 @@ router.post("/", upload.single("invoicePdf"), async (req, res) => {
         await detail.save();
 
         // Reduce the invoice amount from the remaining amount
-        if (record) {
-            record.balanceAmount = (record.balanceAmount || 0) - Number(req.body.invoiceAmount || 0);
-
-            record.lastEditedBy = req.body.lastEditedBy;
-
-            await record.save();
-        }
+        record.balanceAmount = (record.balanceAmount || 0) - Number(req.body.invoiceAmount || 0);
+        record.lastEditedBy = req.body.lastEditedBy;
+        await record.save();
 
         res.status(201).json({
             message: "Network Detail Added Successfully"
@@ -141,9 +141,7 @@ router.post("/", upload.single("invoicePdf"), async (req, res) => {
         if (req.file) {
             const filePath = path.join(uploadDir, req.file.filename);
 
-            if (fs.existsSync(filePath)) {
-                fs.unlinkSync(filePath);
-            }
+            deleteFile(filePath);
         }
         console.error(error);
         res.status(500).json({
@@ -247,10 +245,8 @@ router.put("/:id", upload.single("invoicePdf"), async (req, res) => {
         // If files is changed during edit
         if (req.file) {
             if (detail.invoicePdf) {
-                const oldFile = path.join(__dirname, "../uploads", detail.invoicePdf);
-                if (fs.existsSync(oldFile)) {
-                    fs.unlinkSync(oldFile);
-                }
+                const oldFile = path.join(uploadDir, detail.invoicePdf);
+                deleteFile(oldFile);
             }
             detail.invoicePdf = req.file.filename;
         }
@@ -258,11 +254,9 @@ router.put("/:id", upload.single("invoicePdf"), async (req, res) => {
         // Remove existing invoice PDF
         if (req.body.removeInvoicePdf === "true") {
             if (detail.invoicePdf) {
-                const oldFile = path.join(__dirname, "../uploads", detail.invoicePdf);
+                const oldFile = path.join(uploadDir, detail.invoicePdf);
                 
-                if (fs.existsSync(oldFile)) {
-                    fs.unlinkSync(oldFile);
-                }
+                deleteFile(oldFile);
             }
             detail.invoicePdf = "";
         }
@@ -270,13 +264,9 @@ router.put("/:id", upload.single("invoicePdf"), async (req, res) => {
         await detail.save();
         
         // Update balance amount
-        if (record) {
-            record.balanceAmount = record.balanceAmount + oldInvoiceAmount - Number(req.body.invoiceAmount || 0);
-
-            record.lastEditedBy = req.body.lastEditedBy;
-
-            await record.save();
-        }
+        record.balanceAmount = record.balanceAmount + oldInvoiceAmount - Number(req.body.invoiceAmount || 0);
+        record.lastEditedBy = req.body.lastEditedBy;
+        await record.save();
 
         res.status(200).json({
             message: "Network Detail Updated Successfully"
@@ -312,20 +302,15 @@ router.delete("/:id", async (req, res) => {
                 message: "Network Record not found"
             });
         }
-        if (record) {
-            record.balanceAmount = (record.balanceAmount || 0) + invoiceAmount;
 
-            record.lastEditedBy = req.body.lastEditedBy;
-            
-            await record.save();
-        }
+        record.balanceAmount = (record.balanceAmount || 0) + invoiceAmount;
+        record.lastEditedBy = req.body.lastEditedBy;    
+        await record.save();
 
         // Delete invoice pdf
         if (detail.invoicePdf) {
-            const filePath = path.join(__dirname, "../uploads", detail.invoicePdf);
-            if (fs.existsSync(filePath)) {
-                fs.unlinkSync(filePath);
-            }
+            const filePath = path.join(uploadDir, detail.invoicePdf);
+            deleteFile(filePath);
         }
 
         // Deleting the Invoice

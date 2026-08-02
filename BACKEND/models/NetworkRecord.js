@@ -36,7 +36,8 @@ const networkRecordSchema = new mongoose.Schema({
     },
     poPeriod: {
         type: String,
-        required: true
+        required: true,
+        enum: ["Monthly", "Quarterly", "Half-Yearly", "Yearly"]
     },
     poEndDate: {
         type: Date,

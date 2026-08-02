@@ -25,7 +25,8 @@ const networkDetailSchema = new mongoose.Schema({
     },
     invoicePeriod: {
         type: String,
-        required: true
+        required: true,
+        enum: ["Monthly", "Quarterly", "Half-Yearly", "Yearly"]
     },
     invoicePeriodEndDate: {
         type: Date

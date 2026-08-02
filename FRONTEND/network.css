@@ -87,9 +87,11 @@ body {
     background: transparent;
     transition: 0.3s;
 }
+
 .sidebar-btn:hover {
     background: #fff4ea;
 }
+
 .sidebar-btn.active {
     background: linear-gradient(
         135deg,
@@ -110,12 +112,14 @@ body {
     width: 60px;
     min-width: 60px;
 }
+
 .sidebar.collapsed .sidebar-btn {
     font-size: 0;
     text-align: center;
     min-height: 50px;
     padding: 10px;    
 }
+
 .sidebar.collapsed .sidebar-btn::first-letter {
     font-size: 18px;
 }
@@ -136,17 +140,10 @@ body {
     border-color: #ff6b00;
 }
 
-#toggleSidebarBtn {
-    /* color: white !important; */
-    display: block;
-    visibility: visible;
-}
-
 
 /* =========================
    INVENTORY SUB MENU
 ========================= */
-
 .inventory-submenu {
     display: none;
     flex-direction: column;
@@ -186,11 +183,9 @@ body {
 }
 
 
-
 /* =========================
    PLANT SUB MENU
 ========================= */
-
 .plant-submenu {
     display: none;
     flex-direction: column;
@@ -228,7 +223,6 @@ body {
     );
     color: white;
 }
-
 
 
 /* =========================
@@ -353,25 +347,8 @@ body {
         0 4px 12px rgba(255,107,0,0.15);
 }
 
-.add-btn {
-    padding: 12px 20px;
-    cursor: pointer;
-    font-size: 16px;
-    background: 
-        linear-gradient(
-            135deg,
-            #ff6b00,
-            #ff7f11
-        );
-    border: none;
-    color: white;
-    font-weight: 700;
-    border-radius: 12px;
-}
-.add-btn:hover {
-    filter: brightness(1.05);
-}
-
+.add-btn,
+.import-btn,
 .export-btn {
     padding: 12px 20px;
     cursor: pointer;
@@ -387,28 +364,13 @@ body {
     font-weight: 700;
     border-radius: 12px;
 }
-.export-btn:hover {
-    filter: brightness(1.05);
-}
 
-.import-btn {
-    padding: 12px 20px;
-    cursor: pointer;
-    font-size: 16px;
-    background: 
-        linear-gradient(
-            135deg,
-            #ff6b00,
-            #ff7f11
-        );
-    border: none;
-    color: white;
-    font-weight: 700;
-    border-radius: 12px;
-}
+.add-btn:hover,
+.export-btn:hover,
 .import-btn:hover {
     filter: brightness(1.05);
 }
+
 
 /* =========================
    TABLE SECTION
@@ -445,10 +407,12 @@ table td {
     vertical-align: top;
     white-space: nowrap;
 }
+
 table td{
     background: white;
     color: #1e293b;
 }
+
 table th {
     background: linear-gradient(
         135deg,
@@ -457,18 +421,18 @@ table th {
     );
     color: white;
 }
-table tr:nth-child(even) {
-    background: transparent;
-}
+
 table td a {
     color: #58a6ff;
     text-decoration: none;
     font-weight: 600;
 }
+
 table td a:hover {
     color: #8fc5ff;
     text-decoration: underline;
 }
+
 .table-scroll {
     overflow-x: auto;
     width: 100%;
@@ -477,7 +441,6 @@ table td a:hover {
 /* =========================
    LAST EDITED BY
 ========================= */
-
 .last-edited {
     display: flex;
     align-items: center;
@@ -489,10 +452,10 @@ table td a:hover {
     color: #ff6b00;
 }
 
+
 /* ===============================
    PO STATUS BADGES
 =============================== */
-
 .status-badge {
     display: inline-block;
     padding: 5px 12px;
@@ -521,14 +484,6 @@ table td a:hover {
 .status-unknown {
     background-color: #e2e3e5;
     color: #495057;
-}
-
-.status-unknown-row td {
-    background: white;
-}
-
-.status-active-row td {
-    background-color: white;
 }
 
 .status-expiring-row td {
@@ -743,6 +698,7 @@ table td a:hover {
     font-weight: bold;
     color: #475569;
 }
+
 .invoicepdf-box label{
     display: block;
     margin-bottom: 8px;
@@ -751,16 +707,14 @@ table td a:hover {
     color: #475569;
 }
 
+
 /* =========================
    SERVICE SECTION
 ========================= */
-
 .service-header{
-
     display:flex;
     justify-content:space-between;
     align-items:center;
-
     margin:18px 0 10px;
 }
 
@@ -768,28 +722,23 @@ table td a:hover {
 .service-header h4 {
     margin: 0;
 }
+
 .service-title {
     width: 36px;
     height: 36px;
-
     display: flex;
     align-items: center;
     justify-content: center;
-
     margin-bottom: 15px;
-
     border-radius: 50%;
-
     background: linear-gradient(
         135deg,
         #ff6b00,
         #ff7f11
     );
-
     color: white;
     font-weight: 700;
 }
-
 
 .service-entry {
     background: #f8fafc;
@@ -847,7 +796,6 @@ table td a:hover {
         #ff6b00,
         #ff7f11
     ) !important;
-
     border: none !important;
     font-weight: 600;
 }
@@ -859,50 +807,36 @@ table td a:hover {
 
 
 .add-service-btn {
-
     display: inline-flex;
     align-items: center;
     justify-content: center;
-
     width: auto !important;
     min-width: 170px;
     height: 42px;
-
     padding: 0 18px;
     margin: 0;
-
     background: linear-gradient(
         135deg,
         #ff6b00,
         #ff7f11
     );
-
     color: white;
-
     border: none;
     border-radius: 8px;
-
     font-size: 15px;
     font-weight: 600;
-
     cursor: pointer;
-
     transition: .2s;
 }
 
 .add-service-btn:hover{
     filter: brightness(1.05);
 }
-.add-service-btn:hover {
-    filter: brightness(1.05);
-}
-
 
 
 /* =========================
    DOCUMENT SECTION
 ========================= */
-
 .document-fixed-section label {
     display: block;
     color: #1e293b;
@@ -946,13 +880,10 @@ table td a:hover {
     display: flex;
     align-items: center;
     justify-content: space-between;
-
     gap: 12px;
-
     padding: 10px 14px;
     margin-top: 10px;
     margin-bottom: 8px;
-
     background: #f8fafc;
     border: 1px solid #dbe3ec;
     border-radius: 10px;
@@ -961,11 +892,9 @@ table td a:hover {
 .invoice-pdf-entry span,
 .document-entry span {
     flex: 1;
-
     font-size: 15px;
     font-weight: 500;
     color: #1e293b;
-
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
@@ -1065,12 +994,13 @@ input[type="file"]::file-selector-button {
     background: #4a5568;
     cursor: not-allowed;
 }
+
 input[type="file"]:disabled::file-selector-button {
     background: #c5cbd4;
     color: #f5f5f5;
-    /* cursor: not-allowed; */
     filter: grayscale(100%);
 }
+
 
 /* =========================
    DETAIL MODAL
@@ -1104,8 +1034,7 @@ input[type="file"]:disabled::file-selector-button {
 .details-row .add-btn {
     position: sticky;
     left: 20px;
-    z-index: 50;
-    
+    z-index: 50;    
     display: inline-block;
     margin-bottom: 15px;
 }
@@ -1115,6 +1044,7 @@ input[type="file"]:disabled::file-selector-button {
     margin-top: 10px;
     border-collapse: collapse;
 }
+
 
 /* =========================
    RESPONSIVE
@@ -1153,7 +1083,6 @@ input[type="file"]:disabled::file-selector-button {
         opacity: 1;
     }
 }
-
 
 #referencePO{
     width:100%;
