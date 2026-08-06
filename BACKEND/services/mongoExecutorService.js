@@ -11,7 +11,7 @@ async function executeMongoQuery(query) {
         throw new Error(`Unknown collection: ${query.collection}`);
     }
 
-    return await Model.find(query.filter ?? {})
+    return Model.find(query.filter ?? {})
         .sort(query.sort ?? {})
         .limit(query.limit ?? 0)
         .lean();

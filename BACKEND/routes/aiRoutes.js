@@ -1,6 +1,6 @@
 const express = require("express");
 
-const { summarize } = require("../services/groqService");
+const { summarize } = require("../services/aiService");
 
 const { generateMongoQuery } = require("../services/queryGeneratorService");
 
@@ -9,6 +9,54 @@ const { executeMongoQuery } = require("../services/mongoExecutorService");
 const {getHighest, getLowest, getTotalAmount, getTotalBalance, getCount, getAverageAmount, getHighestBalance, getExpiringSoon, getLowestBalance} = require("../services/analyticsService");
 
 const router = express.Router();
+
+
+function buildAnalytics(records) {
+
+    return {
+
+        totalAmount: getTotalAmount(records),
+        totalBalance: getTotalBalance(records),
+        count: getCount(records),
+        averageAmount: getAverageAmount(records),
+        highestBalance: getHighestBalance(records),
+        highest: getHighest(records),
+        lowest: getLowest(records),
+        lowestBalance: getLowestBalance(records),
+        expiringSoon: getExpiringSoon(records, 60)
+
+    };
+
+}
+
+
+function buildAiRecords(records) {
+
+    return records.map(record => ({
+
+        vendor: record.vendorName ?? record.vendor,
+        vendorCode: record.vendorCode,
+        description:
+            record.poDescription ??
+            record.description,
+        amount:
+            record.poAmount ??
+            record.amount ??
+            record.totalValue ??
+            record.value,
+        balance: record.balanceAmount,
+        startDate:
+            record.poStartDate ??
+            record.startDate,
+        endDate:
+            record.poEndDate ??
+            record.endDate,
+        renewed: record.renewed
+
+    }));
+
+}
+
 
 router.post("/query", async (req, res) => {
 
@@ -29,9 +77,14 @@ router.post("/query", async (req, res) => {
 
         const mongoQuery = await generateMongoQuery(question);
 
-        console.log("MONGO QUERY:", mongoQuery);
-
-        console.log(JSON.stringify(mongoQuery, null, 2));
+        console.log(
+            "MONGO QUERY:\n",
+            JSON.stringify(
+                mongoQuery,
+                null,
+                2
+            )
+        );
 
         const records = await executeMongoQuery(mongoQuery);
 
@@ -45,49 +98,17 @@ router.post("/query", async (req, res) => {
             JSON.stringify(records, null, 2)
         );
 
-        const analytics = {};
+        const analytics =
+            mongoQuery.type === "find"
+                ? buildAnalytics(records)
+                : {};
 
-        if (mongoQuery.type === "find") {
-        
-            analytics.totalAmount = getTotalAmount(records);
-            analytics.totalBalance = getTotalBalance(records);
-            analytics.count = getCount(records);
-            analytics.averageAmount = getAverageAmount(records);
-            analytics.highestBalance = getHighestBalance(records);
-            analytics.highest = getHighest(records);
-            analytics.lowest = getLowest(records);
-            analytics.lowestBalance = getLowestBalance(records);
-        
-        }
+        const totalRecords = records.length;
+
+        const aiRecords = buildAiRecords(records);
 
 
-        analytics.expiringSoon = getExpiringSoon(records, 60);
-
-        
-        let aiRecords = [];
-        let totalRecords = 0;
-
-
-        aiRecords = records.map(record => ({
-
-            vendor: record.vendorName ?? record.vendor,
-            vendorCode: record.vendorCode,
-            description: record.poDescription ?? record.description,
-            amount:
-                record.poAmount ??
-                record.amount ??
-                record.totalValue ??
-                record.value,
-            balance: record.balanceAmount,
-            startDate: record.poStartDate ?? record.startDate,
-            endDate: record.poEndDate ?? record.endDate,
-            renewed: record.renewed
-        }));
-
-        totalRecords = records.length;
-
-
-        if (records.length === 0) {
+        if (totalRecords === 0) {
             return res.json({
                 success: true,
                 answer: "No matching records found.",

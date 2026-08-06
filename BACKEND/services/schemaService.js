@@ -6,7 +6,7 @@ const NetworkRecord = require("../models/NetworkRecord");
 const PlantMaterialRecord = require("../models/PlantMaterialRecord");
 const PlantServiceRecord = require("../models/PlantServiceRecord");
 
-const MODELS = {
+const MODELS = Object.freeze({
     contract: ContractRecord,
     amc: AMCRecord,
     inventoryHardware: InventoryHardwareRecord,
@@ -14,7 +14,14 @@ const MODELS = {
     network: NetworkRecord,
     plantMaterial: PlantMaterialRecord,
     plantService: PlantServiceRecord
-};
+});
+
+const IGNORED_FIELDS = [
+    "_id",
+    "__v",
+    "createdAt",
+    "updatedAt"
+];
 
 function getSchemaDescription() {
 
@@ -28,16 +35,9 @@ function getSchemaDescription() {
 
         const fields = Object.keys(model.schema.paths).sort();
 
-        const ignoredFields = [
-            "_id",
-            "__v",
-            "createdAt",
-            "updatedAt"
-        ];
-
         fields.forEach(field => {
             
-            if (ignoredFields.includes(field)) return;
+            if (IGNORED_FIELDS.includes(field)) return;
 
             const type = model.schema.paths[field].instance;
 

@@ -1,11 +1,42 @@
-const { chatCompletion } = require("./groqService");
+const { chatCompletion } = require("./aiService");
+const {getSchemaDescription, VALID_COLLECTIONS} = require("./schemaService");
+const {generateRuleBasedQuery} = require("./ruleEngineService");
 
-const {
-    getSchemaDescription,
-    VALID_COLLECTIONS
-} = require("./schemaService");
+
+function getDefaultQuery() {
+    return {
+        collection: "contract",
+        type: "find",
+        filter: {},
+        sort: {},
+        limit: 0
+    };
+}
+
+
+function validateQuery(query) {
+    query.collection = String(query.collection ?? "").trim();
+
+    if (!VALID_COLLECTIONS.includes(query.collection)) {
+        throw new Error(`Invalid collection returned by AI: ${query.collection}`);
+    }
+
+    query.type = "find";
+    query.filter ??= {};
+    query.sort ??= {};
+    query.limit ??= 0;
+
+    return query;
+}
+
 
 async function generateMongoQuery(question) {
+    const ruleQuery = generateRuleBasedQuery(question);
+
+    if (ruleQuery) {
+        console.log("Rule Engine matched:", question);
+        return ruleQuery;
+    }
 
     const schema = getSchemaDescription();
 
@@ -48,51 +79,21 @@ Question:
 
 ${question}
 `;
-
-    const response = await chatCompletion(prompt);
+    
+    const response = (await chatCompletion(prompt)).trim();
 
     try {
-
-        const query = JSON.parse(response.trim());
-        
-        if (!VALID_COLLECTIONS.includes(query.collection)) {
-            query.collection = "contract";
-        }
-        
-        query.type = "find";
-        
-        query.filter ??= {};
-        query.sort ??= {};
-        query.limit ??= 0;
-        
-        return query;
-    
+        const query = JSON.parse(response);
+        return validateQuery(query);
     }
     catch (error) {
-    
-        console.error("Invalid AI JSON received from Groq.");
+        console.error("Failed to generate MongoDB query.");
         console.error("Question:", question);
         console.error("Response:", response);
         console.error(error);
     
-        return {
-    
-            collection: "contract",
-    
-            type: "find",
-    
-            filter: {},
-    
-            sort: {},
-    
-            limit: 0
-    
-        };
-    
+        return getDefaultQuery();
     }
-
 }
 
-module.exports = {
-    generateMongoQuery
-};
+module.exports = {generateMongoQuery};
