@@ -2,11 +2,13 @@
 const { GoogleGenAI } = require("@google/genai");
 const MODEL = "gemini-2.5-flash";
 
+if (!process.env.GEMINI_API_KEY) {
+    throw new Error("GEMINI_API_KEY is not configured.");
+}
 
 const ai = new GoogleGenAI({
-    apiKey: process.env.GEMINI_API_KEY,
+    apiKey: process.env.GEMINI_API_KEY
 });
-
 
 function getResponseText(response) {
     return typeof response.text === "function"

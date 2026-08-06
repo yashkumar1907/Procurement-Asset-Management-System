@@ -16,10 +16,27 @@ BACKEND/temp/
 
 # OS Files
 .DS_Store
+.AppleDouble
+.LSOverride
+Thumbs.db
 
 # VS Code Settings
 .vscode/
 
-# Mac Resource Files
-.AppleDouble
-.LSOverride
+# Build / Cache
+BACKEND/.cache/
+BACKEND/dist/
+BACKEND/build/
+
+# Coverage
+coverage/
+
+# npm cache
+.npm/
+
+# Environment files (optional)
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local

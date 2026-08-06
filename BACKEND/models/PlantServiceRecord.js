@@ -19,15 +19,18 @@ const plantServiceRecordSchema = new mongoose.Schema({
         {
             code: {
                 type: String,
-                default: ""
+                default: "",
+                trim: true
             },
             shortText: {
                 type: String,
-                default: ""
+                default: "",
+                trim: true
             },
             desc: {
                 type: String,
-                default: ""
+                default: "",
+                trim: true
             },
             quantity: {
                 type: Number,
@@ -55,7 +58,8 @@ const plantServiceRecordSchema = new mongoose.Schema({
     },
     lastEditedBy: {
         type: String,
-        default: ""
+        default: "",
+        trim: true
     }
 },
     {

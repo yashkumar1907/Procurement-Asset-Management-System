@@ -11,6 +11,10 @@ async function login(event) {
     // Stops page reload
     event.preventDefault();
 
+    const errorMessage = document.getElementById("error-message");
+    errorMessage.style.display = "none";
+    errorMessage.innerText = "";
+
     // Getting email and password enter by user
     const email = document.getElementById("email").value.trim();
     const password = document.getElementById("password").value;

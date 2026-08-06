@@ -18,7 +18,8 @@ const amcDetailSchema = new mongoose.Schema({
     },
     trackingNumber: {
         type: String,
-        default: ""
+        default: "",
+        trim: true
     },
     invoicePeriodStartDate: {
         type: Date
@@ -36,11 +37,13 @@ const amcDetailSchema = new mongoose.Schema({
     },
     serviceEntryNumber: {
         type: String,
-        required: true
+        required: true,
+        trim: true
     },
     documentNumber: {
         type: String,
-        default: ""
+        default: "",
+        trim: true
     },
     invoicePdf: {
         type: String,

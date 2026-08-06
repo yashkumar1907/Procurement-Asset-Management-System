@@ -1,29 +1,10 @@
-/* =========================
-   MAIN BACKEND FRAMEWORK
-========================= */
 const express = require("express");
-
-
-/* =========================
-   Creates a route container
-========================= */
 const router = express.Router();
-
-
-/* =========================
-   Import Plant Service Record Model
-========================= */
-const PlantServiceRecord = require("../models/PlantServiceRecord");
-
-
-/* =========================
-   Import Excel Package
-========================= */
 const XLSX = require("xlsx");
-
-
 const fs = require("fs");
 
+
+const PlantServiceRecord = require("../models/PlantServiceRecord");
 
 /* =========================
    MULTER CONFIGURATION (Used Only For Excel Import)
@@ -58,6 +39,22 @@ const excelUpload = multer({
         }
     }
 });
+
+
+
+// ===============================
+// DELETE FILE
+// ===============================
+function deleteFile(filePath) {
+    try {
+        if (fs.existsSync(filePath)) {
+            fs.unlinkSync(filePath);
+        }
+    }
+    catch (error) {
+        console.error(`Failed to delete file: ${filePath}`, error);
+    }
+}
 
 
 // ===============================
@@ -99,7 +96,7 @@ router.post("/", async (req, res) => {
 // ===============================
 router.get("/", async (req, res) => {
     try {
-        const records = await PlantServiceRecord.find();
+        const records = await PlantServiceRecord.find().lean();
         res.status(200).json(records);
     }
     catch (error) {
@@ -123,13 +120,14 @@ router.put("/:id", async (req, res) => {
             });
         }
 
-        const updateData = {
-            ...req.body
-        };
-
         const updatedPlantServices =
-            req.body.plantServiceDetails ||
+            req.body.plantServiceDetails ??
             existingRecord.plantServiceDetails;
+
+        const updateData = {
+            ...req.body,
+            plantServiceDetails: updatedPlantServices
+        };
 
         const totalPrAmount =
             updatedPlantServices.reduce(
@@ -137,7 +135,6 @@ router.put("/:id", async (req, res) => {
             );
 
         updateData.prAmount = totalPrAmount;
-        updateData.plantServiceDetails = updatedPlantServices;
 
         await PlantServiceRecord.findByIdAndUpdate(req.params.id, updateData);
 
@@ -225,7 +222,7 @@ function parseExcelDate(value) {
 // ===============================
 router.get("/export", async (req, res) => {
     try {
-        const records = await PlantServiceRecord.find();
+        const records = await PlantServiceRecord.find().lean();
 
         const recordSheet = [];
 
@@ -248,7 +245,6 @@ router.get("/export", async (req, res) => {
         });
 
         const workbook = XLSX.utils.book_new();
-        // const worksheet = XLSX.utils.json_to_sheet(recordSheet);
 
         const worksheet = XLSX.utils.json_to_sheet(recordSheet, {
                 header: [
@@ -311,12 +307,24 @@ router.post("/import", excelUpload.single("excelFile"), async (req, res) => {
 
         const workbook = XLSX.readFile(req.file.path);
 
+        if (!workbook.Sheets["Plant Service Records"]) {
+            deleteFile(req.file.path);
+        
+            return res.status(400).json({
+                message: "Invalid Excel format."
+            });
+        }
+
         const recordSheet = XLSX.utils.sheet_to_json(workbook.Sheets["Plant Service Records"]);
 
         const groupedRecords = {};
 
-        recordSheet.forEach(row => {
-            const prNum = String(row["PR Number"]).trim();
+        for (const row of recordSheet) {
+            const prNum = String(row["PR Number"] || "").trim();
+
+            if (!prNum) {
+                continue;
+            }
             
             if (!groupedRecords[prNum]) {
                 groupedRecords[prNum] = {
@@ -337,13 +345,13 @@ router.post("/import", excelUpload.single("excelFile"), async (req, res) => {
                 quantity: Number(row["Quantity"]),
                 pricePerQuantity: Number(row["Price Per Quantity"])
             });
-        });
+        };
         
         let importedRecords = 0;
         let skippedRecords = 0;
 
         for (const prNum of Object.keys(groupedRecords)) {
-            const existingRecord = await PlantServiceRecord.findOne({prNum});
+            const existingRecord = await PlantServiceRecord.findOne({prNum}).lean();
             
             if (existingRecord) {
                 skippedRecords++;
@@ -374,22 +382,27 @@ router.post("/import", excelUpload.single("excelFile"), async (req, res) => {
             importedRecords++;
         }
 
-        fs.unlinkSync(req.file.path);
+        deleteFile(req.file.path);
 
         res.status(200).json({
-            message: `Import Completed \n Imported Records: ${importedRecords} \n Skipped Records: ${skippedRecords}`});
-        }
-        catch (error) {
-            if (req.file && fs.existsSync(req.file.path)) {
-                fs.unlinkSync(req.file.path);
-            }
-            console.error(error);
-            res.status(500).json({
-                message: "Import Failed"
-            });
-        }
+            message: [
+                "Import Completed",
+                "",
+                `Imported Records: ${importedRecords}`,
+                `Skipped Records: ${skippedRecords}`
+            ].join("\n")
+        });
     }
-);
+    catch (error) {
+        if (req.file) {
+            deleteFile(req.file.path);
+        }
+        console.error(error);
+        res.status(500).json({
+            message: "Import Failed"
+        });
+    }
+});
 
 
 
@@ -405,7 +418,9 @@ router.get("/wbs-selector", async (req, res) => {
                 poNum: 1,
                 projectName: 1
             }
-        ).sort({
+        )
+        .lean()
+        .sort({
             prNum: 1
         });
         res.status(200).json(records);
@@ -419,7 +434,4 @@ router.get("/wbs-selector", async (req, res) => {
 });
 
 
-/* =========================
-    Export these all routes so that we can use it anywhere
-========================= */
 module.exports = router;

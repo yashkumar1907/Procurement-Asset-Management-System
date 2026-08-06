@@ -1,29 +1,9 @@
-/* =========================
-   MAIN BACKEND FRAMEWORK
-========================= */
 const express = require("express");
-
-
-/* =========================
-   Creates a route container
-========================= */
 const router = express.Router();
-
-
-/* =========================
-   Import Plant Material Record Model
-========================= */
-const PlantMaterialRecord = require("../models/PlantMaterialRecord");
-
-
-/* =========================
-   Import Excel Package
-========================= */
 const XLSX = require("xlsx");
-
-
 const fs = require("fs");
 
+const PlantMaterialRecord = require("../models/PlantMaterialRecord");
 
 /* =========================
    MULTER CONFIGURATION (Used Only For Excel Import)
@@ -61,6 +41,21 @@ const excelUpload = multer({
 
 
 // ===============================
+// DELETE FILE
+// ===============================
+function deleteFile(filePath) {
+    try {
+        if (fs.existsSync(filePath)) {
+            fs.unlinkSync(filePath);
+        }
+    }
+    catch (error) {
+        console.error(`Failed to delete file: ${filePath}`, error);
+    }
+}
+
+
+// ===============================
 // CREATE RECORD
 // ===============================
 router.post("/", async (req, res) => {
@@ -92,7 +87,7 @@ router.post("/", async (req, res) => {
 // ===============================
 router.get("/", async (req, res) => {
     try {
-        const records = await PlantMaterialRecord.find();
+        const records = await PlantMaterialRecord.find().lean();
         res.status(200).json(records);
     }
     catch (error) {
@@ -117,14 +112,11 @@ router.put("/:id", async (req, res) => {
         }
 
         const updateData = {
-            ...req.body
+            ...req.body,
+            plantMaterialDetails:
+                req.body.plantMaterialDetails ??
+                existingRecord.plantMaterialDetails
         };
-
-        const updatedPlantMaterials =
-            req.body.plantMaterialDetails ||
-            existingRecord.plantMaterialDetails;
-
-        updateData.plantMaterialDetails = updatedPlantMaterials;
 
         await PlantMaterialRecord.findByIdAndUpdate(req.params.id, updateData);
 
@@ -212,7 +204,7 @@ function parseExcelDate(value) {
 // ===============================
 router.get("/export", async (req, res) => {
     try {
-        const records = await PlantMaterialRecord.find();
+        const records = await PlantMaterialRecord.find().lean();
 
         const recordSheet = [];
 
@@ -317,12 +309,27 @@ router.post("/import", excelUpload.single("excelFile"), async (req, res) => {
 
         const workbook = XLSX.readFile(req.file.path);
 
-        const recordSheet = XLSX.utils.sheet_to_json(workbook.Sheets["Plant Material Records"]);
+        if (!workbook.Sheets["Plant Material Records"]) {
+            deleteFile(req.file.path);
+        
+            return res.status(400).json({
+                message: "Invalid Excel format."
+            });
+        }
+        
+        const recordSheet = XLSX.utils.sheet_to_json(
+            workbook.Sheets["Plant Material Records"]
+        );
+
 
         const groupedRecords = {};
 
-        recordSheet.forEach(row => {
-            const prNum = String(row["Indent / PR"]).trim();
+        for (const row of recordSheet) {
+            const prNum = String(row["Indent / PR"] || "").trim();
+
+            if (!prNum) {
+                continue;
+            }
             
             if (!groupedRecords[prNum]) {
 
@@ -355,7 +362,7 @@ router.post("/import", excelUpload.single("excelFile"), async (req, res) => {
                 quantity: Number(row["Qty"]) || 0
             
             });
-        });
+        }
         
         let importedRecords = 0;
         let skippedRecords = 0;
@@ -397,17 +404,24 @@ router.post("/import", excelUpload.single("excelFile"), async (req, res) => {
             importedRecords++;
         }
 
-        fs.unlinkSync(req.file.path);
+        deleteFile(req.file.path);
 
         res.status(200).json({
-            message: `Import Completed \n Imported Records: ${importedRecords} \n Skipped Records: ${skippedRecords}`});
+            message: [
+                "Import Completed",
+                "",
+                `Imported Records: ${importedRecords}`,
+                `Skipped Records: ${skippedRecords}`
+            ].join("\n")
+        });
         }
         catch (error) {
-            if (req.file && fs.existsSync(req.file.path)) {
-                fs.unlinkSync(req.file.path);
+            if (req.file) {
+                deleteFile(req.file.path);
             }
-            
+        
             console.error(error);
+        
             res.status(500).json({
                 message: "Import Failed"
             });
@@ -441,8 +455,4 @@ router.get("/wbs-selector", async (req, res) => {
     }
 });
 
-
-/* =========================
-    Export these all routes so that we can use it anywhere
-========================= */
 module.exports = router;

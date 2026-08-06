@@ -3,7 +3,9 @@
 // ===============================
 const userRole = localStorage.getItem("loggedInUserRole");
 if (userRole !== "admin") {
-    showToast("error", "Access Denied");
+    if (typeof showToast === "function") {
+        showToast("error", "Access Denied");
+    }
     window.location.href = "login.html";
 }
 

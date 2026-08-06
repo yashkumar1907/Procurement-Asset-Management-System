@@ -1,26 +1,8 @@
-/* =========================
-   MAIN BACKEND FRAMEWORK (Used for get, push, put, delete route)
-========================= */
 const express = require("express");
-
-
-/* =========================
-   Creates a route container
-========================= */
 const router = express.Router();
-
-
-/* =========================
-   Import User Model
-========================= */
-const User = require("../models/User");
-
-
-/* =========================
-   Inport Bycrypt (to hash passwords before storing)
-========================= */
 const bcrypt = require("bcryptjs");
 
+const User = require("../models/User");
 
 // ===============================
 // REGISTER USER (POST /api/auth/register)
@@ -30,7 +12,10 @@ router.post("/register", async (req, res) => {
         const {name, email, password, role} = req.body;
         
         // CHECK EXISTING USER
-        const existingUser = await User.findOne({email});
+        const existingUser = await User.findOne({
+            email: email.toLowerCase()
+        });
+
         if (existingUser) {
             return res.status(400).json({
                 message: "User already exists"
@@ -112,7 +97,6 @@ router.post("/login", async (req, res) => {
 });
 
 
-
 // ===============================
 // GET PROFILE
 // ===============================
@@ -151,6 +135,7 @@ router.put("/profile/:id", async (req, res) => {
             email,
             _id: { $ne: req.params.id }
         });
+
         if (existingUser) {
             return res.status(400).json({
                 message: "Email already exists"
@@ -164,7 +149,8 @@ router.put("/profile/:id", async (req, res) => {
                 email
             },
             {
-                new: true
+                new: true,
+                runValidators: true
             }
         );
 
@@ -233,7 +219,5 @@ router.put("/change-password/:id", async (req, res) => {
     }
 });
 
-/* =========================
-    Export these all routes so that we can use it anywhere
-========================= */
+
 module.exports = router;

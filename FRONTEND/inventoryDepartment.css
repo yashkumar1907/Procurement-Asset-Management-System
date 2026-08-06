@@ -44,6 +44,32 @@ body {
 }
 
 
+.logout-btn,
+.add-btn,
+.export-btn,
+.import-btn,
+.edit-btn,
+.delete-btn,
+.remove-service-btn,
+.remove-document-btn {
+    cursor: pointer;
+}
+
+.description-box:focus {
+    outline: none;
+    border-color: #ff6b00;
+    box-shadow:
+        0 0 0 4px rgba(255,107,0,0.15),
+        0 4px 12px rgba(255,107,0,0.15);
+}
+
+input[type="file"]:focus {
+    outline: none;
+    border-color: #ff6b00;
+    box-shadow:
+        0 0 0 4px rgba(255,107,0,0.15);
+}
+
 /* =========================
    DASHBOARD LAYOUT
 ========================= */
@@ -651,6 +677,10 @@ table td a:hover {
     font-size: 40px;
     cursor: pointer;
     font-weight: bold;
+}
+
+.close:hover {
+    color: #ff6b00;
 }
 
 

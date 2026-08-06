@@ -1,48 +1,12 @@
-/* =========================
-   MAIN BACKEND FRAMEWORK (Used for get, push, put, delete route)
-========================= */
 const express = require("express");
-
-
-/* =========================
-   Used to upload PDF files
-========================= */
 const multer = require("multer");
-
-
-/* =========================
-   Used to delete old PDF files
-========================= */
 const fs = require("fs");
-
-
-/* =========================
-Used when building upload file paths
-========================= */
 const path = require("path");
-
-
-/* =========================
-   Creates a route container (Instead of app)
-========================= */
 const router = express.Router();
-
-/* =========================
-   Import Record Model
-========================= */
-const AmcRecord = require("../models/AmcRecord");
-
-
-/* =========================
-   Import RecordDetail Model
-========================= */
-const AmcDetail = require("../models/AmcDetail");
-
-
-/* =========================
-   Import EXCEL
-========================= */
 const XLSX = require("xlsx");
+
+const AmcRecord = require("../models/AmcRecord");
+const AmcDetail = require("../models/AmcDetail");
 
 
 // Create uploads folder if it doesn't exist
@@ -77,6 +41,9 @@ const storage = multer.diskStorage({
 ========================= */
 const upload = multer({
     storage,
+    limits: {
+        fileSize: 10 * 1024 * 1024
+    },
     fileFilter: function (req, file, cb) {
         if (file.mimetype === "application/pdf") {
             cb(null, true);
@@ -87,8 +54,21 @@ const upload = multer({
     }
 });
 
+
 const excelUpload = multer({
-    dest: tempDir
+    dest: tempDir,
+    fileFilter(req, file, cb) {
+        const allowed = [
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            "application/vnd.ms-excel"
+        ];
+
+        if (allowed.includes(file.mimetype)) {
+            cb(null, true);
+        } else {
+            cb(new Error("Only Excel files allowed."));
+        }
+    }
 });
 
 
@@ -167,6 +147,16 @@ router.post("/", upload.array("documents", 10), async (req, res) => {
         });
     }
     catch (error) {
+        if (req.files) {
+            req.files.forEach(file => {
+                const filePath = path.join(uploadDir, file.filename);
+        
+                if (fs.existsSync(filePath)) {
+                    fs.unlinkSync(filePath);
+                }
+            });
+        }
+
         console.error(error);
         res.status(500).json({
             message: "Server Error"
@@ -333,6 +323,16 @@ router.put("/:id", upload.array("documents", 10), async (req, res) => {
         });
     }
     catch (error) {
+        if (req.files) {
+            req.files.forEach(file => {
+                const filePath = path.join(uploadDir, file.filename);
+        
+                if (fs.existsSync(filePath)) {
+                    fs.unlinkSync(filePath);
+                }
+            });
+        }
+
         console.error(error);
         res.status(500).json({
             message: "Server Error"
@@ -595,9 +595,19 @@ router.post("/import", excelUpload.single("excelFile"), async (req, res) => {
         }
 
         const workbook = XLSX.readFile(req.file.path);
-        
-        const recordSheet = XLSX.utils.sheet_to_json(workbook.Sheets["AMC Records"]);
 
+        if (!workbook.Sheets["AMC Records"] || !workbook.Sheets["Invoice Details"]) {
+
+            if (fs.existsSync(req.file.path)) {
+                fs.unlinkSync(req.file.path);
+            }
+        
+            return res.status(400).json({
+                message: "Invalid Excel format."
+            });
+        }
+
+        const recordSheet = XLSX.utils.sheet_to_json(workbook.Sheets["AMC Records"]);
         const detailSheet = XLSX.utils.sheet_to_json(workbook.Sheets["Invoice Details"]);
 
         let importedRecords = 0;
@@ -677,6 +687,9 @@ router.post("/import", excelUpload.single("excelFile"), async (req, res) => {
             });
         }
         catch (error) {
+            if (req.file && fs.existsSync(req.file.path)) {
+                fs.unlinkSync(req.file.path);
+            }
             console.error(error);
             res.status(500).json({
                 message: "Import Failed"

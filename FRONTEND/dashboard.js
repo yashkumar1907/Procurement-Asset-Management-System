@@ -51,19 +51,43 @@ window.onload = function () {
     if (downloadBtn) {
         downloadBtn.addEventListener("click", downloadPaymentReport);
     }
+
+    const today = new Date().toISOString().split("T")[0];
+
+    document.getElementById("paymentFromDate").max = today;
+    document.getElementById("paymentToDate").max = today;
+
+
+    const paymentModal = document.getElementById("paymentReportModal");
+
+    if (paymentModal) {
+        paymentModal.addEventListener("click", function (event) {
+            if (event.target === paymentModal) {
+                closePaymentReportModal();
+            }
+        });
+    }
 };
 
 
 
-const today = new Date().toISOString().split("T")[0];
 
-document.getElementById("paymentFromDate").max = today;
-document.getElementById("paymentToDate").max = today;
 
 // ===============================
 // APPLY PERMISSIONS
 // ===============================
 function applyPermissions() {
+    const networkBtn = document.getElementById("networkBtn");
+    const amcBtn = document.getElementById("amcBtn");
+    const contractBtn = document.getElementById("contractBtn");
+    const inventoryNetworkBtn = document.getElementById("inventoryNetworkBtn");
+    const inventoryHardwareBtn = document.getElementById("inventoryHardwareBtn");
+    const inventoryDepartmentBtn = document.getElementById("inventoryDepartmentBtn");
+    const plantMaterialBtn = document.getElementById("plantMaterialBtn");
+    const plantServiceBtn = document.getElementById("plantServiceBtn");
+    const wbsProjectBtn = document.getElementById("wbsProjectBtn");
+
+
     const networkPermission = localStorage.getItem("networkPermission");
     const amcPermission = localStorage.getItem("amcPermission");
     const contractPermission = localStorage.getItem("contractPermission");
@@ -686,15 +710,4 @@ async function downloadPaymentReport() {
         `${API_BASE_URL}/api/dashboard/payment-report?from=${from}&to=${to}`;
 
     closePaymentReportModal();
-}
-
-
-const paymentModal = document.getElementById("paymentReportModal");
-
-if (paymentModal) {
-    paymentModal.addEventListener("click", function (event) {
-        if (event.target === paymentModal) {
-            closePaymentReportModal();
-        }
-    });
 }

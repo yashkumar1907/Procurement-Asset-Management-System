@@ -1330,11 +1330,11 @@ if (toggleBtn) {
             const plantBtn = document.getElementById("plantToggleBtn");
 
             if (inventoryBtn) {
-                inventoryBtn.innerHTML = "📦 IT Procurement ▼";
+                inventoryBtn.innerHTML = "💻 IT Procurement ▼";
             }
 
             if (plantBtn) {
-                plantBtn.innerHTML = "📦 Plants ▼";
+                plantBtn.innerHTML = "🏭 Plants ▼";
             }
         }
     });
@@ -1450,7 +1450,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (currentPage === "inventoryNetwork.html" || currentPage === "inventoryHardware.html" || currentPage === "inventoryDepartment.html") {
         inventorySubMenu.classList.add("show");
-        inventoryBtn.innerHTML = "📦 IT Procurement ▲";
+        inventoryBtn.innerHTML = "💻 IT Procurement ▲";
     }
 
     inventoryBtn.addEventListener("click", () => {
@@ -1465,10 +1465,10 @@ document.addEventListener("DOMContentLoaded", () => {
         inventorySubMenu.classList.toggle("show");
     
         if (inventorySubMenu.classList.contains("show")) {
-            inventoryBtn.innerHTML = "📦 IT Procurement ▲";
+            inventoryBtn.innerHTML = "💻 IT Procurement ▲";
         }
         else {
-            inventoryBtn.innerHTML = "📦 IT Procurement ▼";
+            inventoryBtn.innerHTML = "💻 IT Procurement ▼";
         }
     });
 });
@@ -1490,7 +1490,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (currentPage === "plantMaterial.html" || currentPage === "plantService.html") {
         plantSubMenu.classList.add("show");
-        plantBtn.innerHTML = "📦 Plants ▲";
+        plantBtn.innerHTML = "🏭 Plants ▲";
     }
 
     plantBtn.addEventListener("click", () => {
@@ -1504,10 +1504,10 @@ document.addEventListener("DOMContentLoaded", () => {
         plantSubMenu.classList.toggle("show");
     
         if (plantSubMenu.classList.contains("show")) {
-            plantBtn.innerHTML = "📦 Plants ▲";
+            plantBtn.innerHTML = "🏭 Plants ▲";
         }
         else {
-            plantBtn.innerHTML = "📦 Plants ▼";
+            plantBtn.innerHTML = "🏭 Plants ▼";
         }
     });
 });

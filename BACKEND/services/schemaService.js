@@ -5,6 +5,7 @@ const InventoryNetworkRecord = require("../models/InventoryNetworkRecord");
 const NetworkRecord = require("../models/NetworkRecord");
 const PlantMaterialRecord = require("../models/PlantMaterialRecord");
 const PlantServiceRecord = require("../models/PlantServiceRecord");
+const WbsProjectRecord = require("../models/WbsProjectRecord");
 
 const MODELS = Object.freeze({
     contract: ContractRecord,
@@ -13,7 +14,8 @@ const MODELS = Object.freeze({
     inventoryNetwork: InventoryNetworkRecord,
     network: NetworkRecord,
     plantMaterial: PlantMaterialRecord,
-    plantService: PlantServiceRecord
+    plantService: PlantServiceRecord,
+    wbsProject: WbsProjectRecord
 });
 
 const IGNORED_FIELDS = [

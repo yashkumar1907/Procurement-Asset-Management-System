@@ -1,28 +1,12 @@
-/* =========================
-   MAIN BACKEND FRAMEWORK
-========================= */
 const express = require("express");
-
-
-/* =========================
-   Creates a route container
-========================= */
 const router = express.Router();
-
-
-/* =========================
-   Import Inventory Network Record Model
-========================= */
-const InventoryNetworkRecord = require("../models/InventoryNetworkRecord");
-
-
-/* =========================
-   Import Excel Package
-========================= */
 const XLSX = require("xlsx");
-
-
 const fs = require("fs");
+const path = require("path");
+const os = require("os");
+
+
+const InventoryNetworkRecord = require("../models/InventoryNetworkRecord");
 
 
 /* =========================
@@ -30,13 +14,22 @@ const fs = require("fs");
 ========================= */
 const multer = require("multer");
 
+const uploadsDir = path.join(os.tmpdir(), "jsl-temp");
+
+if (!fs.existsSync(uploadsDir)) {
+    fs.mkdirSync(uploadsDir, { recursive: true });
+}
+
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
-        cb(null, "uploads/");
+        cb(null, uploadsDir);
     },
 
     filename: function (req, file, cb) {
-        cb(null, Date.now() + "-" + file.originalname);
+        cb(
+            null,
+            `${Date.now()}-${Math.round(Math.random() * 1e9)}${path.extname(file.originalname)}`
+        );
     }
 });
 
@@ -127,7 +120,11 @@ router.put("/:id", async (req, res) => {
 
         updateData.networkDetails = updatedNetworks;
 
-        await InventoryNetworkRecord.findByIdAndUpdate(req.params.id, updateData);
+        await InventoryNetworkRecord.findByIdAndUpdate(
+            req.params.id,
+            updateData,
+            { runValidators: true }
+        );
 
         res.status(200).json({
             message: "Inventory Network Record Updated Successfully"
@@ -216,7 +213,7 @@ router.get("/export", async (req, res) => {
         const recordSheet = [];
 
         records.forEach(record => {
-            record.networkDetails.forEach(network => {
+            (record.networkDetails || []).forEach(network => {
                 recordSheet.push({
                     "PR Requirement Date": record.prReqDate,
                     "PR Number": record.prNum,
@@ -301,12 +298,22 @@ router.post("/import", excelUpload.single("excelFile"), async (req, res) => {
 
         const workbook = XLSX.readFile(req.file.path);
 
+        if (!workbook.Sheets["Inventory Network Records"]) {
+            fs.unlinkSync(req.file.path);
+        
+            return res.status(400).json({
+                message: "Invalid Excel format."
+            });
+        }
+
         const recordSheet = XLSX.utils.sheet_to_json(workbook.Sheets["Inventory Network Records"]);
 
         const groupedRecords = {};
 
         recordSheet.forEach(row => {
-            const prNum = String(row["PR Number"]).trim();
+            const prNum = String(row["PR Number"] || "").trim();
+            
+            if (!prNum) return;
             
             if (!groupedRecords[prNum]) {
                 groupedRecords[prNum] = {
@@ -329,7 +336,7 @@ router.post("/import", excelUpload.single("excelFile"), async (req, res) => {
             groupedRecords[prNum].networkDetails.push({
                 code: row["Material Code"],
                 desc: row["Material Description"],
-                quantity: Number(row["Quantity"]),
+                quantity: Number(row["Quantity"]) || 0,
             });
         });
         
@@ -413,7 +420,4 @@ router.get("/wbs-selector", async (req, res) => {
 });
 
 
-/* =========================
-    Export these all routes so that we can use it anywhere
-========================= */
 module.exports = router;

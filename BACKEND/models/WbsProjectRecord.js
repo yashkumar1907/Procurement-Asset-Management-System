@@ -4,11 +4,13 @@ const wbsProjectRecordSchema = new mongoose.Schema({
     wbsNum: {
         type: String,
         required: true,
-        default: ""
+        default: "",
+        trim: true
     },
     description: {
         type: String,
-        default: ""
+        default: "",
+        trim: true
     },
     budget: {
         type: Number,
@@ -17,23 +19,28 @@ const wbsProjectRecordSchema = new mongoose.Schema({
     },
     transfer: {
         type: String,
-        default: ""
+        default: "",
+        trim: true
     },
     released: {
         type: String,
-        default: ""
+        default: "",
+        trim: true
     },
     preqComm: {
         type: String,
-        default: ""
+        default: "",
+        trim: true
     },
     poCommt: {
         type: String,
-        default: ""
+        default: "",
+        trim: true
     },
     commitment: {
         type: String,
-        default: ""
+        default: "",
+        trim: true
     },
     actual: {
         type: Number,
@@ -42,15 +49,18 @@ const wbsProjectRecordSchema = new mongoose.Schema({
     },
     assigned: {
         type: String,
-        default: ""
+        default: "",
+        trim: true
     },
     totalAvailable: {
         type: String,
-        default: ""
+        default: "",
+        trim: true
     },
     lastEditedBy: {
         type: String,
-        default: ""
+        default: "",
+        trim: true
     }
 },
     {

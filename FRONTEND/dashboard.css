@@ -136,7 +136,6 @@ body {
 }
 
 #toggleSidebarBtn {
-    /* color: white !important; */
     display: block;
     visibility: visible;
 }
@@ -357,7 +356,7 @@ body {
     font-size: 16px;
     font-weight: 600;
     cursor: pointer;
-    transition: .25s;
+    transition: 0.25s;
 }
 
 .export-report-btn:hover{

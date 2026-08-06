@@ -1,28 +1,11 @@
-/* =========================
-   MAIN BACKEND FRAMEWORK
-========================= */
 const express = require("express");
-
-
-/* =========================
-   Creates a route container
-========================= */
 const router = express.Router();
-
-
-/* =========================
-   Import Inventory Department Record Model
-========================= */
-const InventoryDepartmentRecord = require("../models/InventoryDepartmentRecord");
-
-
-/* =========================
-   Import Excel Package
-========================= */
 const XLSX = require("xlsx");
-
-
 const fs = require("fs");
+const path = require("path");
+const os = require("os");
+
+const InventoryDepartmentRecord = require("../models/InventoryDepartmentRecord");
 
 
 /* =========================
@@ -30,13 +13,22 @@ const fs = require("fs");
 ========================= */
 const multer = require("multer");
 
+const uploadsDir = path.join(os.tmpdir(), "jsl-temp");
+
+if (!fs.existsSync(uploadsDir)) {
+    fs.mkdirSync(uploadsDir, { recursive: true });
+}
+
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
-        cb(null, "uploads/");
+        cb(null, uploadsDir);
     },
 
     filename: function (req, file, cb) {
-        cb(null, Date.now() + "-" + file.originalname);
+        cb(
+            null,
+            `${Date.now()}-${Math.round(Math.random() * 1e9)}${path.extname(file.originalname)}`
+        );
     }
 });
 
@@ -414,7 +406,4 @@ router.get("/wbs-selector", async (req, res) => {
 });
 
 
-/* =========================
-    Export these all routes so that we can use it anywhere
-========================= */
 module.exports = router;

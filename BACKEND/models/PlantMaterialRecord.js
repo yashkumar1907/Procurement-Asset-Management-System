@@ -3,36 +3,43 @@ const mongoose = require("mongoose");
 const plantMaterialRecordSchema = new mongoose.Schema({
     year: {
         type: String,
-        default: ""
+        default: "",
+        trim: true
     },
     yearMonth: {
         type: String,
-        default: ""
+        default: "",
+        trim: true
     },
     requirementDate: {
         type: Date
     },
     reqIndentorName: {
         type: String,
-        default: ""
+        default: "",
+        trim: true
     },
     reqIndentorDept: {
         type: String,
-        default: ""
+        default: "",
+        trim: true
     },
     requirement: {
         type: String,
-        default: ""
+        default: "",
+        trim: true
     },
     plantMaterialDetails: [
         {
             materialCode: {
                 type: String,
-                default: ""
+                default: "",
+                trim: true
             },
             itemDescription: {
                 type: String,
-                default: ""
+                default: "",
+                trim: true
             },
             quantity: {
                 type: Number,
@@ -53,46 +60,56 @@ const plantMaterialRecordSchema = new mongoose.Schema({
     },
     purchaserName: {
         type: String,
-        default: ""
+        default: "",
+        trim: true
     },
     currentProgress: {
         type: String,
-        default: ""
+        default: "",
+        trim: true
     },
     trackingId: {
         type: String,
-        default: ""
+        default: "",
+        trim: true
     },
     costCentre: {
         type: String,
-        default: ""
+        default: "",
+        trim: true
     },
     projectName: {
         type: String,
-        default: ""
+        default: "",
+        trim: true
     },
     indentMailRequest: {
         type: String,
-        default: ""
+        default: "",
+        trim: true
     },
     remark: {
         type: String,
-        default: ""
+        default: "",
+        trim: true
     },
     materialDeliveryDate: {
         type: Date
     },
     materialReceived: {
         type: String,
-        default: ""
+        default: "",
+        trim: true
     },
     srrCleared: {
         type: String,
-        default: ""
+        default: "",
+        trim: true
     },
     lastEditedBy: {
         type: String,
-        default: ""
+        default: "",
+        trim: true
     }
 },
     {

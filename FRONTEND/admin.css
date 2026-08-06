@@ -373,11 +373,6 @@ tbody tr:hover {
     overflow-y: auto;
 }
 
-.modal-content h2 {
-    color: #ff6b00;
-    margin-bottom: 25px;
-}
-
 .modal-content select {
     width: 100%;
     padding: 12px;
@@ -402,14 +397,6 @@ tbody tr:hover {
     color: white;
     border: none;
     border-radius: 12px;
-    cursor: pointer;
-}
-
-.close {
-    position: absolute;
-    top: 12px;
-    right: 18px;
-    font-size: 28px;
     cursor: pointer;
 }
 

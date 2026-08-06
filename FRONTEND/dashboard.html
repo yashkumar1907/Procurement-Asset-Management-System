@@ -32,30 +32,30 @@
         <div class="sidebar">
 
             <div class="sidebar-header">
-                <button id="toggleSidebarBtn" class="toggle-sidebar">☰</button>
+                <button type="button" id="toggleSidebarBtn" class="toggle-sidebar">☰</button>
             </div>
 
-            <button id="dashboardBtn" class="sidebar-btn active">📊 Dashboard</button>
-            <button id="networkBtn" class="sidebar-btn" onclick="window.location.href='network.html'" >🌐 Network and Bandwidth Management</button>
-            <button id="amcBtn" class="sidebar-btn" onclick="window.location.href='amc.html'">🛠 Annual Maintenance Contract</button>
-            <button id="contractBtn" class="sidebar-btn" onclick="window.location.href='contract.html'">📋 Contract Resource and Support PRs</button>
+            <button type="button" id="dashboardBtn" class="sidebar-btn active">📊 Dashboard</button>
+            <button type="button" id="networkBtn" class="sidebar-btn" onclick="window.location.href='network.html'" >🌐 Network and Bandwidth Management</button>
+            <button type="button" id="amcBtn" class="sidebar-btn" onclick="window.location.href='amc.html'">🛠 Annual Maintenance Contract</button>
+            <button type="button" id="contractBtn" class="sidebar-btn" onclick="window.location.href='contract.html'">📋 Contract Resource and Support PRs</button>
             
-            <button id="inventoryToggleBtn" class="sidebar-btn">💻 IT Procurement ▼</button>
+            <button type="button" id="inventoryToggleBtn" class="sidebar-btn">💻 IT Procurement ▼</button>
             <div id="inventorySubMenu" class="inventory-submenu">
-                <button id="inventoryNetworkBtn" class="sidebar-btn inventory-sub-btn" onclick="window.location.href='inventoryNetwork.html'">🌐 Network Accel IT</button>
-                <button id="inventoryHardwareBtn" class="sidebar-btn inventory-sub-btn" onclick="window.location.href='inventoryHardware.html'">🖥️ Hardware CMS</button>
-                <button id="inventoryDepartmentBtn" class="sidebar-btn inventory-sub-btn" onclick="window.location.href='inventoryDepartment.html'">🏢 IT Department Indent</button>
+                <button type="button" id="inventoryNetworkBtn" class="sidebar-btn inventory-sub-btn" onclick="window.location.href='inventoryNetwork.html'">🌐 Network Accel IT</button>
+                <button type="button" id="inventoryHardwareBtn" class="sidebar-btn inventory-sub-btn" onclick="window.location.href='inventoryHardware.html'">🖥️ Hardware CMS</button>
+                <button type="button" id="inventoryDepartmentBtn" class="sidebar-btn inventory-sub-btn" onclick="window.location.href='inventoryDepartment.html'">🏢 IT Department Indent</button>
             </div>
 
-            <button id="plantToggleBtn" class="sidebar-btn">🏭 Plants ▼</button>
+            <button type="button" id="plantToggleBtn" class="sidebar-btn">🏭 Plants ▼</button>
             <div id="plantSubMenu" class="plant-submenu">
-                <button id="plantMaterialBtn" class="sidebar-btn plant-sub-btn" onclick="window.location.href='plantMaterial.html'">📦 Plant Material</button>
-                <button id="plantServiceBtn" class="sidebar-btn plant-sub-btn" onclick="window.location.href='plantService.html'">🔧 Plant Service</button>
+                <button type="button" id="plantMaterialBtn" class="sidebar-btn plant-sub-btn" onclick="window.location.href='plantMaterial.html'">📦 Plant Material</button>
+                <button type="button" id="plantServiceBtn" class="sidebar-btn plant-sub-btn" onclick="window.location.href='plantService.html'">🔧 Plant Service</button>
             </div>
 
-            <button id="wbsProjectBtn" class="sidebar-btn" onclick="window.location.href='wbsProject.html'">📁 WBS Projects</button>
+            <button type="button" id="wbsProjectBtn" class="sidebar-btn" onclick="window.location.href='wbsProject.html'">📁 WBS Projects</button>
 
-            <button class="sidebar-btn" onclick="window.location.href='profile.html'">👤 View Profile</button>
+            <button type="button" class="sidebar-btn" onclick="window.location.href='profile.html'">👤 View Profile</button>
         </div>
 
         <!-- MAIN CONTENT -->
@@ -76,7 +76,7 @@
                         </p>
                     </div>
 
-                    <button class="export-report-btn" id="exportPaymentReportBtn">
+                    <button type="button" class="export-report-btn" id="exportPaymentReportBtn">
                         <i class="fa-solid fa-file-export"></i>
                         Export Payment Report
                     </button>
@@ -355,8 +355,9 @@
             </div>
 
         </main>
+    </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
 
 
     <!-- ===============================
@@ -378,11 +379,11 @@
 
             <div class="payment-modal-buttons">
 
-                <button id="cancelPaymentReportBtn" class="cancel-payment-btn">
+                <button type="button" id="cancelPaymentReportBtn" class="cancel-payment-btn">
                     Cancel
                 </button>
 
-                <button id="downloadPaymentReportBtn" class="download-payment-btn">
+                <button type="button" id="downloadPaymentReportBtn" class="download-payment-btn">
                     Export Excel
                 </button>
             </div>
@@ -395,7 +396,7 @@
         AI ASSISTANT
     ================================ -->
 
-    <button id="aiToggleBtn" class="ai-toggle-btn">
+    <button type="button" id="aiToggleBtn" class="ai-toggle-btn">
         <i class="fa-solid fa-robot"></i>
     </button>
 
@@ -408,7 +409,7 @@
                 <span>JSL Enterprise AI</span>
             </div>
 
-            <button id="closeAiChat">
+            <button type="button" id="closeAiChat">
                 <i class="fa-solid fa-xmark"></i>
             </button>
 
@@ -426,27 +427,27 @@
             
                 <div class="ai-suggestions">
             
-                    <button class="ai-chip">
+                    <button type="button" class="ai-chip">
                         Highest Contract
                     </button>
             
-                    <button class="ai-chip">
+                    <button type="button" class="ai-chip">
                         Highest AMC Balance
                     </button>
             
-                    <button class="ai-chip">
+                    <button type="button" class="ai-chip">
                         Contracts Expiring Soon
                     </button>
             
-                    <button class="ai-chip">
+                    <button type="button" class="ai-chip">
                         Total Contract Amount
                     </button>
             
-                    <button class="ai-chip">
+                    <button type="button" class="ai-chip">
                         Show Dell Contracts
                     </button>
             
-                    <button class="ai-chip">
+                    <button type="button" class="ai-chip">
                         Average AMC Amount
                     </button>
             
@@ -463,7 +464,7 @@
                 placeholder="Ask anything..."
             ></textarea>
 
-            <button id="sendAiMessage">
+            <button type="button" id="sendAiMessage">
 
                 <i class="fa-solid fa-paper-plane"></i>
 
@@ -474,6 +475,7 @@
     </div>
 
 
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="config.js"></script>
     <script src="dashboard.js"></script>
     <script src="ai-chat.js"></script>

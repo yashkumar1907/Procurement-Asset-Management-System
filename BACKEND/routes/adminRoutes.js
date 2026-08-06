@@ -1,28 +1,9 @@
-/* =========================
-   MAIN BACKEND FRAMEWORK (Used for get, push, put, delete route)
-========================= */
 const express = require("express");
-
-/* =========================
-   Creates a route container (Instead of app)
-========================= */
 const router = express.Router();
-
-
-/* =========================
-   Import User Model
-========================= */
 const User = require("../models/User");
-
-
-/* =========================
-   Inport Bycrypt (to hash passwords before storing)
-========================= */
 const bcrypt = require("bcryptjs");
 
-
 const sendEmail = require("../services/emailService");
-
 const welcomeEmail = require("../templates/welcomeEmail");
 const permissionUpdatedEmail = require("../templates/permissionUpdatedEmail");
 const accountDeletedEmail = require("../templates/accountDeletedEmail");
@@ -33,7 +14,7 @@ const accountDeletedEmail = require("../templates/accountDeletedEmail");
 // ===============================
 router.get("/users", async (req, res) => {
     try {
-        const users = await User.find();
+        const users = await User.find().select("-password");
         res.status(200).json(users);
     }
     catch (error) {
@@ -102,7 +83,10 @@ router.put("/update-permissions/:id", async (req, res) => {
         const updatedUser = await User.findByIdAndUpdate(
             req.params.id,
             { permissions },
-            { new: true }
+            {
+                new: true,
+                runValidators: true
+            }
         );
 
         if (!updatedUser) {
@@ -176,7 +160,5 @@ router.delete("/delete-user/:id", async (req, res) => {
     }
 });
 
-/* =========================
-    Export these all routes so that we can use it anywhere
-========================= */
+
 module.exports = router;

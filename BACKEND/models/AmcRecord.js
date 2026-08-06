@@ -13,7 +13,8 @@ const amcRecordSchema = new mongoose.Schema({
     },
     pr: {
         type: String,
-        required: true
+        required: true,
+        trim: true
     },
     po: {
         type: String,
@@ -36,7 +37,8 @@ const amcRecordSchema = new mongoose.Schema({
     },
     poPeriod: {
         type: String,
-        required: true
+        required: true,
+        trim: true
     },
     poEndDate: {
         type: Date,
@@ -52,7 +54,8 @@ const amcRecordSchema = new mongoose.Schema({
     },
     lastEditedBy: {
         type: String,
-        default: ""
+        default: "",
+        trim: true
     },
     renewed: {
         type: Boolean,
@@ -93,6 +96,4 @@ const amcRecordSchema = new mongoose.Schema({
 });
 
 
-module.exports =
-    mongoose.models.AmcRecord ||
-    mongoose.model("AmcRecord", amcRecordSchema);
+module.exports = mongoose.models.AmcRecord || mongoose.model("AmcRecord", amcRecordSchema);

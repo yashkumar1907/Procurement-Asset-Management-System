@@ -1,56 +1,21 @@
-/* =========================
-   MAIN BACKEND FRAMEWORK (Used for get, push, put, delete route)
-========================= */
 const express = require("express");
-
-
-/* =========================
-   Used to upload PDF files
-========================= */
 const multer = require("multer");
-
-
-/* =========================
-   Creates a route container (Instead of app)
-========================= */
 const router = express.Router();
-
-
-/* =========================
-   Used to delete old PDF files
-========================= */
 const fs = require("fs");
-
-
-/* =========================
-Used when building upload file paths
-========================= */
 const path = require("path");
-
 const os = require("os");
 
-
-/* =========================
-   Import Record Model
-========================= */
 const ContractRecord = require("../models/ContractRecord");
-
-
-/* =========================
-   Import RecordDetail Model
-========================= */
 const ContractDetail = require("../models/ContractDetail");
 
 
 const uploadsDir = path.join(__dirname, "../uploads");
-
 if (!fs.existsSync(uploadsDir)) {
     fs.mkdirSync(uploadsDir, { recursive: true });
 }
 
 
 const tempDir = path.join(os.tmpdir(), "jsl-uploads");
-
 if (!fs.existsSync(tempDir)) {
     fs.mkdirSync(tempDir, { recursive: true });
 }
@@ -74,7 +39,19 @@ const storage = multer.diskStorage({
 /* ===============================
     Upload middleware
 =============================== */
-const upload = multer({storage});
+const upload = multer({
+    storage,
+    limits: {
+        fileSize: 10 * 1024 * 1024
+    },
+    fileFilter(req, file, cb) {
+        if (file.mimetype === "application/pdf") {
+            cb(null, true);
+        } else {
+            cb(new Error("Only PDF files allowed."));
+        }
+    }
+});
 
 
 // ===============================
@@ -133,9 +110,7 @@ router.post("/", upload.single("invoicePdf"), async (req, res) => {
         // Reduce the invoice amount from the remaining amount
         if (record) {
             record.balanceAmount = (record.balanceAmount || 0) - Number(req.body.invoiceAmount || 0);
-
             record.lastEditedBy = req.body.lastEditedBy;
-
             await record.save();
         }
 
@@ -144,7 +119,6 @@ router.post("/", upload.single("invoicePdf"), async (req, res) => {
         });
     }
     catch(error) {
-
         // Delete uploaded invoice PDF if database operation failed
         if (req.file) {
             const filePath = path.join(uploadsDir, req.file.filename);
@@ -184,14 +158,12 @@ router.get("/single/:id", async (req, res) => {
 });
 
 
-
 // ===============================
 // GET ALL DETAILS (For Excel Export)
 // ===============================
 router.get("/", async (req, res) => {
     try {
         const details = await ContractDetail.find();
-
         res.status(200).json(details);
     }
     catch (error) {
@@ -272,7 +244,6 @@ router.put("/:id", upload.single("invoicePdf"), async (req, res) => {
             detail.invoicePdf = req.file.filename;
         }
 
-
         // Remove existing invoice PDF
         if (req.body.removeInvoicePdf === "true") {
             if (detail.invoicePdf) {
@@ -290,17 +261,20 @@ router.put("/:id", upload.single("invoicePdf"), async (req, res) => {
         // Update balance amount
         if (record) {
             record.balanceAmount = record.balanceAmount + oldInvoiceAmount - Number(req.body.invoiceAmount || 0);
-
             record.lastEditedBy = req.body.lastEditedBy;
-
             await record.save();
         }
-
         res.status(200).json({
             message: "Contract Detail Updated Successfully"
         });
     }
     catch(error) {
+        if (req.file) {
+            const filePath = path.join(uploadsDir, req.file.filename);
+            if (fs.existsSync(filePath)) {
+                fs.unlinkSync(filePath);
+            }
+        }
         console.error(error);
         res.status(500).json({
             message: "Server Error"
@@ -325,13 +299,15 @@ router.delete("/:id", async (req, res) => {
         const invoiceAmount = detail.invoiceAmount || 0;
 
         const record = await ContractRecord.findById(detail.recordId);
-        if (record) {
-            record.balanceAmount = (record.balanceAmount || 0) + invoiceAmount;
-
-            record.lastEditedBy = req.body.lastEditedBy;
-            
-            await record.save();
+        if (!record) {
+            return res.status(404).json({
+                message: "Contract Record not found"
+            });
         }
+
+        record.balanceAmount = (record.balanceAmount || 0) + invoiceAmount;
+        record.lastEditedBy = req.body.lastEditedBy;    
+        await record.save();
 
         // Delete invoice pdf
         if (detail.invoicePdf) {
@@ -356,7 +332,4 @@ router.delete("/:id", async (req, res) => {
 });
 
 
-/* =========================
-    Export these all routes so that we can use it anywhere
-========================= */
 module.exports = router;

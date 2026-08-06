@@ -1,28 +1,10 @@
-/* =========================
-   MAIN BACKEND FRAMEWORK
-========================= */
 const express = require("express");
-
-
-/* =========================
-   Creates a route container
-========================= */
 const router = express.Router();
-
-
-/* =========================
-   Import WBS PROJECT Record Model
-========================= */
-const WbsProjectRecord = require("../models/WbsProjectRecord");
-
-
-/* =========================
-   Import Excel Package
-========================= */
 const XLSX = require("xlsx");
-
-
 const fs = require("fs");
+
+
+const WbsProjectRecord = require("../models/WbsProjectRecord");
 
 
 /* =========================
@@ -58,6 +40,23 @@ const excelUpload = multer({
         }
     }
 });
+
+
+
+// ===============================
+// DELETE FILE
+// ===============================
+function deleteFile(filePath) {
+    try {
+        if (fs.existsSync(filePath)) {
+            fs.unlinkSync(filePath);
+        }
+    }
+    catch (error) {
+        console.error(`Failed to delete file: ${filePath}`, error);
+    }
+}
+
 
 
 // ===============================
@@ -254,7 +253,7 @@ router.post("/import", excelUpload.single("excelFile"), async (req, res) => {
         const worksheet = workbook.Sheets["WBS Project Records"];
 
         if (!worksheet) {
-            fs.unlinkSync(req.file.path);
+            deleteFile(req.file.path);
             return res.status(400).json({
                 message: "Sheet 'WBS Project Records' not found"
             });
@@ -269,10 +268,18 @@ router.post("/import", excelUpload.single("excelFile"), async (req, res) => {
         // SAVE RECORDS
         for (const row of excelData) {
 
+            const wbsNum = String(row["WBS Number"] || "").trim();
+
+            if (!wbsNum) {
+                continue;
+            }
+
             // CHECK DUPLICATE WBS NUMBER
-            const existingRecord = await WbsProjectRecord.findOne({
-                wbsNum: String(row["WBS Number"] || "").trim()
-            });
+            const existingRecord = await WbsProjectRecord
+                .findOne({
+                    wbsNum
+                })
+                .lean();
 
             if (existingRecord) {
                 skippedRecords++;
@@ -280,7 +287,7 @@ router.post("/import", excelUpload.single("excelFile"), async (req, res) => {
             }
 
             const record = new WbsProjectRecord({
-                wbsNum: String(row["WBS Number"] || "").trim(),
+                wbsNum,
                 description: row["Description"] ?? "",
                 budget: Number(row["Budget"]) || 0,
                 transfer: row["Transfer"] ?? "",
@@ -299,15 +306,15 @@ router.post("/import", excelUpload.single("excelFile"), async (req, res) => {
         }
 
         // DELETE TEMP FILE
-        fs.unlinkSync(req.file.path);
+        deleteFile(req.file.path);
         res.status(200).json({
             message: `Import Completed\nImported Records: ${importedRecords}\nSkipped Records: ${skippedRecords}`
         });
     }
     catch (error) {
         console.error(error);
-        if (req.file && fs.existsSync(req.file.path)) {
-            fs.unlinkSync(req.file.path);
+        if (req.file) {
+            deleteFile(req.file.path);
         }
         res.status(500).json({
             message: "Import Failed"
@@ -316,8 +323,4 @@ router.post("/import", excelUpload.single("excelFile"), async (req, res) => {
 });
 
 
-
-/* =========================
-    Export these all routes so that we can use it anywhere
-========================= */
 module.exports = router;

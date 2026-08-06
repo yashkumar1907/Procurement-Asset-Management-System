@@ -11,8 +11,6 @@ const ContractDetail = require("../models/ContractDetail");
 const InventoryNetworkRecord = require("../models/InventoryNetworkRecord");
 const InventoryHardwareRecord = require("../models/InventoryHardwareRecord");
 const InventoryDepartmentRecord = require("../models/InventoryDepartmentRecord");
-const PlantMaterialRecord = require("../models/PlantMaterialRecord");
-const PlantServiceRecord = require("../models/PlantServiceRecord");
 const WbsProjectRecord = require("../models/WbsProjectRecord");
 
 
@@ -167,7 +165,11 @@ router.get("/monthly-po", async (req, res) => {
                 return;
             }
 
-            const month = new Date(record.poDate).getMonth();
+            const date = new Date(record.poDate);
+
+            if (isNaN(date.getTime())) return;
+
+            const month = date.getMonth();
             monthlyAmount[month] += Number(record.poAmount || 0);
 
         });
@@ -213,7 +215,11 @@ router.get("/payment-vs-procurement", async (req, res) => {
                 return;
             }
 
-            const month = new Date(record.poDate).getMonth();
+            const date = new Date(record.poDate);
+
+            if (isNaN(date.getTime())) return;
+
+            const month = date.getMonth();
             procurement[month] += Number(record.poAmount || 0);
         });
 
@@ -222,7 +228,13 @@ router.get("/payment-vs-procurement", async (req, res) => {
                 return;
             }
 
-            const month = new Date(record.invoiceDate).getMonth();
+            const date = new Date(record.invoiceDate);
+
+            if (isNaN(date.getTime())) {
+                return;
+            }
+
+            const month = date.getMonth();
             payments[month] += Number(record.invoiceAmount || 0);
         });
 
@@ -269,6 +281,10 @@ router.get("/po-expiry", async (req, res) => {
             if (!record.poEndDate) return;
 
             const end = new Date(record.poEndDate);
+
+            if (isNaN(end.getTime())) {
+                return;
+            }
 
             if (end < today) {
                 return;
@@ -666,6 +682,10 @@ router.get("/dashboard-alerts", async (req, res) => {
             }
 
             const endDate = new Date(record.poEndDate);
+
+            if (isNaN(endDate.getTime())) {
+                return;
+            }
 
             if (endDate < today) {
                 expiredPOs++;

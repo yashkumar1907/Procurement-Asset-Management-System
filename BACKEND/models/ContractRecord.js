@@ -13,7 +13,8 @@ const contractRecordSchema = new mongoose.Schema({
     },
     pr: {
         type: String,
-        required: true
+        required: true,
+        trim: true
     },
     po: {
         type: String,
@@ -34,15 +35,18 @@ const contractRecordSchema = new mongoose.Schema({
         {
             itemType: {
                 type: String,
-                default: ""
+                default: "",
+                trim: true
             },
             code: {
                 type: String,
-                default: ""
+                default: "",
+                trim: true
             },
             shortText: {
                 type: String,
-                default: ""
+                default: "",
+                trim: true
             },
             quantity: {
                 type: Number,
@@ -60,7 +64,8 @@ const contractRecordSchema = new mongoose.Schema({
     },
     poPeriod: {
         type: String,
-        required: true
+        required: true,
+        trim: true
     },
     poEndDate: {
         type: Date,
@@ -76,7 +81,8 @@ const contractRecordSchema = new mongoose.Schema({
     },
     lastEditedBy: {
         type: String,
-        default: ""
+        default: "",
+        trim: true
     },
     renewed: {
         type: Boolean,

@@ -1,50 +1,21 @@
-/* =========================
-   MAIN BACKEND FRAMEWORK (Used for get, push, put, delete route)
-========================= */
 const express = require("express");
-
-
-/* =========================
-   Used to upload PDF files
-========================= */
 const multer = require("multer");
-
-
-/* =========================
-   Creates a route container (Instead of app)
-========================= */
 const router = express.Router();
-
-
-/* =========================
-   Used to delete old PDF files
-========================= */
 const fs = require("fs");
-
-
-/* =========================
-    Used when building upload file paths
-========================= */
 const path = require("path");
+const os = require("os");
 
 
-/* =========================
-    Import Record Model
-========================= */
+
 const NetworkRecord = require("../models/NetworkRecord");
-
-
-/* =========================
-    Import NetworkDetail Model
-========================= */
 const NetworkDetail = require("../models/NetworkDetail");
 
 
-const uploadDir = path.join(__dirname, "..", "uploads");
+const uploadDir = path.join(os.tmpdir(), "jsl-uploads");
+
 if (!fs.existsSync(uploadDir)) {
     fs.mkdirSync(uploadDir, { recursive: true });
 }
-
 
 // ===============================
 // DELETE FILE
@@ -75,7 +46,19 @@ const storage = multer.diskStorage({
 /* ===============================
     Upload middleware
 =============================== */
-const upload = multer({storage});
+const upload = multer({
+    storage,
+    limits: {
+        fileSize: 10 * 1024 * 1024 // 10 MB
+    },
+    fileFilter(req, file, cb) {
+        if (file.mimetype === "application/pdf") {
+            cb(null, true);
+        } else {
+            cb(new Error("Only PDF files allowed"), false);
+        }
+    }
+});
 
 
 // ===============================
@@ -103,6 +86,12 @@ router.post("/", upload.single("invoicePdf"), async (req, res) => {
 
         // Check is invoice amount is greater than balance amount
         const invoiceAmount = Number(req.body.invoiceAmount);
+        if (isNaN(invoiceAmount)) {
+            return res.status(400).json({
+                message: "Invalid Invoice Amount"
+            });
+        }
+
         if (invoiceAmount > record.balanceAmount) {
             return res.status(400).json({
                 message: "Invoice Amount should be less than or equal to Balance Amount"
@@ -120,7 +109,7 @@ router.post("/", upload.single("invoicePdf"), async (req, res) => {
             invoicePeriodStartDate: req.body.invoicePeriodStartDate,
             invoicePeriod: req.body.invoicePeriod,
             invoicePeriodEndDate: req.body.invoicePeriodEndDate,
-            invoiceAmount: Number(req.body.invoiceAmount),
+            invoiceAmount,
             invoicePdf: req.file ? req.file.filename: ""
         });
 
@@ -128,7 +117,7 @@ router.post("/", upload.single("invoicePdf"), async (req, res) => {
         await detail.save();
 
         // Reduce the invoice amount from the remaining amount
-        record.balanceAmount = (record.balanceAmount || 0) - Number(req.body.invoiceAmount || 0);
+        record.balanceAmount = (record.balanceAmount || 0) - invoiceAmount;
         record.lastEditedBy = req.body.lastEditedBy;
         await record.save();
 
@@ -223,7 +212,19 @@ router.put("/:id", upload.single("invoicePdf"), async (req, res) => {
 
         const oldInvoiceAmount = detail.invoiceAmount || 0;
         const record = await NetworkRecord.findById(detail.recordId);
+        if (!record) {
+            return res.status(404).json({
+                message: "Network Record not found"
+            });
+        }
+
         const newInvoiceAmount = Number(req.body.invoiceAmount || 0);
+        if (isNaN(newInvoiceAmount)) {
+            return res.status(400).json({
+                message: "Invalid Invoice Amount"
+            });
+        }
+
         const allowedAmount = (record.balanceAmount || 0) + oldInvoiceAmount;
         if (newInvoiceAmount > allowedAmount) {
             return res.status(400).json({
@@ -240,40 +241,53 @@ router.put("/:id", upload.single("invoicePdf"), async (req, res) => {
         detail.invoicePeriod = req.body.invoicePeriod;
         detail.invoicePeriodEndDate = req.body.invoicePeriodEndDate;
         detail.invoiceDate = req.body.invoiceDate;
-        detail.invoiceAmount = Number(req.body.invoiceAmount);
+        detail.invoiceAmount = newInvoiceAmount;
 
-        // If files is changed during edit
+        let oldFilePath = null;
+
+        // If file is changed during edit
         if (req.file) {
             if (detail.invoicePdf) {
-                const oldFile = path.join(uploadDir, detail.invoicePdf);
-                deleteFile(oldFile);
+                oldFilePath = path.join(uploadDir, detail.invoicePdf);
             }
+
             detail.invoicePdf = req.file.filename;
         }
 
         // Remove existing invoice PDF
         if (req.body.removeInvoicePdf === "true") {
+
             if (detail.invoicePdf) {
-                const oldFile = path.join(uploadDir, detail.invoicePdf);
-                
-                deleteFile(oldFile);
+                oldFilePath = path.join(uploadDir, detail.invoicePdf);
             }
+        
             detail.invoicePdf = "";
         }
 
         await detail.save();
-        
+
         // Update balance amount
-        record.balanceAmount = record.balanceAmount + oldInvoiceAmount - Number(req.body.invoiceAmount || 0);
+        record.balanceAmount = record.balanceAmount + oldInvoiceAmount - newInvoiceAmount;
         record.lastEditedBy = req.body.lastEditedBy;
         await record.save();
+
+        // Delete old PDF only after successful database update
+        if (oldFilePath) {
+            deleteFile(oldFilePath);
+        }
 
         res.status(200).json({
             message: "Network Detail Updated Successfully"
         });
     }
-    catch(error) {
+    catch (error) {
+
+        if (req.file) {
+            deleteFile(path.join(uploadDir, req.file.filename));
+        }
+    
         console.error(error);
+    
         res.status(500).json({
             message: "Server Error"
         });
@@ -307,14 +321,15 @@ router.delete("/:id", async (req, res) => {
         record.lastEditedBy = req.body.lastEditedBy;    
         await record.save();
 
-        // Delete invoice pdf
+        // Delete the invoice record first
+        await NetworkDetail.findByIdAndDelete(req.params.id);
+
+        // Delete the PDF only after successful DB deletion
         if (detail.invoicePdf) {
-            const filePath = path.join(uploadDir, detail.invoicePdf);
-            deleteFile(filePath);
+            deleteFile(path.join(uploadDir, detail.invoicePdf));
         }
 
-        // Deleting the Invoice
-        await NetworkDetail.findByIdAndDelete(req.params.id);
+        
         res.status(200).json({
             message: "Network Detail Deleted Successfully"
         });
@@ -328,7 +343,21 @@ router.delete("/:id", async (req, res) => {
 });
 
 
-/* =========================
-    Export these all routes so that we can use it anywhere
-========================= */
+router.use((err, req, res, next) => {
+    if (err instanceof multer.MulterError) {
+        return res.status(400).json({
+            message: err.message
+        });
+    }
+
+    if (err) {
+        return res.status(400).json({
+            message: err.message
+        });
+    }
+
+    next();
+});
+
+
 module.exports = router;

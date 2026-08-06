@@ -1,49 +1,13 @@
-/* =========================
-   MAIN BACKEND FRAMEWORK (Used for get, push, put, delete route)
-========================= */
 const express = require("express");
-
-
-/* =========================
-   Used to upload PDF files
-========================= */
 const multer = require("multer");
-
-
-/* =========================
-   Used to delete old PDF files
-========================= */
 const fs = require("fs");
-
-
-/* =========================
-    Used when building upload file paths
-========================= */
 const path = require("path");
-
-
-/* =========================
-   Creates a route container (Instead of app)
-========================= */
 const router = express.Router();
-
-
-/* =========================
-   Import Record Model
-========================= */
-const NetworkRecord = require("../models/NetworkRecord");
-
-
-/* =========================
-   Import RecordDetail Model
-========================= */
-const NetworkDetail = require("../models/NetworkDetail");
-
-
-/* =========================
-   Import Excel Model
-========================= */
 const XLSX = require("xlsx");
+
+
+const NetworkRecord = require("../models/NetworkRecord");
+const NetworkDetail = require("../models/NetworkDetail");
 
 
 const uploadDir = path.join(__dirname, "..", "uploads");
@@ -57,11 +21,15 @@ if (!fs.existsSync(uploadDir)) {
 // DELETE FILE
 // ===============================
 function deleteFile(filePath) {
-    if (fs.existsSync(filePath)) {
-        fs.unlinkSync(filePath);
+    try {
+        if (fs.existsSync(filePath)) {
+            fs.unlinkSync(filePath);
+        }
+    }
+    catch (error) {
+        console.error(`Failed to delete file: ${filePath}`, error);
     }
 }
-
 
 // ===============================
 // MAP DOCUMENTS
@@ -312,17 +280,13 @@ router.put("/:id", upload.array("documents", 10), async (req, res) => {
             updateData.balanceAmount = Number(req.body.poAmount) - totalPaidAmount;
         }
 
-        // If documents is updated
         if (req.body.removedDocuments) {
             const removedIds = JSON.parse(req.body.removedDocuments);
-            updateData.documents =
-                existingRecord.documents.filter(
-                    doc => !removedIds.includes(
-                        doc._id.toString()
-                    )
-                );
-        }
-        else {
+        
+            updateData.documents = existingRecord.documents.filter(
+                doc => !removedIds.includes(doc._id.toString())
+            );
+        } else {
             updateData.documents = existingRecord.documents;
         }
         
@@ -331,10 +295,12 @@ router.put("/:id", upload.array("documents", 10), async (req, res) => {
             const newDocuments = mapDocuments(req.files, documentTypes);
         
             updateData.documents = [
-                ...(updateData.documents || []),
+                ...updateData.documents,
                 ...newDocuments
             ];
         }
+        
+        await NetworkRecord.findByIdAndUpdate(req.params.id, updateData);
 
         if (oldReferencePO !== newReferencePO) {
 
@@ -348,7 +314,7 @@ router.put("/:id", upload.array("documents", 10), async (req, res) => {
                     }
                 );
             }
-        
+
             // Add link to newly selected Reference PO
             if (newReferencePO) {
                 await NetworkRecord.findByIdAndUpdate(
@@ -361,14 +327,33 @@ router.put("/:id", upload.array("documents", 10), async (req, res) => {
             }
         }
 
-        await NetworkRecord.findByIdAndUpdate(req.params.id, updateData);
+        // Delete removed PDFs only after all database updates succeed
+        if (req.body.removedDocuments) {
+            const removedIds = JSON.parse(req.body.removedDocuments);
+
+            existingRecord.documents.forEach(doc => {
+                if (removedIds.includes(doc._id.toString())) {
+                    deleteFile(path.join(uploadDir, doc.fileName));
+                }
+            });
+        }
+
+        
 
         res.status(200).json({
             message: "Network Record Updated Successfully"
         });
     }
     catch (error) {
+
+        if (req.files && req.files.length > 0) {
+            req.files.forEach(file => {
+                deleteFile(path.join(uploadDir, file.filename));
+            });
+        }
+    
         console.error(error);
+    
         res.status(500).json({
             message: "Server Error"
         });
@@ -637,6 +622,14 @@ router.post("/import", excelUpload.single("excelFile"), async (req, res) => {
         }
 
         const workbook = XLSX.readFile(req.file.path);
+
+        if (!workbook.Sheets["Network Records"] || !workbook.Sheets["Invoice Details"]) {
+            deleteFile(req.file.path);
+        
+            return res.status(400).json({
+                message: "Invalid Excel format."
+            });
+        }
         
         const recordSheet = XLSX.utils.sheet_to_json(workbook.Sheets["Network Records"]);
         const detailSheet = XLSX.utils.sheet_to_json(workbook.Sheets["Invoice Details"]);
@@ -745,7 +738,4 @@ router.post("/import", excelUpload.single("excelFile"), async (req, res) => {
 });
 
 
-/* =========================
-    Export these all routes so that we can use it anywhere
-========================= */
 module.exports = router;

@@ -18,12 +18,16 @@ window.onload = function () {
         return;
     }
 
-    document.querySelector(".user-info").innerHTML = `
-        Welcome, <strong>${userName}</strong>
-        <button type="button" class="logout-btn" onclick="logout(event)">
-            Logout
-        </button>
-    `;
+    const userInfo = document.querySelector(".user-info");
+
+    if (userInfo) {
+        userInfo.innerHTML = `
+            Welcome, <strong>${userName}</strong>
+            <button type="button" class="logout-btn" onclick="logout(event)">
+                Logout
+            </button>
+        `;
+    }
 
     const searchBox = document.getElementById("searchBox");
 
@@ -58,6 +62,16 @@ function toggleCustomProgress() {
 // APPLY PERMISSIONS
 // ===============================
 function applyPermissions() {
+    const networkBtn = document.getElementById("networkBtn");
+    const amcBtn = document.getElementById("amcBtn");
+    const contractBtn = document.getElementById("contractBtn");
+    const inventoryNetworkBtn = document.getElementById("inventoryNetworkBtn");
+    const inventoryHardwareBtn = document.getElementById("inventoryHardwareBtn");
+    const plantMaterialBtn = document.getElementById("plantMaterialBtn");
+    const plantServiceBtn = document.getElementById("plantServiceBtn");
+    const wbsProjectBtn = document.getElementById("wbsProjectBtn");
+
+
     const networkPermission = localStorage.getItem("networkPermission");
     const amcPermission = localStorage.getItem("amcPermission");
     const contractPermission = localStorage.getItem("contractPermission");
@@ -76,33 +90,33 @@ function applyPermissions() {
 
     // Hide sidebar options
     if (networkPermission === "none") {
-        document.getElementById("networkBtn").style.display = "none";
+        if (networkBtn) networkBtn.style.display = "none";
     }
     if (amcPermission === "none") {
-        document.getElementById("amcBtn").style.display = "none";
+        if (amcBtn) amcBtn.style.display = "none";
     }
 
     if (contractPermission === "none") {
-        document.getElementById("contractBtn").style.display = "none";
+        if (contractBtn) contractBtn.style.display = "none";
     }
 
     if (inventoryNetworkPermission === "none") {
-        document.getElementById("inventoryNetworkBtn").style.display = "none";
+        if (inventoryNetworkBtn) inventoryNetworkBtn.style.display = "none";
     }
 
     if (inventoryHardwarePermission === "none") {
-        document.getElementById("inventoryHardwareBtn").style.display = "none";
+        if (inventoryHardwareBtn) inventoryHardwareBtn.style.display = "none";
     }
 
     if (plantMaterialPermission === "none") {
-        document.getElementById("plantMaterialBtn").style.display = "none";
+        if (plantMaterialBtn) plantMaterialBtn.style.display = "none";
     }
 
     if (plantServicePermission === "none") {
-        document.getElementById("plantServiceBtn").style.display = "none";
+        if (plantServiceBtn) plantServiceBtn.style.display = "none";
     }
     if (wbsProjectPermission === "none") {
-        document.getElementById("wbsProjectBtn").style.display = "none";
+        if (wbsProjectBtn) wbsProjectBtn.style.display = "none";
     }
 }
 
@@ -749,12 +763,12 @@ window.addEventListener("DOMContentLoaded", () => {
 // ===============================
 // CLOSE MODAL OUTSIDE CLICK
 // ===============================
-window.onclick = function(event) {
+window.addEventListener("click", (event) => {
     const recordModal = document.getElementById("recordModal");
     if (event.target === recordModal) {
         closeModal();
     }
-};
+});
 
 
 

@@ -1,41 +1,10 @@
-/* =========================
-   MAIN BACKEND FRAMEWORK (Used for get, push, put, delete route)
-========================= */
 const express = require("express");
-
-/* =========================
-   Used to upload PDF files
-========================= */
 const multer = require("multer");
-
-
-/* =========================
-   Creates a route container (Instead of app)
-========================= */
 const router = express.Router();
-
-
-/* =========================
-   Used to delete old PDF files
-========================= */
 const fs = require("fs");
-
-
-/* =========================
-Used when building upload file paths
-========================= */
 const path = require("path");
 
-
-/* =========================
-   Import Record Model
-========================= */
 const AmcRecord = require("../models/AmcRecord");
-
-
-/* =========================
-   Import AmcDetail Model
-========================= */
 const AmcDetail = require("../models/AmcDetail");
 
 
@@ -65,6 +34,9 @@ const storage = multer.diskStorage({
 =============================== */
 const upload = multer({
     storage,
+    limits: {
+        fileSize: 10 * 1024 * 1024
+    },
     fileFilter: function(req, file, cb) {
         if (file.mimetype === "application/pdf") {
             cb(null, true);
@@ -127,9 +99,7 @@ router.post("/", upload.single("invoicePdf"), async (req, res) => {
         // Reduce the invoice amount from the remaining amount
         if (record) {
             record.balanceAmount = (record.balanceAmount || 0) - Number(req.body.invoiceAmount || 0);
-
             record.lastEditedBy = req.body.lastEditedBy;
-
             await record.save();
         }
 
@@ -184,7 +154,6 @@ router.get("/single/:id", async (req, res) => {
 router.get("/", async (req, res) => {
     try {
         const details = await AmcDetail.find();
-
         res.status(200).json(details);
     }
     catch (error) {
@@ -227,6 +196,13 @@ router.put("/:id", upload.single("invoicePdf"), async (req, res) => {
 
         const oldInvoiceAmount = detail.invoiceAmount || 0;
         const record = await AmcRecord.findById(detail.recordId);
+
+        if (!record) {
+            return res.status(404).json({
+                message: "AMC Record not found"
+            });
+        }
+
         const newInvoiceAmount = Number(req.body.invoiceAmount || 0);
         const allowedAmount = (record.balanceAmount || 0) + oldInvoiceAmount;
         if (newInvoiceAmount > allowedAmount) {
@@ -257,7 +233,6 @@ router.put("/:id", upload.single("invoicePdf"), async (req, res) => {
             detail.invoicePdf = req.file.filename;
         }
 
-
         // Remove existing invoice PDF
         if (req.body.removeInvoicePdf === "true") {
             if (detail.invoicePdf) {
@@ -275,17 +250,22 @@ router.put("/:id", upload.single("invoicePdf"), async (req, res) => {
         // Update balance amount
         if (record) {
             record.balanceAmount = record.balanceAmount + oldInvoiceAmount - Number(req.body.invoiceAmount || 0);
-
             record.lastEditedBy = req.body.lastEditedBy;
-
             await record.save();
         }
-
         res.status(200).json({
             message: "AMC Detail Updated Successfully"
         });
     }
     catch(error) {
+        if (req.file) {
+            const filePath = path.join(uploadDir, req.file.filename);
+        
+            if (fs.existsSync(filePath)) {
+                fs.unlinkSync(filePath);
+            }
+        }
+
         console.error(error);
         res.status(500).json({
             message: "Server Error"
@@ -310,11 +290,15 @@ router.delete("/:id", async (req, res) => {
         const invoiceAmount = detail.invoiceAmount || 0;
 
         const record = await AmcRecord.findById(detail.recordId);
+        if (!record) {
+            return res.status(404).json({
+                message: "AMC Record not found"
+            });
+        }
+
         if (record) {
             record.balanceAmount = (record.balanceAmount || 0) + invoiceAmount;
-
             record.lastEditedBy = req.body.lastEditedBy;
-            
             await record.save();
         }
 
@@ -341,7 +325,4 @@ router.delete("/:id", async (req, res) => {
 });
 
 
-/* =========================
-    Export these all routes so that we can use it anywhere
-========================= */
 module.exports = router;

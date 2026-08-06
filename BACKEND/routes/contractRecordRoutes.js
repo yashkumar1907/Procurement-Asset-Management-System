@@ -1,61 +1,23 @@
-/* =========================
-   MAIN BACKEND FRAMEWORK (Used for get, push, put, delete route)
-========================= */
 const express = require("express");
-
-
-/* =========================
-   Used to upload PDF files
-========================= */
 const multer = require("multer");
-
-
-/* =========================
-   Used to delete old PDF files
-========================= */
 const fs = require("fs");
-
-
-/* =========================
-Used when building upload file paths
-========================= */
 const path = require("path");
-
 const os = require("os");
-
-
-/* =========================
-   Creates a route container (Instead of app)
-========================= */
 const router = express.Router();
-
-
-/* =========================
-   Import Record Model
-========================= */
-const ContractRecord = require("../models/ContractRecord");
-
-
-/* =========================
-   Import RecordDetail Model
-========================= */
-const ContractDetail = require("../models/ContractDetail");
-
-
-/* =========================
-   Import Excel Model
-========================= */
 const XLSX = require("xlsx");
 
 
+const ContractRecord = require("../models/ContractRecord");
+const ContractDetail = require("../models/ContractDetail");
 
-const uploadsDir = path.join(__dirname, "../uploads");
+
+const uploadsDir = path.join(os.tmpdir(), "jsl-uploads");
 
 if (!fs.existsSync(uploadsDir)) {
     fs.mkdirSync(uploadsDir, { recursive: true });
 }
 
-const tempDir = path.join(os.tmpdir(), "jsl-uploads");
+const tempDir = path.join(os.tmpdir(), "jsl-temp");
 
 if (!fs.existsSync(tempDir)) {
     fs.mkdirSync(tempDir, { recursive: true });
@@ -68,9 +30,18 @@ if (!fs.existsSync(tempDir)) {
 const storage = multer.diskStorage({
     // Where to store files
     destination: function(req, file, cb) {
-        cb(null, tempDir);
+        cb(null, uploadsDir);
     },
     // File Name
+    filename: function (req, file, cb) {
+        cb(null, `${Date.now()}-${Math.round(Math.random() * 1e9)}${path.extname(file.originalname)}`);
+    }
+});
+
+const excelStorage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, tempDir);
+    },
     filename: function (req, file, cb) {
         cb(null, `${Date.now()}-${Math.round(Math.random() * 1e9)}${path.extname(file.originalname)}`);
     }
@@ -94,7 +65,7 @@ const upload = multer({
 
 
 const excelUpload = multer({
-    storage,
+    storage: excelStorage,
     fileFilter: function(req, file, cb) {
         const allowedTypes = [
             "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
@@ -126,7 +97,6 @@ router.get("/reference-pos", async (req, res) => {
     }
     catch (error) {
         console.error(error);
-
         res.status(500).json({
             message: "Server Error"
         });
@@ -194,7 +164,19 @@ router.post("/", upload.array("documents", 10), async (req, res) => {
         });
     }
     catch (error) {
+
+        if (req.files) {
+            req.files.forEach(file => {
+                const filePath = path.join(uploadsDir, file.filename);
+    
+                if (fs.existsSync(filePath)) {
+                    fs.unlinkSync(filePath);
+                }
+            });
+        }
+    
         console.error(error);
+    
         res.status(500).json({
             message: "Server Error"
         });
@@ -382,7 +364,19 @@ router.put("/:id", upload.array("documents", 10), async (req, res) => {
         });
     }
     catch (error) {
+
+        if (req.files) {
+            req.files.forEach(file => {
+                const filePath = path.join(uploadsDir, file.filename);
+    
+                if (fs.existsSync(filePath)) {
+                    fs.unlinkSync(filePath);
+                }
+            });
+        }
+    
         console.error(error);
+    
         res.status(500).json({
             message: "Server Error"
         });
@@ -403,7 +397,7 @@ router.delete("/:id/document/:filename", async (req, res) => {
         }
 
         const filename = decodeURIComponent(req.params.filename);
-        const filePath = path.join(__dirname, "../uploads", filename);
+        const filePath = path.join(uploadsDir, filename);
 
         // Remove file path (means delete pdf from folder)
         if (fs.existsSync(filePath)) {
@@ -433,6 +427,12 @@ router.delete("/:id", async (req, res) => {
     try {
         const record = await ContractRecord.findById(req.params.id);
 
+        if (!record) {
+            return res.status(404).json({
+                message: "Record not found"
+            });
+        }
+
         // Restore previous Reference PO
         if (record.referencePO) {
             await ContractRecord.findByIdAndUpdate(
@@ -445,16 +445,12 @@ router.delete("/:id", async (req, res) => {
         }
 
 
-        if (!record) {
-            return res.status(404).json({
-                message: "Record not found"
-            });
-        }
+        
 
         // DELETE ALL UPLOADED PDFs
         if (record.documents && record.documents.length > 0) {
             record.documents.forEach(doc => {
-                const filePath = path.join(__dirname, "../uploads", doc.fileName);
+                const filePath = path.join(uploadsDir, doc.fileName);
 
                 // Remove all files path
                 if (fs.existsSync(filePath)) {
@@ -469,7 +465,7 @@ router.delete("/:id", async (req, res) => {
         // DELETE INVOICE PDFs
         details.forEach(detail => {
             if (detail.invoicePdf) {
-                const filePath = path.join(__dirname, "../uploads", detail.invoicePdf);
+                const filePath = path.join(uploadsDir, detail.invoicePdf);
                 if (fs.existsSync(filePath)) {
                     fs.unlinkSync(filePath);
                 }
@@ -678,6 +674,17 @@ router.post("/import", excelUpload.single("excelFile"), async (req, res) => {
 
         const workbook = XLSX.readFile(req.file.path);
 
+        if (!workbook.Sheets["Contract Records"] || !workbook.Sheets["Invoice Details"]) {
+
+            if (req.file && fs.existsSync(req.file.path)) {
+                fs.unlinkSync(req.file.path);
+            }
+        
+            return res.status(400).json({
+                message: "Invalid Excel format."
+            });
+        }
+
         const recordSheet = XLSX.utils.sheet_to_json(workbook.Sheets["Contract Records"]);
         
         const detailSheet = XLSX.utils.sheet_to_json(workbook.Sheets["Invoice Details"]);
@@ -750,82 +757,86 @@ router.post("/import", excelUpload.single("excelFile"), async (req, res) => {
                 });
 
                 
-                await record.save();
+            await record.save();
 
-                poMap[po] = record._id;
-                importedRecords++;
-            }
-            for(const row of detailSheet) {
-                const existingInvoice = await ContractDetail.findOne({
-                    invoiceNumber: row["Invoice / External Number"]
-                });
+            poMap[po] = record._id;
+            importedRecords++;
+        }
+
+        for(const row of detailSheet) {
+            const existingInvoice = await ContractDetail.findOne({
+                invoiceNumber: row["Invoice / External Number"]
+            });
             
-                if (existingInvoice) {
-                    continue;
-                }
-
-                const po = String(row["Purchase Order (PO)"]).trim();
-                const recordId = poMap[po];
-                if (!recordId) {
-                    continue;
-                }
-
-                const invoiceAmount = Number(row["Invoice Amount"]);
-                if (isNaN(invoiceAmount)) {
-                    continue;
-                }
-
-                const record = await ContractRecord.findById(recordId);
-                if (!record) {
-                    continue;
-                }
-
-                if (invoiceAmount > Number(record.balanceAmount)) {
-                    continue;
-                }
-
-                const detail =
-                    new ContractDetail({
-                        recordId,
-                        serviceCodes: row["Service Code"]
-                            ? String(row["Service Code"])
-                                .split(",")
-                                .map(code => code.trim())
-                                .filter(Boolean)
-                            : [],
-                        invoiceNumber: row["Invoice / External Number"],
-                        invoiceDate: parseExcelDate(row["Invoice Date"]),
-                        trackingNumber: row["Tracking Number"],
-                        invoicePeriodStartDate: parseExcelDate(row["Invoice Period Start"]),
-                        invoicePeriod: row["Invoice Period"],
-                        invoicePeriodEndDate: parseExcelDate(row["Invoice Period End"]),
-                        invoiceAmount,
-                        serviceEntryNumber: row["Service Entry Number"],
-                        documentNumber: row["Document Number"]
-                    });
-
-                await detail.save();
-
-                record.balanceAmount -= invoiceAmount;
-                await record.save();
-                importedInvoices++;
+            if (existingInvoice) {
+                continue;
             }
+
+            const po = String(row["Purchase Order (PO)"]).trim();
+            const recordId = poMap[po];
+            if (!recordId) {
+                continue;
+            }
+
+            const invoiceAmount = Number(row["Invoice Amount"]);
+            if (isNaN(invoiceAmount)) {
+                continue;
+            }
+
+            const record = await ContractRecord.findById(recordId);
+            if (!record) {
+                continue;
+            }
+
+            if (invoiceAmount > Number(record.balanceAmount)) {
+                continue;
+            }
+
+            const detail =
+                new ContractDetail({
+                    recordId,
+                    serviceCodes: row["Service Code"]
+                        ? String(row["Service Code"])
+                            .split(",")
+                            .map(code => code.trim())
+                            .filter(Boolean)
+                        : [],
+                    invoiceNumber: row["Invoice / External Number"],
+                    invoiceDate: parseExcelDate(row["Invoice Date"]),
+                    trackingNumber: row["Tracking Number"],
+                    invoicePeriodStartDate: parseExcelDate(row["Invoice Period Start"]),
+                    invoicePeriod: row["Invoice Period"],
+                    invoicePeriodEndDate: parseExcelDate(row["Invoice Period End"]),
+                    invoiceAmount,
+                    serviceEntryNumber: row["Service Entry Number"],
+                    documentNumber: row["Document Number"]
+                });
+
+            await detail.save();
+            record.balanceAmount -= invoiceAmount;
+            await record.save();
+            importedInvoices++;
+        }
+        if (req.file && fs.existsSync(req.file.path)) {
             fs.unlinkSync(req.file.path);
-            res.status(200).json({
-                message: `Import Completed\n\nImported Records: ${importedRecords}\nImported Invoices: ${importedInvoices}\nSkipped Records: ${skippedRecords}`
-            });
         }
-        catch (error) {
-            console.error(error);
-            res.status(500).json({
-                message: "Import Failed"
-            });
-        }
+        res.status(200).json({
+            message: `Import Completed\n\nImported Records: ${importedRecords}\nImported Invoices: ${importedInvoices}\nSkipped Records: ${skippedRecords}`
+        });
     }
-);
+    catch (error) {
+
+        if (req.file && fs.existsSync(req.file.path)) {
+            fs.unlinkSync(req.file.path);
+        }
+        
+        console.error(error);
+    
+        res.status(500).json({
+            message: "Import Failed"
+        });
+    }
+});
 
 
-/* =========================
-    Export these all routes so that we can use it anywhere
-========================= */
 module.exports = router;

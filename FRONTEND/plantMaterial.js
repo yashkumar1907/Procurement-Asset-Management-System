@@ -149,7 +149,7 @@ async function importExcel(input) {
         await loadRecords();
     }
     catch(error) {
-        console.log(error);
+        console.error(error);
         showToast("error", "Import Failed");
     }
     input.value = "";
@@ -366,7 +366,7 @@ async function loadRecords() {
         renderTable();
     }
     catch (error) {
-        console.log(error);
+        console.error(error);
         showToast("error", "Failed to load records");
     }
 }
@@ -418,7 +418,7 @@ async function saveRecord(recordData) {
         closeModal();
     }
     catch (error) {
-        console.log(error);
+        console.error(error);
         showToast("error", "Server Error");
     }
 }
@@ -465,7 +465,7 @@ async function deleteRecord(id) {
         await loadRecords();
     }
     catch (error) {
-        console.log(error);
+        console.error(error);
         showToast("error", "Server Error");
     }
 }
@@ -771,6 +771,17 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!inventoryBtn || !inventorySubMenu) {
         return;
     }
+
+    const currentPage = window.location.pathname.split("/").pop();
+
+    if (
+        currentPage === "inventoryNetwork.html" ||
+        currentPage === "inventoryHardware.html" ||
+        currentPage === "inventoryDepartment.html"
+    ) {
+        inventorySubMenu.classList.add("show");
+        inventoryBtn.innerHTML = "📦 IT Procurement ▲";
+    }
     
     inventoryBtn.addEventListener("click", () => {
 
@@ -803,6 +814,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (!plantBtn || !plantSubMenu) {
         return;
+    }
+
+    const currentPage = window.location.pathname.split("/").pop();
+
+    if (
+        currentPage === "plantMaterial.html" ||
+        currentPage === "plantService.html"
+    ) {
+        plantSubMenu.classList.add("show");
+        plantBtn.innerHTML = "📦 Plants ▲";
     }
 
     

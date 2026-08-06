@@ -12,6 +12,10 @@ async function searchEnterprise(intent) {
 
     const vendor = intent.filters.vendor;
 
+    if (!vendor) {
+        return [];
+    }
+
     const search = {
         vendorName: {
             $regex: vendor,

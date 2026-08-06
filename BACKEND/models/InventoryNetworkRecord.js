@@ -20,11 +20,13 @@ const inventoryNetworkRecordSchema = new mongoose.Schema({
         {
             code: {
                 type: String,
-                default: ""
+                default: "",
+                trim: true
             },
             desc: {
                 type: String,
-                default: ""
+                default: "",
+                trim: true
             },
             quantity: {
                 type: Number,
@@ -35,7 +37,8 @@ const inventoryNetworkRecordSchema = new mongoose.Schema({
     trackingId: {
         type: String,
         required: true,
-        unique: true
+        unique: true,
+        trim: true
     },
     costCenter: {
         type: String,
@@ -60,10 +63,12 @@ const inventoryNetworkRecordSchema = new mongoose.Schema({
     srrNumber: {
         type: String,
         required: true,
+        trim: true
     },
     grnNumber: {
         type: String,
-        required: true
+        required: true,
+        trim: true
     },
     remark: {
         type: String,
@@ -72,7 +77,8 @@ const inventoryNetworkRecordSchema = new mongoose.Schema({
     },
     lastEditedBy: {
         type: String,
-        default: ""
+        default: "",
+        trim: true
     }
 },
     {

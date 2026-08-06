@@ -42,33 +42,37 @@ async function checkNetworkPOReminders() {
             const oneMonthLater = new Date(today);
             oneMonthLater.setMonth(oneMonthLater.getMonth() + 1);
 
-            if (endDate <= twoMonthsLater && endDate > oneMonthLater) {
+            if (endDate <= twoMonthsLater && endDate > oneMonthLater && !record.twoMonthReminderSentAt) {
                 try {
                     await sendEmail(
                         RECIPIENTS.join(","),
                         "PO Expiry Reminder - 2 Months Remaining",
                         poExpiryReminderEmail(record, "2_MONTH")
                     );
+            
+                    record.twoMonthReminderSentAt = new Date();
+                    await record.save();
                 }
                 catch (emailError) {
                     console.error(emailError);
                 }
-                
             }
 
 
-            if (endDate <= oneMonthLater && endDate >= today) {
+            if ( endDate <= oneMonthLater && endDate >= today && !record.oneMonthReminderSentAt) {
                 try {
                     await sendEmail(
                         RECIPIENTS.join(","),
                         "Urgent: PO Expiry Reminder - 1 Month Remaining",
                         poExpiryReminderEmail(record, "1_MONTH")
                     );
+            
+                    record.oneMonthReminderSentAt = new Date();
+                    await record.save();
                 }
                 catch (emailError) {
                     console.error(emailError);
                 }
-                
             }
         }
     }
@@ -110,13 +114,19 @@ async function checkAmcPOReminders() {
             const oneMonthLater = new Date(today);
             oneMonthLater.setMonth(oneMonthLater.getMonth() + 1);
 
-            if (endDate <= twoMonthsLater && endDate > oneMonthLater) {
+            if (
+                endDate <= twoMonthsLater &&
+                endDate > oneMonthLater &&
+                !record.twoMonthReminderSentAt
+            ) {
                 try {
                     await sendEmail(
                         RECIPIENTS.join(","),
                         "PO Expiry Reminder - 2 Months Remaining",
                         poExpiryReminderEmail(record, "2_MONTH")
                     );
+                    record.twoMonthReminderSentAt = new Date();
+                    await record.save();
                 }
                 catch (emailError) {
                     console.error(emailError);
@@ -124,13 +134,15 @@ async function checkAmcPOReminders() {
                 
             }
 
-            if (endDate <= oneMonthLater && endDate >= today) {
+            if (endDate <= oneMonthLater && endDate >= today && !record.oneMonthReminderSentAt) {
                 try {
                     await sendEmail(
                         RECIPIENTS.join(","),
                         "Urgent: PO Expiry Reminder - 1 Month Remaining",
                         poExpiryReminderEmail(record, "1_MONTH")
                     );
+                    record.oneMonthReminderSentAt = new Date();
+                    await record.save();
                 }
                 catch (emailError) {
                     console.error(emailError);
@@ -179,13 +191,17 @@ async function checkContractPOReminders() {
             const oneMonthLater = new Date(today);
             oneMonthLater.setMonth(oneMonthLater.getMonth() + 1);
 
-            if (endDate <= twoMonthsLater && endDate > oneMonthLater) {
+            if (endDate <= twoMonthsLater &&
+                endDate > oneMonthLater &&
+                !record.twoMonthReminderSentAt) {
                 try {
                     await sendEmail(
                         RECIPIENTS.join(","),
                         "PO Expiry Reminder - 2 Months Remaining",
                         poExpiryReminderEmail(record, "2_MONTH")
                     );
+                    record.twoMonthReminderSentAt = new Date();
+                    await record.save();
                 }
                 catch (emailError) {
                     console.error(emailError);
@@ -193,13 +209,15 @@ async function checkContractPOReminders() {
                 
             }
 
-            if (endDate <= oneMonthLater && endDate >= today) {
+            if (endDate <= oneMonthLater && endDate >= today && !record.oneMonthReminderSentAt) {
                 try {
                     await sendEmail(
                         RECIPIENTS.join(","),
                         "Urgent: PO Expiry Reminder - 1 Month Remaining",
                         poExpiryReminderEmail(record, "1_MONTH")
                     );
+                    record.oneMonthReminderSentAt = new Date();
+                    await record.save();
                 }
                 catch (emailError) {
                     console.error(emailError);

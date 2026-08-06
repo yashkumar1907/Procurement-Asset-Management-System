@@ -13,7 +13,8 @@ const networkRecordSchema = new mongoose.Schema({
     },
     pr: {
         type: String,
-        required: true
+        required: true,
+        trim: true
     },
     po: {
         type: String,
@@ -37,6 +38,7 @@ const networkRecordSchema = new mongoose.Schema({
     poPeriod: {
         type: String,
         required: true,
+        trim: true,
         enum: ["Monthly", "Quarterly", "Half-Yearly", "Yearly"]
     },
     poEndDate: {
@@ -53,7 +55,8 @@ const networkRecordSchema = new mongoose.Schema({
     },
     lastEditedBy: {
         type: String,
-        default: ""
+        default: "",
+        trim: true
     },
     renewed: {
         type: Boolean,
@@ -81,11 +84,13 @@ const networkRecordSchema = new mongoose.Schema({
         {
             type: {
                 type: String,
-                required: true
+                required: true,
+                trim: true
             },
             fileName: {
                 type: String,
-                required: true
+                required: true,
+                trim: true
             }
         }
     ]
