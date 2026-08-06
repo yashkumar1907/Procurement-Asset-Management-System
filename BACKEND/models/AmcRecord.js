@@ -93,4 +93,6 @@ const amcRecordSchema = new mongoose.Schema({
 });
 
 
-module.exports = mongoose.model("AmcRecord", amcRecordSchema);
+module.exports =
+    mongoose.models.AmcRecord ||
+    mongoose.model("AmcRecord", amcRecordSchema);

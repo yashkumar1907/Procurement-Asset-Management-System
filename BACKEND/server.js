@@ -53,6 +53,9 @@ const cron = require("node-cron");
 const {checkNetworkPOReminders, checkAmcPOReminders, checkContractPOReminders} = require("./services/poReminderService");
 
 
+const aiRoutes = require("./routes/aiRoutes");
+
+
 
 /* =========================
    Creates backend application
@@ -106,6 +109,8 @@ app.use("/api/plant-service-records", plantServiceRecordRoutes);
 app.use("/api/wbs-project-records", wbsProjectRecordRoutes);
 
 app.use("/api/dashboard", dashboardRoutes);
+
+app.use("/api/ai", aiRoutes);
 
 
 

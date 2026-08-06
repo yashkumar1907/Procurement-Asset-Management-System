@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard</title>
     <link rel="stylesheet" href="dashboard.css">
+    <link rel="stylesheet" href="ai-chat.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="icon" type="image/x-icon" href="favicon.jpg">
 </head>
@@ -389,7 +390,92 @@
     </div>
 
 
+
+    <!-- ===============================
+        AI ASSISTANT
+    ================================ -->
+
+    <button id="aiToggleBtn" class="ai-toggle-btn">
+        <i class="fa-solid fa-robot"></i>
+    </button>
+
+    <div id="aiChatWindow" class="ai-chat-window">
+
+        <div class="ai-chat-header">
+
+            <div class="ai-title">
+                <i class="fa-solid fa-robot"></i>
+                <span>JSL Enterprise AI</span>
+            </div>
+
+            <button id="closeAiChat">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+
+        </div>
+
+        <div id="aiMessages" class="ai-chat-body">
+
+            <div class="ai-message">
+
+                👋 Hello! I'm your Enterprise AI Assistant.
+            
+                <br><br>
+            
+                Click a suggestion or ask your own question.
+            
+                <div class="ai-suggestions">
+            
+                    <button class="ai-chip">
+                        Highest Contract
+                    </button>
+            
+                    <button class="ai-chip">
+                        Highest AMC Balance
+                    </button>
+            
+                    <button class="ai-chip">
+                        Contracts Expiring Soon
+                    </button>
+            
+                    <button class="ai-chip">
+                        Total Contract Amount
+                    </button>
+            
+                    <button class="ai-chip">
+                        Show Dell Contracts
+                    </button>
+            
+                    <button class="ai-chip">
+                        Average AMC Amount
+                    </button>
+            
+                </div>
+            
+            </div>
+
+        </div>
+
+        <div class="ai-chat-footer">
+
+            <textarea
+                id="aiInput"
+                placeholder="Ask anything..."
+            ></textarea>
+
+            <button id="sendAiMessage">
+
+                <i class="fa-solid fa-paper-plane"></i>
+
+            </button>
+
+        </div>
+
+    </div>
+
+
     <script src="config.js"></script>
     <script src="dashboard.js"></script>
+    <script src="ai-chat.js"></script>
 </body>
 </html>
