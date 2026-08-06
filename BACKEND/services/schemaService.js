@@ -1,5 +1,5 @@
 const ContractRecord = require("../models/ContractRecord");
-const AMCRecord = require("../models/AMCRecord");
+const AMCRecord = require("../models/AmcRecord");
 const InventoryHardwareRecord = require("../models/InventoryHardwareRecord");
 const InventoryNetworkRecord = require("../models/InventoryNetworkRecord");
 const NetworkRecord = require("../models/NetworkRecord");
