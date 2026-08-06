@@ -477,7 +477,6 @@ MongoDB Atlas
 
 # 📸 Screenshots
 
-> Replace the image paths below with screenshots from your project.
 
 ## 🔐 Login Page
 
@@ -542,12 +541,6 @@ MongoDB Atlas
 ## 📁 WBS Project Management
 
 ![WBS Project](screenshots/wbs-project.png)
-
----
-
-## 👤 User Profile
-
-![Profile](screenshots/profile.png)
 
 ---
 
