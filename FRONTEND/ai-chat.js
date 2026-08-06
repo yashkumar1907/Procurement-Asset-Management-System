@@ -50,12 +50,13 @@ function addMessage(message, sender = "ai") {
         }
         else {        
             div.innerHTML = `
-                <div>${message}</div>    
-                <button class="copy-btn">
-        
-                    📋 Copy
-        
-                </button>
+                <div>${message}</div>
+
+                <div class="copy-container">
+                    <button class="copy-btn">
+                        📋 Copy
+                    </button>
+                </div>
             `;
         
         }

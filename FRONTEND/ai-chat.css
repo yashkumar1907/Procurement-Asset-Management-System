@@ -342,6 +342,66 @@
 
 }
 
+/* =========================
+   COPY BUTTON
+========================= */
+
+.copy-btn{
+
+    margin-top:12px;
+
+    padding:6px 12px;
+
+    border:none;
+
+    border-radius:8px;
+
+    background:#f3f4f6;
+
+    color:#374151;
+
+    font-size:13px;
+
+    font-weight:600;
+
+    cursor:pointer;
+
+    transition:.25s;
+
+}
+
+.copy-btn:hover{
+
+    background:#ff6b00;
+
+    color:white;
+
+}
+
+.copy-btn:active{
+
+    transform:scale(.96);
+
+}
+
+.copy-btn:focus{
+
+    outline:none;
+
+    box-shadow:0 0 0 3px rgba(255,107,0,.2);
+
+}
+
+.copy-container{
+
+    display:flex;
+
+    justify-content:flex-end;
+
+    margin-top:12px;
+
+}
+
 @keyframes fadeIn{
 
     from{
