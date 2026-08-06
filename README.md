@@ -781,41 +781,12 @@ It showcases the ability to design, develop, and integrate multiple technologies
 
 ---
 
-# 🤝 Contributing
-
-Contributions, suggestions, and improvements are welcome.
-
-If you'd like to contribute:
-
-1. Fork the repository
-2. Create a new feature branch
-
-```bash
-git checkout -b feature/YourFeature
-```
-
-3. Commit your changes
-
-```bash
-git commit -m "Add Your Feature"
-```
-
-4. Push to your branch
-
-```bash
-git push origin feature/YourFeature
-```
-
-5. Open a Pull Request
-
----
-
 # 📬 Contact
 
 **Yash Kumar**
 
 - GitHub: https://github.com/yashkumar1907
-- LinkedIn: *(Add your LinkedIn profile here if available.)*
+- LinkedIn: https://www.linkedin.com/in/yash-kumar-2a69972a7/
 
 ---
 
